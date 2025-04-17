@@ -1,6 +1,6 @@
 
 import { Button } from "./ui/button";
-import { ArrowRight, PhoneCall, MapPin, Tool } from "lucide-react";
+import { ArrowRight, PhoneCall, MapPin, Wrench } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Hero = () => {
@@ -45,7 +45,7 @@ const Hero = () => {
             <span className="text-sm">Fast response times</span>
           </div>
           <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-            <Tool className="h-4 w-4 text-yellow-300" />
+            <Wrench className="h-4 w-4 text-yellow-300" />
             <span className="text-sm">Expert technicians</span>
           </div>
         </div>
