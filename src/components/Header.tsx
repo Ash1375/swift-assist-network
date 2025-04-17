@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { PhoneCall, Menu, X } from "lucide-react";
@@ -40,7 +40,7 @@ const Header = () => {
     >
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center">
-          <span className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-700">SwiftAssist</span>
+          <span className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-700">Towbuddy</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">

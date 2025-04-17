@@ -1,4 +1,3 @@
-
 import { Button } from "./ui/button";
 import { ArrowRight, PhoneCall, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -47,7 +46,6 @@ const Hero = () => {
       
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-white clip-path-hero"></div>
       
-      {/* Decorative elements */}
       <div className="absolute top-1/2 left-10 w-20 h-20 bg-red-300/20 rounded-full blur-md animate-float"></div>
       <div className="absolute top-1/3 right-10 w-16 h-16 bg-yellow-300/20 rounded-full blur-md animate-float" style={{animationDelay: '1s'}}></div>
     </section>
