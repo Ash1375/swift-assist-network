@@ -1,12 +1,26 @@
-
 import { useState } from "react";
 import { 
   Car, Bike, Truck, Wrench, Battery, Key, 
-  Fuel, LifeBuoy, Anchor, MapPin, ArrowRight
+  Fuel, LifeBuoy, Anchor, MapPin, ArrowRight,
+  CheckCircle2, ChevronDown, ChevronUp
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 
 const services = [
   {
@@ -21,6 +35,13 @@ const services = [
       "Flatbed towing for all vehicle types",
       "Long-distance towing available",
       "Transparent pricing with no hidden fees"
+    ],
+    process: [
+      "Initial assessment of vehicle condition",
+      "Selection of appropriate towing equipment",
+      "Secure attachment of vehicle to towing equipment",
+      "Safe transport to desired location",
+      "Final inspection upon delivery"
     ]
   },
   {
@@ -35,6 +56,14 @@ const services = [
       "Proper torque and pressure checks",
       "Advice on tire condition and potential replacement needs",
       "Service for all vehicle types including cars, SUVs, and motorcycles"
+    ],
+    process: [
+      "Assess tire damage and determine repair possibility",
+      "Safely jack up vehicle using proper equipment",
+      "Remove damaged tire and inspect wheel",
+      "Replace with spare or perform temporary repair",
+      "Check tire pressure and properly torque lug nuts",
+      "Advise on permanent repair options if needed"
     ]
   },
   {
@@ -125,26 +154,54 @@ const services = [
 
 const vehicleCategories = [
   { id: "all", name: "All Vehicles" },
-  { id: "car", name: "Cars", icon: Car },
-  { id: "bike", name: "Bikes", icon: Bike },
-  { id: "commercial", name: "Commercial", icon: Truck }
+  { id: "car", name: "Cars", icon: Car, subtypes: ["SUV", "Hatchback", "Sedan", "MPV", "Other Cars"] },
+  { id: "bike", name: "Bikes", icon: Bike, subtypes: ["Sport Bike", "Cruiser", "Commuter", "Scooter", "Other Bikes"] },
+  { id: "commercial", name: "Commercial", icon: Truck, subtypes: ["Truck", "Van", "Bus", "Construction Vehicle", "Other Commercial"] }
 ];
 
 const ServicesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [showVehicleSelect, setShowVehicleSelect] = useState(false);
+  const [selectedVehicleType, setSelectedVehicleType] = useState<string | null>(null);
+  const [selectedVehicleSubtype, setSelectedVehicleSubtype] = useState<string | null>(null);
+  
+  const form = useForm({
+    defaultValues: {
+      vehicleType: "",
+      vehicleSubtype: "",
+      location: "",
+      contactNumber: "",
+      additionalInfo: "",
+      agreeTOS: false,
+    }
+  });
 
   const handleServiceClick = (serviceId: string) => {
-    setSelectedService(serviceId === selectedService ? null : serviceId);
+    if (serviceId === selectedService) {
+      setSelectedService(null);
+      setShowVehicleSelect(false);
+    } else {
+      setSelectedService(serviceId);
+      setShowVehicleSelect(false);
+    }
   };
 
-  // Filter services based on vehicle category (in a real app)
-  // For now we'll just show all services regardless of category
+  const handleRequestService = () => {
+    setShowVehicleSelect(true);
+  };
+
+  const handleVehicleTypeSelect = (vehicleType: string) => {
+    setSelectedVehicleType(vehicleType);
+    setSelectedVehicleSubtype(null);
+  };
+
   const filteredServices = services;
+  const currentService = filteredServices.find(service => service.id === selectedService);
 
   return (
     <div className="min-h-screen">
-      <div className="bg-red-600 text-white py-16">
+      <div className="bg-gradient-to-r from-red-600 to-red-700 text-white py-16">
         <div className="container">
           <h1 className="text-4xl md:text-5xl font-bold text-center">Our Services</h1>
           <p className="text-xl text-center mt-4 max-w-3xl mx-auto">
@@ -197,22 +254,151 @@ const ServicesPage = () => {
                   <div className="mt-4 animate-fade-in">
                     <div className="mt-4 mb-6">
                       <p className="text-gray-700 mb-4">{service.details}</p>
-                      <h4 className="font-medium text-gray-900 mb-2">Features:</h4>
-                      <ul className="space-y-2">
-                        {service.features.map((feature, index) => (
-                          <li key={index} className="flex items-start">
-                            <span className="text-red-600 mr-2">•</span>
-                            <span className="text-gray-700 text-sm">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      
+                      <Collapsible className="w-full">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-gray-900 mb-2">Service Features:</h4>
+                          <CollapsibleTrigger className="rounded-full hover:bg-gray-100 p-1">
+                            <ChevronDown className="h-5 w-5 text-gray-500" />
+                          </CollapsibleTrigger>
+                        </div>
+                        <CollapsibleContent>
+                          <ul className="space-y-2 mb-4">
+                            {service.features.map((feature, index) => (
+                              <li key={index} className="flex items-start">
+                                <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-1 flex-shrink-0" />
+                                <span className="text-gray-700 text-sm">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </CollapsibleContent>
+                      </Collapsible>
+                      
+                      <Collapsible className="w-full mt-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-gray-900 mb-2">How We Do It:</h4>
+                          <CollapsibleTrigger className="rounded-full hover:bg-gray-100 p-1">
+                            <ChevronDown className="h-5 w-5 text-gray-500" />
+                          </CollapsibleTrigger>
+                        </div>
+                        <CollapsibleContent>
+                          <ol className="space-y-2 mb-4">
+                            {service.process.map((step, index) => (
+                              <li key={index} className="flex items-start">
+                                <span className="flex items-center justify-center h-5 w-5 rounded-full bg-red-100 text-red-600 text-xs font-medium mr-2 mt-0.5 flex-shrink-0">
+                                  {index + 1}
+                                </span>
+                                <span className="text-gray-700 text-sm">{step}</span>
+                              </li>
+                            ))}
+                          </ol>
+                        </CollapsibleContent>
+                      </Collapsible>
                     </div>
                     
-                    <Button className="w-full bg-red-600 hover:bg-red-700" asChild>
-                      <Link to={`/request-service/${service.id}`}>
+                    {!showVehicleSelect && (
+                      <Button 
+                        className="w-full bg-red-600 hover:bg-red-700" 
+                        onClick={handleRequestService}
+                      >
                         Request This Service <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+                      </Button>
+                    )}
+                    
+                    {showVehicleSelect && selectedService === service.id && (
+                      <div className="mt-6 p-4 bg-gray-50 rounded-lg animate-fade-in">
+                        <h4 className="font-medium text-lg mb-4">Select Vehicle & Details</h4>
+                        
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle Type</label>
+                            <div className="grid grid-cols-3 gap-3">
+                              {vehicleCategories.slice(1).map((category) => (
+                                <div
+                                  key={category.id}
+                                  className={cn(
+                                    "flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer transition-all",
+                                    selectedVehicleType === category.id
+                                      ? "border-red-500 bg-red-50"
+                                      : "border-gray-200 hover:border-red-200"
+                                  )}
+                                  onClick={() => handleVehicleTypeSelect(category.id)}
+                                >
+                                  <category.icon className="h-8 w-8 mb-2 text-gray-700" />
+                                  <span className="text-sm text-center">{category.name}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          {selectedVehicleType && (
+                            <div className="animate-fade-in">
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle Subtype</label>
+                              <Select onValueChange={setSelectedVehicleSubtype}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select vehicle subtype" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {vehicleCategories
+                                    .find(c => c.id === selectedVehicleType)
+                                    ?.subtypes?.map((subtype) => (
+                                      <SelectItem key={subtype} value={subtype}>
+                                        {subtype}
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+                          
+                          {selectedVehicleSubtype && (
+                            <form className="space-y-4 animate-fade-in">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Your Location</label>
+                                <div className="flex gap-2">
+                                  <Input placeholder="Enter your location" />
+                                  <Button type="button" variant="outline" size="icon">
+                                    <MapPin className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">Click the location icon to use your current location</p>
+                              </div>
+                              
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                                <Input type="tel" placeholder="Enter contact number" />
+                              </div>
+                              
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Additional Information (Optional)</label>
+                                <Input placeholder="Describe your situation" />
+                              </div>
+                              
+                              <div className="flex items-start gap-2">
+                                <Checkbox id="terms" />
+                                <div className="grid gap-1.5 leading-none">
+                                  <label
+                                    htmlFor="terms"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    I agree to terms and conditions
+                                  </label>
+                                  <p className="text-xs text-gray-500">
+                                    You will be charged only after service completion.
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              <Button className="w-full bg-red-600 hover:bg-red-700" asChild>
+                                <Link to={`/request-service/${service.id}`}>
+                                  Confirm Request <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                              </Button>
+                            </form>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

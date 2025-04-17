@@ -1,13 +1,14 @@
+
 import { Button } from "./ui/button";
-import { ArrowRight, PhoneCall, MapPin } from "lucide-react";
+import { ArrowRight, PhoneCall, MapPin, Tool } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
     <section className="relative hero-bg text-white overflow-hidden">
       <div className="container px-4 py-20 md:py-32 flex flex-col items-center relative z-10">
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-32 -left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-red-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-32 -left-20 w-80 h-80 bg-red-500/20 rounded-full blur-3xl"></div>
         
         <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-8 animate-float">
           <PhoneCall className="h-4 w-4 text-yellow-300" />
@@ -25,9 +26,9 @@ const Hero = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button className="bg-white text-red-600 hover:bg-gray-100 px-8 py-6 text-lg btn-glow" size="lg" asChild>
+          <Button className="bg-white text-red-600 hover:bg-gray-100 px-8 py-6 text-lg btn-glow group" size="lg" asChild>
             <Link to="/services">
-              View Services <ArrowRight className="ml-2 h-5 w-5" />
+              View Services <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
           <Button className="bg-red-700 border-2 border-white text-white hover:bg-red-800 px-8 py-6 text-lg animate-pulse-red" size="lg" asChild>
@@ -38,9 +39,15 @@ const Hero = () => {
           </Button>
         </div>
         
-        <div className="mt-12 flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-          <MapPin className="h-4 w-4 text-yellow-300" />
-          <span className="text-sm">Available in your area - Fast response times</span>
+        <div className="mt-12 flex items-center gap-6 justify-center flex-wrap">
+          <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+            <MapPin className="h-4 w-4 text-yellow-300" />
+            <span className="text-sm">Fast response times</span>
+          </div>
+          <div className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+            <Tool className="h-4 w-4 text-yellow-300" />
+            <span className="text-sm">Expert technicians</span>
+          </div>
         </div>
       </div>
       
