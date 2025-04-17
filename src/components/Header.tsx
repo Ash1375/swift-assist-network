@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { PhoneCall, Menu, X } from "lucide-react";
+import UserMenu from "./UserMenu";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -84,6 +85,16 @@ const Header = () => {
           >
             Contact
           </Link>
+          <Link 
+            to="/subscription" 
+            className={`font-medium transition-colors ${
+              isActive('/subscription') 
+                ? "text-red-600" 
+                : "text-gray-700 hover:text-red-600"
+            }`}
+          >
+            Pricing
+          </Link>
         </nav>
 
         <div className="flex items-center gap-4">
@@ -93,6 +104,10 @@ const Header = () => {
               Emergency Call
             </Link>
           </Button>
+          
+          <div className="hidden md:block">
+            <UserMenu />
+          </div>
           
           <button className="md:hidden text-gray-700" onClick={toggleMobileMenu}>
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -148,6 +163,21 @@ const Header = () => {
             >
               Contact
             </Link>
+            <Link 
+              to="/subscription" 
+              className={`font-medium py-2 transition-colors ${
+                isActive('/subscription') 
+                  ? "text-red-600" 
+                  : "text-gray-700"
+              }`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Pricing
+            </Link>
+            
+            <div className="py-2">
+              <UserMenu />
+            </div>
             
             <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 w-full mt-2" asChild>
               <Link 
