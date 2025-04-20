@@ -1,17 +1,15 @@
-
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
-import { MapPin, AlertCircle, Car, Bike, Truck, Check, Info } from "lucide-react";
+import { MapPin, AlertCircle, Car, Bike, Truck, Check, Info, Star } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import TechnicianSelection from "./TechnicianSelection";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
-// Mock service data - this would come from your backend
 const services = {
   "towing": {
     name: "Towing Service",
@@ -95,7 +93,6 @@ const ServiceRequest = () => {
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [step, setStep] = useState(1);
   
-  // Get current service based on URL param
   const service = serviceId && services[serviceId as keyof typeof services] 
     ? services[serviceId as keyof typeof services] 
     : services.other;
@@ -128,7 +125,6 @@ const ServiceRequest = () => {
       ...formData,
       selectedTechnicianId: technicianId
     });
-    // Move to next step
     setStep(step + 1);
   };
 
@@ -138,7 +134,6 @@ const ServiceRequest = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // In a real app, you would use a Maps API to reverse geocode these coordinates
           const locationText = `Latitude: ${position.coords.latitude}, Longitude: ${position.coords.longitude}`;
           setCurrentLocation(locationText);
           setFormData({
@@ -223,17 +218,13 @@ const ServiceRequest = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would send the form data to your backend
     console.log("Form submitted:", formData);
     
-    // Show success message
     toast({
       title: "Service requested!",
       description: "Your request has been submitted. A technician will be assigned shortly.",
     });
     
-    // Redirect to tracking page
-    // In a real app, this would include the request ID
     navigate("/request-tracking/123");
   };
 

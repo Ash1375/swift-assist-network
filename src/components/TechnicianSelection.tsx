@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Star, ThumbsUp, MapPin, Clock, Award, Shield } from "lucide-react";
+import { ThumbsUp, MapPin, Clock, Award, Shield, Star } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
