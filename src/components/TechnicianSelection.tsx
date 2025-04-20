@@ -1,27 +1,9 @@
-
 import { useState } from "react";
-import { ThumbsUp, MapPin, Clock, Award, Shield, Star } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { Badge } from "./ui/badge";
+import TechnicianCard from "./technician/TechnicianCard";
+import SortControls from "./technician/SortControls";
+import { Technician } from "./technician/types";
 
-type Technician = {
-  id: string;
-  name: string;
-  avatar?: string;
-  rating: number;
-  price: number;
-  currency: string;
-  distance: string;
-  estimatedArrival: string;
-  completedJobs: number;
-  specialties: string[];
-  verified: boolean;
-  badges?: string[];
-};
-
-// Mock data - in a real app, this would come from an API
 const mockTechnicians: Technician[] = [
   {
     id: "tech-1",
@@ -94,7 +76,6 @@ const TechnicianSelection = ({ serviceType, onSelect }: TechnicianSelectionProps
     } else if (sortBy === "rating") {
       return b.rating - a.rating;
     } else {
-      // Sort by estimated arrival (parsing the min values)
       const aTime = parseInt(a.estimatedArrival.split("-")[0]);
       const bTime = parseInt(b.estimatedArrival.split("-")[0]);
       return aTime - bTime;
@@ -111,18 +92,6 @@ const TechnicianSelection = ({ serviceType, onSelect }: TechnicianSelectionProps
     }
   };
 
-  // Generate star display for ratings
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 0; i < 5; i++) {
-      const starFill = i < Math.floor(rating) ? "text-yellow-500" : "text-gray-300";
-      stars.push(
-        <Star key={i} className={`h-4 w-4 ${starFill} inline-block`} fill={i < Math.floor(rating) ? "currentColor" : "none"} />
-      );
-    }
-    return stars;
-  };
-
   return (
     <div className="w-full space-y-6 animate-fade-in">
       <div className="flex flex-col space-y-4">
@@ -131,124 +100,17 @@ const TechnicianSelection = ({ serviceType, onSelect }: TechnicianSelectionProps
           Select a technician for your {serviceType} service
         </p>
         
-        <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-          <Button 
-            variant={sortBy === "arrival" ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setSortBy("arrival")}
-            className={sortBy === "arrival" ? "bg-red-600 hover:bg-red-700" : ""}
-          >
-            <Clock className="mr-1 h-4 w-4" />
-            Fastest Arrival
-          </Button>
-          <Button 
-            variant={sortBy === "price" ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setSortBy("price")}
-            className={sortBy === "price" ? "bg-red-600 hover:bg-red-700" : ""}
-          >
-            Price: Low to High
-          </Button>
-          <Button 
-            variant={sortBy === "rating" ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setSortBy("rating")}
-            className={sortBy === "rating" ? "bg-red-600 hover:bg-red-700" : ""}
-          >
-            <Star className="mr-1 h-4 w-4" />
-            Top Rated
-          </Button>
-        </div>
+        <SortControls sortBy={sortBy} onSortChange={setSortBy} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {sortedTechnicians.map((tech) => (
-          <Card 
-            key={tech.id} 
-            className={`cursor-pointer border-2 hover:shadow-md transition-all ${
-              selectedTechnician === tech.id ? "border-red-500 ring-2 ring-red-100" : "border-gray-200"
-            }`}
-            onClick={() => handleTechnicianClick(tech.id)}
-          >
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center space-x-4">
-                  <Avatar className="h-12 w-12 border-2 border-gray-100">
-                    <AvatarImage src={tech.avatar} alt={tech.name} />
-                    <AvatarFallback className="bg-red-100 text-red-800 font-semibold">
-                      {tech.name.split(" ").map(n => n[0]).join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      {tech.name} 
-                      {tech.verified && <Shield className="h-4 w-4 text-blue-500" fill="currentColor" />}
-                    </CardTitle>
-                    <div className="flex items-center mt-1">
-                      {renderStars(tech.rating)}
-                      <span className="ml-1 text-sm font-medium">{tech.rating}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xl font-bold text-red-600">{tech.currency}{tech.price}</div>
-                  <div className="text-xs text-gray-500">Base Charge</div>
-                </div>
-              </div>
-              
-              {tech.badges && tech.badges.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {tech.badges.map(badge => (
-                    <Badge key={badge} variant="secondary" className="bg-red-50 text-red-700 hover:bg-red-100">
-                      {badge === "Premium" && <Award className="h-3 w-3 mr-1" />}
-                      {badge}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </CardHeader>
-            
-            <CardContent className="pb-2">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 text-gray-500 mr-1" />
-                  <span>{tech.distance} away</span>
-                </div>
-                <div className="flex items-center">
-                  <Clock className="h-4 w-4 text-gray-500 mr-1" />
-                  <span>ETA: {tech.estimatedArrival}</span>
-                </div>
-                <div className="flex items-center col-span-2">
-                  <ThumbsUp className="h-4 w-4 text-gray-500 mr-1" />
-                  <span>{tech.completedJobs} jobs completed</span>
-                </div>
-              </div>
-              
-              <div className="mt-3">
-                <CardDescription className="text-xs text-gray-500 mb-1">Specialties:</CardDescription>
-                <div className="flex flex-wrap gap-1">
-                  {tech.specialties.map(specialty => (
-                    <Badge key={specialty} variant="outline" className="text-xs">
-                      {specialty}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-            
-            <CardFooter>
-              <Button 
-                variant={selectedTechnician === tech.id ? "default" : "outline"} 
-                className={`w-full ${selectedTechnician === tech.id ? "bg-red-600 hover:bg-red-700" : ""}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleTechnicianClick(tech.id);
-                }}
-              >
-                {selectedTechnician === tech.id ? "Selected" : "Select"}
-              </Button>
-            </CardFooter>
-          </Card>
+          <TechnicianCard
+            key={tech.id}
+            technician={tech}
+            isSelected={selectedTechnician === tech.id}
+            onSelect={handleTechnicianClick}
+          />
         ))}
       </div>
       
