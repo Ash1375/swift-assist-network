@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -8,7 +9,7 @@ import { ServiceRequestFormData, ServiceType } from "./service-request/types";
 import PersonalInfoStep from "./service-request/PersonalInfoStep";
 import VehicleInfoStep from "./service-request/VehicleInfoStep";
 import LocationStep from "./service-request/LocationStep";
-import TechnicianSelection from "./technician/TechnicianSelection";
+import TechnicianSelection from "./TechnicianSelection";
 import ConfirmationStep from "./service-request/ConfirmationStep";
 
 const services: Record<string, ServiceType> = {
