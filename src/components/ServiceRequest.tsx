@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
-import { MapPin, AlertCircle, Car, Bike, Truck, Check, Info, Star } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import TechnicianSelection from "./TechnicianSelection";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Check, MapPin, Car } from "lucide-react";
+import { ServiceRequestFormData, ServiceType } from "./service-request/types";
+import PersonalInfoStep from "./service-request/PersonalInfoStep";
+import VehicleInfoStep from "./service-request/VehicleInfoStep";
+import LocationStep from "./service-request/LocationStep";
+import TechnicianSelection from "./technician/TechnicianSelection";
+import ConfirmationStep from "./service-request/ConfirmationStep";
 
-const services = {
+const services: Record<string, ServiceType> = {
   "towing": {
     name: "Towing Service",
     description: "Vehicle breakdown? Our towing service quickly transports your vehicle to the nearest repair shop or your preferred location.",
@@ -53,32 +54,11 @@ const services = {
   }
 };
 
-const vehicleTypes = [
-  { 
-    id: "car",
-    name: "Cars", 
-    icon: Car,
-    subtypes: ["SUV", "Hatchback", "Sedan", "MPV", "Other Cars"] 
-  },
-  { 
-    id: "bike",
-    name: "Motorcycles/Bikes", 
-    icon: Bike,
-    subtypes: ["Sport Bike", "Cruiser", "Commuter", "Scooter", "Other Bikes"] 
-  },
-  { 
-    id: "commercial",
-    name: "Commercial Vehicles", 
-    icon: Truck,
-    subtypes: ["Truck", "Van", "Bus", "Construction Vehicle", "Other Commercial"] 
-  },
-];
-
 const ServiceRequest = () => {
   const { serviceId } = useParams<{ serviceId: string }>();
   const navigate = useNavigate();
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ServiceRequestFormData>({
     name: "",
     phone: "",
     vehicleType: "",
@@ -93,9 +73,7 @@ const ServiceRequest = () => {
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [step, setStep] = useState(1);
   
-  const service = serviceId && services[serviceId as keyof typeof services] 
-    ? services[serviceId as keyof typeof services] 
-    : services.other;
+  const service = serviceId && services[serviceId] ? services[serviceId] : services.other;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -109,7 +87,7 @@ const ServiceRequest = () => {
     setFormData({
       ...formData,
       vehicleType: type,
-      vehicleSubtype: "" // Reset subtype when type changes
+      vehicleSubtype: ""
     });
   };
 
@@ -162,53 +140,38 @@ const ServiceRequest = () => {
     }
   };
 
-  const nextStep = () => {
-    if (step === 1) {
-      if (!formData.name || !formData.phone) {
-        toast({
-          title: "Missing information",
-          description: "Please provide your name and phone number.",
-          variant: "destructive"
-        });
-        return;
-      }
-    } else if (step === 2) {
-      if (!formData.vehicleType) {
-        toast({
-          title: "Missing information",
-          description: "Please select your vehicle type.",
-          variant: "destructive"
-        });
-        return;
-      }
-      if (!formData.vehicleSubtype) {
-        toast({
-          title: "Missing information",
-          description: "Please select your vehicle subtype.",
-          variant: "destructive"
-        });
-        return;
-      }
-      if (!formData.vehicleModel) {
-        toast({
-          title: "Missing information",
-          description: "Please provide your vehicle make & model.",
-          variant: "destructive"
-        });
-        return;
-      }
-    } else if (step === 3) {
-      if (!formData.location) {
-        toast({
-          title: "Missing information",
-          description: "Please provide your location.",
-          variant: "destructive"
-        });
-        return;
-      }
+  const validateStep = () => {
+    if (step === 1 && (!formData.name || !formData.phone)) {
+      toast({
+        title: "Missing information",
+        description: "Please provide your name and phone number.",
+        variant: "destructive"
+      });
+      return false;
     }
-    
-    setStep(step + 1);
+    if (step === 2 && (!formData.vehicleType || !formData.vehicleSubtype || !formData.vehicleModel)) {
+      toast({
+        title: "Missing information",
+        description: "Please complete all vehicle information.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    if (step === 3 && !formData.location) {
+      toast({
+        title: "Missing information",
+        description: "Please provide your location.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const nextStep = () => {
+    if (validateStep()) {
+      setStep(step + 1);
+    }
   };
 
   const prevStep = () => {
@@ -217,14 +180,11 @@ const ServiceRequest = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     console.log("Form submitted:", formData);
-    
     toast({
       title: "Service requested!",
       description: "Your request has been submitted. A technician will be assigned shortly.",
     });
-    
     navigate("/request-tracking/123");
   };
 
@@ -263,7 +223,7 @@ const ServiceRequest = () => {
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <div className="container max-w-3xl py-12">
@@ -271,15 +231,15 @@ const ServiceRequest = () => {
         <CardHeader className="bg-gradient-to-r from-red-600 to-red-700 text-white">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-white/20 rounded-full">
-              {serviceId && services[serviceId as keyof typeof services]?.name === "Towing Service" && 
+              {serviceId && services[serviceId]?.name === "Towing Service" && 
                 <MapPin className="h-6 w-6" />}
-              {serviceId && services[serviceId as keyof typeof services]?.name === "Flat Tire Repair" && 
+              {serviceId && services[serviceId]?.name === "Flat Tire Repair" && 
                 <Car className="h-6 w-6" />}
-              {serviceId && services[serviceId as keyof typeof services]?.name === "Battery Jumpstart" && 
+              {serviceId && services[serviceId]?.name === "Battery Jumpstart" && 
                 <Car className="h-6 w-6" />}
-              {serviceId && services[serviceId as keyof typeof services]?.name !== "Towing Service" && 
-               services[serviceId as keyof typeof services]?.name !== "Flat Tire Repair" && 
-               services[serviceId as keyof typeof services]?.name !== "Battery Jumpstart" && 
+              {serviceId && services[serviceId]?.name !== "Towing Service" && 
+               services[serviceId]?.name !== "Flat Tire Repair" && 
+               services[serviceId]?.name !== "Battery Jumpstart" && 
                 <Car className="h-6 w-6" />}
             </div>
             <div>
@@ -294,139 +254,29 @@ const ServiceRequest = () => {
           
           <form onSubmit={handleSubmit}>
             {step === 1 && (
-              <div className="space-y-6 animate-fade-in">
-                <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
-                <div className="grid gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input 
-                      id="name" 
-                      name="name" 
-                      value={formData.name} 
-                      onChange={handleInputChange} 
-                      placeholder="Enter your full name"
-                      className="border-gray-300 focus:border-red-500 focus:ring focus:ring-red-200"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input 
-                      id="phone" 
-                      name="phone" 
-                      value={formData.phone} 
-                      onChange={handleInputChange} 
-                      placeholder="Enter your phone number"
-                      className="border-gray-300 focus:border-red-500 focus:ring focus:ring-red-200"
-                      required
-                    />
-                    <p className="text-xs text-gray-500">We'll send updates about your service request to this number</p>
-                  </div>
-                </div>
-              </div>
+              <PersonalInfoStep 
+                formData={formData}
+                onInputChange={handleInputChange}
+              />
             )}
 
             {step === 2 && (
-              <div className="space-y-6 animate-fade-in">
-                <h2 className="text-xl font-semibold mb-4">Vehicle Information</h2>
-                
-                <div className="space-y-4">
-                  <Label>Vehicle Type</Label>
-                  <div className="grid grid-cols-3 gap-4">
-                    {vehicleTypes.map((type) => (
-                      <div
-                        key={type.id}
-                        className={`flex flex-col items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all
-                          ${formData.vehicleType === type.id 
-                            ? 'border-red-500 bg-red-50' 
-                            : 'border-gray-200 hover:border-red-300 hover:bg-red-50/30'}`}
-                        onClick={() => handleVehicleTypeSelect(type.id)}
-                      >
-                        <div className={`p-3 rounded-full ${formData.vehicleType === type.id ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
-                          <type.icon className="h-6 w-6" />
-                        </div>
-                        <span className="font-medium text-center">{type.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                {formData.vehicleType && (
-                  <div className="space-y-4 animate-fade-in">
-                    <Label>Vehicle Subtype</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {vehicleTypes.find(t => t.id === formData.vehicleType)?.subtypes.map((subtype) => (
-                        <Button
-                          key={subtype}
-                          type="button"
-                          variant={formData.vehicleSubtype === subtype ? "default" : "outline"}
-                          className={formData.vehicleSubtype === subtype ? "bg-red-600 hover:bg-red-700" : ""}
-                          onClick={() => handleVehicleSubtypeSelect(subtype)}
-                        >
-                          {subtype}
-                        </Button>
-                      ))}
-                    </div>
-                    
-                    <div className="space-y-2 mt-6">
-                      <Label htmlFor="vehicleModel">Vehicle Make & Model</Label>
-                      <Input 
-                        id="vehicleModel" 
-                        name="vehicleModel" 
-                        value={formData.vehicleModel} 
-                        onChange={handleInputChange} 
-                        placeholder="e.g., Toyota Camry, Honda CBR"
-                        className="border-gray-300 focus:border-red-500 focus:ring focus:ring-red-200"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
+              <VehicleInfoStep 
+                formData={formData}
+                onInputChange={handleInputChange}
+                onVehicleTypeSelect={handleVehicleTypeSelect}
+                onVehicleSubtypeSelect={handleVehicleSubtypeSelect}
+              />
             )}
 
             {step === 3 && (
-              <div className="space-y-6 animate-fade-in">
-                <h2 className="text-xl font-semibold mb-4">Your Location</h2>
-                <div className="flex items-center gap-4 mb-4">
-                  <Button 
-                    type="button" 
-                    onClick={getCurrentLocation}
-                    disabled={isGettingLocation}
-                    className="bg-red-600 hover:bg-red-700"
-                  >
-                    <MapPin className="mr-2 h-4 w-4" />
-                    {isGettingLocation ? "Getting Location..." : "Use Current Location"}
-                  </Button>
-                  <span className="text-sm text-gray-500">or enter manually</span>
-                </div>
-                
-                {currentLocation && (
-                  <div className="p-4 bg-red-50 rounded-md mb-4 border border-red-100">
-                    <div className="flex items-start gap-3">
-                      <Info className="h-5 w-5 text-red-600 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-gray-900">Detected Location:</p>
-                        <p className="text-gray-700">{currentLocation}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                <div className="space-y-2">
-                  <Label htmlFor="location">Address/Location Description</Label>
-                  <Textarea 
-                    id="location" 
-                    name="location" 
-                    value={formData.location} 
-                    onChange={handleInputChange} 
-                    placeholder="Enter your precise location, nearby landmarks, or address"
-                    className="min-h-[100px] border-gray-300 focus:border-red-500 focus:ring focus:ring-red-200"
-                    required
-                  />
-                  <p className="text-xs text-gray-500">Please provide as much detail as possible to help the technician find you</p>
-                </div>
-              </div>
+              <LocationStep 
+                formData={formData}
+                onInputChange={handleInputChange}
+                currentLocation={currentLocation}
+                isGettingLocation={isGettingLocation}
+                onGetCurrentLocation={getCurrentLocation}
+              />
             )}
 
             {step === 4 && (
@@ -437,108 +287,11 @@ const ServiceRequest = () => {
             )}
 
             {step === 5 && (
-              <div className="space-y-6 animate-fade-in">
-                <h2 className="text-xl font-semibold mb-4">Request Summary</h2>
-                
-                <Card className="bg-red-50 border-red-100">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg text-red-700">Service Details</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="font-medium">Service:</span>
-                        <span>{service.name}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">Estimated Price:</span>
-                        <span>{service.estimatedPrice}</span>
-                      </div>
-                      <p className="text-sm text-red-600/80 mt-1">Final price may vary based on specific requirements</p>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Selected Technician</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-12 w-12 border-2 border-gray-100">
-                        <AvatarImage src="/placeholder.svg" alt="Technician" />
-                        <AvatarFallback className="bg-red-100 text-red-800 font-semibold">
-                          RT
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h4 className="font-semibold">Rajesh Kumar</h4>
-                        <div className="flex items-center text-yellow-500">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className="h-3 w-3" fill="currentColor" />
-                          ))}
-                          <span className="ml-1 text-xs text-gray-600">4.8 (538 jobs)</span>
-                        </div>
-                      </div>
-                      <div className="ml-auto text-right">
-                        <div className="text-xl font-bold text-red-600">₹599</div>
-                        <div className="text-xs text-gray-500">Base Charge</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Your Information</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <p className="text-sm text-gray-500">Name</p>
-                          <p className="font-medium">{formData.name}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">Phone</p>
-                          <p className="font-medium">{formData.phone}</p>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <p className="text-sm text-gray-500">Vehicle</p>
-                        <p className="font-medium">
-                          {formData.vehicleSubtype} {formData.vehicleModel}
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <p className="text-sm text-gray-500">Location</p>
-                        <p className="font-medium">{formData.location}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <div>
-                  <Label htmlFor="details">Additional Details (Optional)</Label>
-                  <Textarea 
-                    id="details" 
-                    name="details" 
-                    value={formData.details} 
-                    onChange={handleInputChange} 
-                    placeholder="Any additional information about your situation that might help our technician"
-                    className="min-h-[80px] border-gray-300 focus:border-red-500 focus:ring focus:ring-red-200"
-                  />
-                </div>
-                
-                <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                  <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0" />
-                  <p className="text-sm text-yellow-700">
-                    By submitting this request, you agree to our terms of service and privacy policy.
-                  </p>
-                </div>
-              </div>
+              <ConfirmationStep 
+                service={service}
+                formData={formData}
+                onInputChange={handleInputChange}
+              />
             )}
 
             <div className="mt-8 flex justify-between">
