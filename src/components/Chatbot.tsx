@@ -23,18 +23,18 @@ const Chatbot = () => {
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-    const newMessages = [...messages, { sender: "user", text: input }];
+    const newMessages = [...messages, { sender: "user" as const, text: input }];
     setMessages(newMessages);
     setInput("");
     setLoading(true);
 
     try {
       const answer = await fetchChatbotAnswer(newMessages);
-      setMessages([...newMessages, { sender: "bot", text: answer }]);
+      setMessages([...newMessages, { sender: "bot" as const, text: answer }]);
     } catch (e) {
       setMessages([
         ...newMessages,
-        { sender: "bot", text: "Sorry, I'm having trouble answering right now." },
+        { sender: "bot" as const, text: "Sorry, I'm having trouble answering right now." },
       ]);
     } finally {
       setLoading(false);
