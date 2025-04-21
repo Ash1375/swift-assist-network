@@ -32,7 +32,7 @@ const Hero = () => {
             </Link>
           </Button>
           <Button className="bg-red-700 border-2 border-white text-white hover:bg-red-800 px-8 py-6 text-lg animate-pulse-red" size="lg" asChild>
-            <Link to="/request-service/emergency">
+            <Link to="/emergency">
               <PhoneCall className="mr-2 h-5 w-5" />
               Emergency Call
             </Link>

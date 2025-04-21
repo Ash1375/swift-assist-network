@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +18,8 @@ import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Chatbot from "@/components/Chatbot";
+import LoadingAnimation from "@/components/LoadingAnimation";
+import Emergency from "./pages/Emergency";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +30,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <LoadingAnimation />
           <div className="flex flex-col min-h-screen">
             <Header />
             <main className="flex-grow">
@@ -38,6 +42,7 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/subscription" element={<Subscription />} />
+                <Route path="/emergency" element={<Emergency />} />
                 <Route path="/request-service/:serviceId" element={<ServiceRequest />} />
                 <Route path="/request-tracking/:requestId" element={<RequestTracking />} />
                 <Route path="*" element={<NotFound />} />
