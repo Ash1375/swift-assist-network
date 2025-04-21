@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Car, Bike, Truck, Wrench, Battery, Key, 
@@ -78,6 +79,13 @@ const services = [
       "Replacement batteries available if needed",
       "Works with all vehicle types and battery systems",
       "Advice on preventing future battery issues"
+    ],
+    process: [
+      "Assess battery condition",
+      "Perform jumpstart with professional equipment",
+      "Check charging system health",
+      "Test battery performance",
+      "Provide recommendations for battery maintenance"
     ]
   },
   {
@@ -92,6 +100,13 @@ const services = [
       "Expert advice on next steps for complex problems",
       "ASE-certified mechanics with extensive experience",
       "Service for all types of vehicles and common mechanical problems"
+    ],
+    process: [
+      "Initial diagnosis of the mechanical issue",
+      "Determine if on-site repair is possible",
+      "Perform necessary repairs if feasible",
+      "Test vehicle operation after repair",
+      "Provide recommendations for future maintenance"
     ]
   },
   {
@@ -106,6 +121,13 @@ const services = [
       "Available in all service areas",
       "Enough fuel to reach your destination or nearest gas station",
       "Service available 24/7 for emergencies"
+    ],
+    process: [
+      "Confirm fuel type needed",
+      "Dispatch nearest technician with fuel",
+      "Deliver and add fuel to vehicle",
+      "Ensure vehicle starts properly",
+      "Provide guidance to nearest gas station if needed"
     ]
   },
   {
@@ -120,6 +142,13 @@ const services = [
       "Trained technicians with expertise in various lock systems",
       "Fast response times to minimize your inconvenience",
       "Affordable alternative to dealership services"
+    ],
+    process: [
+      "Verify vehicle ownership",
+      "Select appropriate tools for vehicle make/model",
+      "Safely unlock vehicle without damage",
+      "Test locks and doors after entry",
+      "Provide access to vehicle contents"
     ]
   },
   {
@@ -134,6 +163,13 @@ const services = [
       "Works with all vehicle types",
       "Trained operators to prevent vehicle damage",
       "Available in difficult terrains and weather conditions"
+    ],
+    process: [
+      "Assess vehicle position and terrain",
+      "Select appropriate recovery technique",
+      "Safely attach winch and recovery equipment",
+      "Extract vehicle with controlled force",
+      "Inspect vehicle for any damage after recovery"
     ]
   },
   {
@@ -148,6 +184,13 @@ const services = [
       "Tire pressure services",
       "General roadside assistance for unexpected problems",
       "Custom solutions for unique roadside emergencies"
+    ],
+    process: [
+      "Assess specific issue over the phone",
+      "Dispatch technician with appropriate equipment",
+      "Diagnose problem on-site",
+      "Implement solution or recommend next steps",
+      "Ensure safety before leaving"
     ]
   },
 ];
@@ -198,6 +241,14 @@ const ServicesPage = () => {
 
   const filteredServices = services;
   const currentService = filteredServices.find(service => service.id === selectedService);
+
+  // Get the selected vehicle category safely
+  const selectedVehicleCategory = selectedVehicleType 
+    ? vehicleCategories.find(c => c.id === selectedVehicleType) 
+    : null;
+  
+  // Make sure subtypes exist before trying to map over them
+  const vehicleSubtypes = selectedVehicleCategory?.subtypes || [];
 
   return (
     <div className="min-h-screen">
@@ -264,7 +315,7 @@ const ServicesPage = () => {
                         </div>
                         <CollapsibleContent>
                           <ul className="space-y-2 mb-4">
-                            {service.features.map((feature, index) => (
+                            {service.features && service.features.map((feature, index) => (
                               <li key={index} className="flex items-start">
                                 <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-1 flex-shrink-0" />
                                 <span className="text-gray-700 text-sm">{feature}</span>
@@ -283,7 +334,7 @@ const ServicesPage = () => {
                         </div>
                         <CollapsibleContent>
                           <ol className="space-y-2 mb-4">
-                            {service.process.map((step, index) => (
+                            {service.process && service.process.map((step, index) => (
                               <li key={index} className="flex items-start">
                                 <span className="flex items-center justify-center h-5 w-5 rounded-full bg-red-100 text-red-600 text-xs font-medium mr-2 mt-0.5 flex-shrink-0">
                                   {index + 1}
@@ -339,13 +390,11 @@ const ServicesPage = () => {
                                   <SelectValue placeholder="Select vehicle subtype" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {vehicleCategories
-                                    .find(c => c.id === selectedVehicleType)
-                                    ?.subtypes?.map((subtype) => (
-                                      <SelectItem key={subtype} value={subtype}>
-                                        {subtype}
-                                      </SelectItem>
-                                    ))}
+                                  {vehicleSubtypes.map((subtype) => (
+                                    <SelectItem key={subtype} value={subtype}>
+                                      {subtype}
+                                    </SelectItem>
+                                  ))}
                                 </SelectContent>
                               </Select>
                             </div>
