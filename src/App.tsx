@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,7 @@ import RequestTracking from "./components/RequestTracking";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Chatbot from "@/components/Chatbot";
 
 const queryClient = new QueryClient();
 
@@ -40,9 +40,9 @@ const App = () => (
                 <Route path="/subscription" element={<Subscription />} />
                 <Route path="/request-service/:serviceId" element={<ServiceRequest />} />
                 <Route path="/request-tracking/:requestId" element={<RequestTracking />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <Chatbot />
             </main>
             <Footer />
           </div>
