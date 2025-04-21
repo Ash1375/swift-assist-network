@@ -9,6 +9,51 @@ type Message = {
   text: string;
 };
 
+function getLocalBotResponse(input: string): string {
+  const lower = input.toLowerCase();
+  // Very basic keyword matching. Expand as desired!
+  if (lower.includes("terms") || lower.includes("conditions")) {
+    return "Our terms and conditions ensure fair service and transparent billing. You can view the detailed terms on our website or ask for specifics.";
+  }
+  if (lower.includes("availability") || lower.includes("working hours") || lower.includes("open")) {
+    return "We're available 24/7 for roadside assistance! You can request help at any time.";
+  }
+  if (lower.match(/track/i) || lower.includes("status") || lower.includes("request id") || lower.includes("follow")) {
+    return "To track your request, please provide your request ID or visit the Request Tracking page from the main menu.";
+  }
+  if (lower.includes("contact")) {
+    return "You can contact our customer support via the Contact page or call our helpline at 1800-123-4567.";
+  }
+  if (lower.includes("pricing") || lower.includes("cost") || lower.includes("charge") || lower.includes("fee")) {
+    return "Our pricing varies by service type and location. Get an instant quote on the website or ask about a specific service!";
+  }
+  if (lower.includes("privacy")) {
+    return "We respect your privacy and only use your data to provide our services. Check our Privacy Policy for details.";
+  }
+  if (lower.includes("help") || lower.includes("assist")) {
+    return "How can I help you today? You can ask me about service availability, getting help, terms & conditions, pricing, or tracking your request.";
+  }
+  if (lower.includes("insurance")) {
+    return "We work with several insurance partners. If your coverage includes roadside assistance, let us know and we’ll coordinate directly!";
+  }
+  if (
+    lower.includes("subscription") ||
+    lower.includes("plan") ||
+    lower.includes("member") ||
+    lower.includes("join")
+  ) {
+    return "You can subscribe to our membership plans for extra savings and priority support. Visit the Subscription page or ask for more info!";
+  }
+  if (lower.match(/(thank you|thanks|ty|thx)/i)) {
+    return "You're welcome! If you have any other questions, just ask.";
+  }
+  if (lower.match(/hi|hello|hey|greetings/)) {
+    return "Hello! How can I assist you today?";
+  }
+  // Fallback answer
+  return "I'm here to help with any questions about our services, terms, tracking, or support. Could you please clarify your question?";
+}
+
 const Chatbot = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -23,60 +68,16 @@ const Chatbot = () => {
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-    const newMessages = [...messages, { sender: "user" as const, text: input }];
+    const newMessages: Message[] = [...messages, { sender: "user", text: input }];
     setMessages(newMessages);
     setInput("");
     setLoading(true);
 
-    try {
-      const answer = await fetchChatbotAnswer(newMessages);
-      setMessages([...newMessages, { sender: "bot" as const, text: answer }]);
-    } catch (e) {
-      setMessages([
-        ...newMessages,
-        { sender: "bot" as const, text: "Sorry, I'm having trouble answering right now." },
-      ]);
-    } finally {
+    setTimeout(() => {
+      const answer = getLocalBotResponse(input);
+      setMessages([...newMessages, { sender: "bot", text: answer }]);
       setLoading(false);
-    }
-  };
-
-  const fetchChatbotAnswer = async (msgs: Message[]): Promise<string> => {
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    if (!apiKey) return "Chatbot error: API key not set.";
-    const userMessages = msgs.map((m) => ({
-      role: m.sender === "user" ? "user" : "assistant",
-      content: m.text,
-    }));
-
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a helpful website assistant for an online roadside assistance and service provider. Respond informatively to questions about terms, how to get help, query tracking, and general doubts. If asked about privacy, pricing, or contacting support, explain helpfully. Always use concise, clear language.",
-          },
-          ...userMessages,
-        ],
-        max_tokens: 200,
-      }),
-    });
-
-    if (!response.ok) {
-      return "Sorry, I'm having trouble connecting right now.";
-    }
-    const data = await response.json();
-    return (
-      data.choices?.[0]?.message?.content ||
-      "Sorry, I couldn't find an answer to your question."
-    );
+    }, 800); // Simulate response delay for realism
   };
 
   return (
