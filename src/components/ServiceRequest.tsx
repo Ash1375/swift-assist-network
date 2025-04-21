@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
-import { Check, MapPin, Car } from "lucide-react";
+import { Check, MapPin, Car, User, Wrench } from "lucide-react";
 import { ServiceRequestFormData, ServiceType } from "./service-request/types";
 import PersonalInfoStep from "./service-request/PersonalInfoStep";
 import VehicleInfoStep from "./service-request/VehicleInfoStep";
@@ -54,6 +53,73 @@ const services: Record<string, ServiceType> = {
     estimatedPrice: "Varies"
   }
 };
+
+const stepDetails = [
+  {
+    name: "Personal",
+    icon: (active: boolean, completed: boolean) => (
+      <div className={`rounded-full border-4 flex items-center justify-center transition-all duration-300
+        ${completed ? "bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-200 shadow-xl animate-glow"
+          : active ? "bg-gradient-to-br from-red-400 via-red-500 to-red-600 border-red-200 shadow-lg animate-glow"
+          : "bg-gray-200 border-gray-100"}
+      `}>
+        <User className={`h-6 w-6 ${completed || active ? "text-white" : "text-gray-400"}`} />
+      </div>
+    ),
+    tooltip: "Enter your personal details"
+  },
+  {
+    name: "Vehicle",
+    icon: (active: boolean, completed: boolean) => (
+      <div className={`rounded-full border-4 flex items-center justify-center transition-all duration-300
+        ${completed ? "bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-200 shadow-xl animate-glow"
+          : active ? "bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 border-yellow-200 shadow-lg animate-glow"
+          : "bg-gray-200 border-gray-100"}
+      `}>
+        <Car className={`h-6 w-6 ${completed || active ? "text-white" : "text-gray-400"}`} />
+      </div>
+    ),
+    tooltip: "Enter your vehicle details"
+  },
+  {
+    name: "Location",
+    icon: (active: boolean, completed: boolean) => (
+      <div className={`rounded-full border-4 flex items-center justify-center transition-all duration-300
+        ${completed ? "bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-200 shadow-xl animate-glow"
+          : active ? "bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 border-blue-200 shadow-lg animate-glow"
+          : "bg-gray-200 border-gray-100"}
+      `}>
+        <MapPin className={`h-6 w-6 ${completed || active ? "text-white" : "text-gray-400"}`} />
+      </div>
+    ),
+    tooltip: "Provide your location"
+  },
+  {
+    name: "Technician",
+    icon: (active: boolean, completed: boolean) => (
+      <div className={`rounded-full border-4 flex items-center justify-center transition-all duration-300
+        ${completed ? "bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-200 shadow-xl animate-glow"
+          : active ? "bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 border-purple-200 shadow-lg animate-glow"
+          : "bg-gray-200 border-gray-100"}
+      `}>
+        <Wrench className={`h-6 w-6 ${completed || active ? "text-white" : "text-gray-400"}`} />
+      </div>
+    ),
+    tooltip: "Choose a technician"
+  },
+  {
+    name: "Confirm",
+    icon: (active: boolean, completed: boolean) => (
+      <div className={`rounded-full border-4 flex items-center justify-center transition-all duration-300
+        ${completed || active ? "bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 border-red-200 shadow-xl animate-glow"
+          : "bg-gray-200 border-gray-100"}
+      `}>
+        <Check className={`h-6 w-6 ${completed || active ? "text-white" : "text-gray-400"}`} />
+      </div>
+    ),
+    tooltip: "Review and confirm"
+  }
+];
 
 const ServiceRequest = () => {
   const { serviceId } = useParams<{ serviceId: string }>();
@@ -190,37 +256,42 @@ const ServiceRequest = () => {
   };
 
   const renderProgress = () => {
-    const totalSteps = 5;
-    
+    const totalSteps = stepDetails.length;
     return (
-      <div className="relative mb-10">
-        <div className="flex justify-between mb-2">
-          {[...Array(totalSteps)].map((_, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <div 
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
-                  ${index + 1 <= step ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-500'}`}
-              >
-                {index + 1 <= step ? (
-                  <Check className="h-5 w-5" />
-                ) : (
-                  index + 1
-                )}
+      <div className="relative mb-10 select-none">
+        <div className="flex justify-between items-center z-10 relative">
+          {stepDetails.map((s, idx) => {
+            const active = step === idx + 1;
+            const completed = step > idx + 1;
+            return (
+              <div className="flex flex-col items-center group" key={idx}>
+                <div className="relative cursor-pointer group">
+                  {s.icon(active, completed)}
+                  {active && (
+                    <span className="absolute -inset-2 rounded-full border-2 border-yellow-300 shadow-2xl animate-ping z-0" />
+                  )}
+                  <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 transition bg-black text-white px-2 py-1 text-xs rounded shadow-lg">
+                    {s.tooltip}
+                  </div>
+                </div>
+                <span className={`mt-2 text-xs font-bold transition-colors ${active ? "text-red-600" : completed ? "text-green-600" : "text-gray-500 group-hover:text-black"}`}>
+                  {s.name}
+                </span>
               </div>
-              <span className="text-xs mt-1 font-medium text-center text-gray-500">
-                {index === 0 ? "Personal" : 
-                 index === 1 ? "Vehicle" : 
-                 index === 2 ? "Location" :
-                 index === 3 ? "Technician" : "Confirm"}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
-        <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 z-0">
-          <div 
-            className="h-0.5 bg-red-600 transition-all" 
-            style={{ width: `${(step - 1) / (totalSteps - 1) * 100}%` }}
+        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 flex z-0">
+          <div
+            className="bg-gradient-to-r from-red-400 via-yellow-400 to-green-500 rounded-full transition-all duration-500 shadow-lg"
+            style={{
+              width: `${(step - 1) / (stepDetails.length - 1) * 100}%`,
+              minWidth: step > 1 ? "2.5rem" : "0px",
+              height: "100%",
+              transition: "width 500ms cubic-bezier(0.4,0,0.2,1)"
+            }}
           />
+          <div className="flex-1 bg-gray-200 rounded-full" />
         </div>
       </div>
     );
