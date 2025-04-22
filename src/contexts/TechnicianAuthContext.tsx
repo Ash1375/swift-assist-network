@@ -104,6 +104,7 @@ export const TechnicianAuthProvider: React.FC<{ children: React.ReactNode }> = (
         if (existingTechnician) {
           reject(new Error("Email already in use"));
         } else {
+          // Create new technician with pending status
           const newTechnician = {
             id: (demoTechnicians.length + 1).toString(),
             name,
@@ -116,10 +117,12 @@ export const TechnicianAuthProvider: React.FC<{ children: React.ReactNode }> = (
             verificationStatus: "pending" as const,
           };
           
+          // Add to demo technicians array
           demoTechnicians.push(newTechnician);
           
+          // Set the current technician without the password
           const { password: _, ...technicianWithoutPassword } = newTechnician;
-          setTechnician(technicianWithoutPassword);
+          setTechnician(technicianWithoutPassword as Technician);
           localStorage.setItem("towbuddy_technician", JSON.stringify(technicianWithoutPassword));
           resolve();
         }
