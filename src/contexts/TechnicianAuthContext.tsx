@@ -40,7 +40,7 @@ const TechnicianAuthContext = createContext<TechnicianAuthContextType>({
 });
 
 // Demo technicians for our mock authentication
-const demoTechnicians = [
+const demoTechnicians: Array<Omit<Technician, 'verificationStatus'> & { password: string, verificationStatus: "pending" | "verified" | "rejected" }> = [
   {
     id: "1",
     name: "John Smith",
@@ -50,7 +50,7 @@ const demoTechnicians = [
     address: "123 Main St, City, State",
     experience: 5,
     specialties: ["Tire Change", "Jump Start", "Towing"],
-    verificationStatus: "verified" as const,
+    verificationStatus: "verified",
   },
 ];
 
@@ -122,7 +122,8 @@ export const TechnicianAuthProvider: React.FC<{ children: React.ReactNode }> = (
           
           // Set the current technician without the password
           const { password: _, ...technicianWithoutPassword } = newTechnician;
-          setTechnician(technicianWithoutPassword as Technician);
+          // The type issue is fixed by ensuring technicianWithoutPassword matches the Technician type
+          setTechnician(technicianWithoutPassword);
           localStorage.setItem("towbuddy_technician", JSON.stringify(technicianWithoutPassword));
           resolve();
         }
