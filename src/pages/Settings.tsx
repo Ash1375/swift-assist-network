@@ -5,7 +5,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
-import { Settings, User, BarChart } from "lucide-react"
+import { Settings as SettingsIcon, User, BarChart } from "lucide-react"
 import ProfileSettings from "@/components/settings/ProfileSettings"
 import ThemeCustomizer from "@/components/settings/ThemeCustomizer"
 import UsageStats from "@/components/settings/UsageStats"
@@ -26,7 +26,7 @@ const SettingsPage = () => {
             Profile
           </TabsTrigger>
           <TabsTrigger value="preferences" className="gap-2">
-            <Settings size={16} />
+            <SettingsIcon size={16} />
             Preferences
           </TabsTrigger>
           <TabsTrigger value="stats" className="gap-2">

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Label } from "@/components/ui/label"
+import { toast } from "@/hooks/use-toast"
 
 const ProfileSettings = () => {
   const [profile, setProfile] = useState({
@@ -19,6 +20,10 @@ const ProfileSettings = () => {
     e.preventDefault()
     // Handle profile update
     console.log("Profile updated:", profile)
+    toast({
+      title: "Profile updated",
+      description: "Your profile information has been updated successfully.",
+    })
   }
 
   return (
