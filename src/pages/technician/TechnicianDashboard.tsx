@@ -5,17 +5,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useTechnicianAuth } from "@/contexts/TechnicianAuthContext";
 import { 
-  BarChart, 
   Clock, 
   Settings, 
-  Car, 
   MapPin, 
   Users, 
   Activity,
-  CheckCircle,
-  DollarSign,
   Star
 } from "lucide-react";
+import TechnicianStats from "@/components/technician/dashboard/TechnicianStats";
+import RevenueChart from "@/components/technician/dashboard/RevenueChart";
 
 const TechnicianDashboard = () => {
   const { technician, isAuthenticated } = useTechnicianAuth();
@@ -28,6 +26,23 @@ const TechnicianDashboard = () => {
     return <Navigate to="/technician/verification" replace />;
   }
 
+  // Mock data for demonstration
+  const mockStats = {
+    activeRequests: 2,
+    completedJobs: 150,
+    totalEarnings: 15000,
+    rating: 4.8
+  };
+
+  const mockRevenueData = [
+    { date: "Jan", amount: 1000 },
+    { date: "Feb", amount: 1500 },
+    { date: "Mar", amount: 1200 },
+    { date: "Apr", amount: 1800 },
+    { date: "May", amount: 2000 },
+    { date: "Jun", amount: 2400 }
+  ];
+
   return (
     <div className="container py-12">
       <div className="flex flex-col space-y-6">
@@ -36,51 +51,14 @@ const TechnicianDashboard = () => {
           <p className="text-muted-foreground">Welcome back, {technician.name}!</p>
         </div>
         
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Requests</CardTitle>
-              <Car className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">No active requests</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed Jobs</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">+0% from last month</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Earnings</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$0.00</div>
-              <p className="text-xs text-muted-foreground">+0% from last month</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Rating</CardTitle>
-              <Star className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">-</div>
-              <p className="text-xs text-muted-foreground">No ratings yet</p>
-            </CardContent>
-          </Card>
-        </div>
+        <TechnicianStats stats={mockStats} />
         
-        <Tabs defaultValue="requests" className="space-y-4">
+        <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
+            <TabsTrigger value="overview" className="gap-2">
+              <Activity size={16} />
+              Overview
+            </TabsTrigger>
             <TabsTrigger value="requests" className="gap-2">
               <Clock size={16} />
               Service Requests
@@ -93,15 +71,64 @@ const TechnicianDashboard = () => {
               <Users size={16} />
               Customers
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2">
-              <BarChart size={16} />
-              Analytics
-            </TabsTrigger>
             <TabsTrigger value="account" className="gap-2">
               <Settings size={16} />
               Account
             </TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="overview">
+            <div className="grid gap-4 md:grid-cols-4">
+              <RevenueChart data={mockRevenueData} />
+              
+              <Card className="col-span-4">
+                <CardHeader>
+                  <CardTitle>Recent Reviews</CardTitle>
+                  <CardDescription>Your latest customer feedback</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        name: "John D.",
+                        rating: 5,
+                        comment: "Excellent service! Very professional and quick.",
+                        date: "2024-04-20"
+                      },
+                      {
+                        name: "Sarah M.",
+                        rating: 4,
+                        comment: "Great work, helped me out of a tough situation.",
+                        date: "2024-04-18"
+                      }
+                    ].map((review, index) => (
+                      <div key={index} className="border-b pb-4 last:border-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="font-medium">{review.name}</div>
+                          <div className="flex items-center">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < review.rating
+                                    ? "text-yellow-400 fill-yellow-400"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-muted-foreground text-sm">{review.comment}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {new Date(review.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
           
           <TabsContent value="requests" className="space-y-4">
             <Card>
