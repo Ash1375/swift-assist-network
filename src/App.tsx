@@ -55,7 +55,7 @@ const App = () => (
               } />
               
               {/* Standard routes with Header/Footer */}
-              <Route element={
+              <Route path="/" element={
                 <div className="flex flex-col min-h-screen">
                   <Header />
                   <main className="flex-grow">
@@ -75,7 +75,18 @@ const App = () => (
                   <Footer />
                   <Chatbot />
                 </div>
-              } />
+              }>
+                <Route path="services" element={<ServicesPage />} />
+                <Route path="about" element={<About />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="login" element={<Login />} />
+                <Route path="register" element={<Register />} />
+                <Route path="subscription" element={<Subscription />} />
+                <Route path="emergency" element={<Emergency />} />
+                <Route path="request-service/:serviceId" element={<ServiceRequest />} />
+                <Route path="request-tracking/:requestId" element={<RequestTracking />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
               
               {/* Technician portal routes */}
               <Route path="/technician" element={<TechnicianLayout />}>
