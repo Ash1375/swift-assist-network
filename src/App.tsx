@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { TechnicianAuthProvider } from "@/contexts/TechnicianAuthContext";
 import Index from "./pages/Index";
 import ServicesPage from "./pages/ServicesPage";
 import About from "./pages/About";
@@ -34,60 +35,62 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <LoadingAnimation />
-          <Routes>
-            {/* Main app routes */}
-            <Route path="/" element={
-              <div className="flex flex-col min-h-screen">
-                <Header />
-                <main className="flex-grow">
-                  <Index />
-                </main>
-                <Footer />
-                <Chatbot />
-              </div>
-            } />
-            
-            {/* Standard routes with Header/Footer */}
-            <Route element={
-              <div className="flex flex-col min-h-screen">
-                <Header />
-                <main className="flex-grow">
-                  <Routes>
-                    <Route path="/services" element={<ServicesPage />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/subscription" element={<Subscription />} />
-                    <Route path="/emergency" element={<Emergency />} />
-                    <Route path="/request-service/:serviceId" element={<ServiceRequest />} />
-                    <Route path="/request-tracking/:requestId" element={<RequestTracking />} />
-                    <Route path="/settings" element={<Settings />} />
-                  </Routes>
-                </main>
-                <Footer />
-                <Chatbot />
-              </div>
-            } />
-            
-            {/* Technician portal routes */}
-            <Route path="/technician" element={<TechnicianLayout />}>
-              <Route path="login" element={<TechnicianLogin />} />
-              <Route path="register" element={<TechnicianRegister />} />
-              <Route path="verification" element={<TechnicianVerification />} />
-              <Route path="dashboard" element={<TechnicianDashboard />} />
-            </Route>
-            
-            {/* 404 page */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <TechnicianAuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <LoadingAnimation />
+            <Routes>
+              {/* Main app routes */}
+              <Route path="/" element={
+                <div className="flex flex-col min-h-screen">
+                  <Header />
+                  <main className="flex-grow">
+                    <Index />
+                  </main>
+                  <Footer />
+                  <Chatbot />
+                </div>
+              } />
+              
+              {/* Standard routes with Header/Footer */}
+              <Route element={
+                <div className="flex flex-col min-h-screen">
+                  <Header />
+                  <main className="flex-grow">
+                    <Routes>
+                      <Route path="/services" element={<ServicesPage />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
+                      <Route path="/subscription" element={<Subscription />} />
+                      <Route path="/emergency" element={<Emergency />} />
+                      <Route path="/request-service/:serviceId" element={<ServiceRequest />} />
+                      <Route path="/request-tracking/:requestId" element={<RequestTracking />} />
+                      <Route path="/settings" element={<Settings />} />
+                    </Routes>
+                  </main>
+                  <Footer />
+                  <Chatbot />
+                </div>
+              } />
+              
+              {/* Technician portal routes */}
+              <Route path="/technician" element={<TechnicianLayout />}>
+                <Route path="login" element={<TechnicianLogin />} />
+                <Route path="register" element={<TechnicianRegister />} />
+                <Route path="verification" element={<TechnicianVerification />} />
+                <Route path="dashboard" element={<TechnicianDashboard />} />
+              </Route>
+              
+              {/* 404 page */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </TechnicianAuthProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
