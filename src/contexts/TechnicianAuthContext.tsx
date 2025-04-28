@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext } from "react";
 import { TechnicianAuthContextType } from "@/types/technician";
-import { useTechnicianAuth } from "@/hooks/useTechnicianAuth";
+import { useTechnicianAuth as useTechnicianAuthHook } from "@/hooks/useTechnicianAuth";
 
 const TechnicianAuthContext = createContext<TechnicianAuthContextType>({
   technician: null,
@@ -12,7 +12,7 @@ const TechnicianAuthContext = createContext<TechnicianAuthContextType>({
 });
 
 export const TechnicianAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const authState = useTechnicianAuth();
+  const authState = useTechnicianAuthHook();
 
   return (
     <TechnicianAuthContext.Provider value={authState}>
@@ -22,4 +22,3 @@ export const TechnicianAuthProvider: React.FC<{ children: React.ReactNode }> = (
 };
 
 export const useTechnicianAuth = () => useContext(TechnicianAuthContext);
-
