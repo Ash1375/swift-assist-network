@@ -14,7 +14,7 @@ export const useTechnicianAuthState = () => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<Technician>((resolve, reject) => {
       setTimeout(() => {
         const foundTechnician = demoTechnicians.find(
           (t) => t.email === email && t.password === password
@@ -24,7 +24,7 @@ export const useTechnicianAuthState = () => {
           const { password: _, ...technicianWithoutPassword } = foundTechnician;
           setTechnician(technicianWithoutPassword);
           localStorage.setItem("towbuddy_technician", JSON.stringify(technicianWithoutPassword));
-          resolve();
+          resolve(technicianWithoutPassword);
         } else {
           reject(new Error("Invalid email or password"));
         }
@@ -41,7 +41,7 @@ export const useTechnicianAuthState = () => {
     experience: number,
     specialties: string[]
   ) => {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<Technician>((resolve, reject) => {
       setTimeout(() => {
         const existingTechnician = demoTechnicians.find((t) => t.email === email);
         
@@ -65,7 +65,7 @@ export const useTechnicianAuthState = () => {
           const { password: _, ...technicianWithoutPassword } = newTechnician;
           setTechnician(technicianWithoutPassword);
           localStorage.setItem("towbuddy_technician", JSON.stringify(technicianWithoutPassword));
-          resolve();
+          resolve(technicianWithoutPassword);
         }
       }, 500);
     });
