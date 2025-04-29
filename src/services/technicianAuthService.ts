@@ -1,6 +1,7 @@
 
 import { Technician, TechnicianWithPassword } from "@/types/technician";
 import { demoTechnicians } from "@/mocks/technicians";
+import { emailService } from "./emailService";
 
 export const technicianAuthService = {
   login: async (email: string, password: string): Promise<Technician> => {
@@ -57,8 +58,55 @@ export const technicianAuthService = {
     });
   },
 
+  approveTechnician: async (technicianId: string): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const technicianIndex = demoTechnicians.findIndex(t => t.id === technicianId);
+        
+        if (technicianIndex === -1) {
+          reject(new Error("Technician not found"));
+          return;
+        }
+        
+        demoTechnicians[technicianIndex].verificationStatus = "verified";
+        
+        // Send approval email to technician
+        emailService.sendTechnicianStatusEmail(
+          demoTechnicians[technicianIndex].email,
+          demoTechnicians[technicianIndex].name,
+          true
+        );
+        
+        resolve(true);
+      }, 500);
+    });
+  },
+
+  rejectTechnician: async (technicianId: string): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const technicianIndex = demoTechnicians.findIndex(t => t.id === technicianId);
+        
+        if (technicianIndex === -1) {
+          reject(new Error("Technician not found"));
+          return;
+        }
+        
+        demoTechnicians[technicianIndex].verificationStatus = "rejected";
+        
+        // Send rejection email to technician
+        emailService.sendTechnicianStatusEmail(
+          demoTechnicians[technicianIndex].email,
+          demoTechnicians[technicianIndex].name,
+          false
+        );
+        
+        resolve(true);
+      }, 500);
+    });
+  },
+
   logout: () => {
     localStorage.removeItem("towbuddy_technician");
   }
 };
-

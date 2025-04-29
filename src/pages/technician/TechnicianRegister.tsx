@@ -10,7 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTechnicianAuth } from "@/contexts/TechnicianAuthContext";
 import { toast } from "@/hooks/use-toast";
-import { UserPlus, Check } from "lucide-react";
+import { UserPlus, Check, Upload } from "lucide-react";
+import { emailService } from "@/services/emailService";
 
 type RegisterFormValues = {
   name: string;
@@ -37,6 +38,7 @@ const TechnicianRegister = () => {
   const { register } = useTechnicianAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
   
   const form = useForm<RegisterFormValues>({
     defaultValues: {
@@ -51,6 +53,25 @@ const TechnicianRegister = () => {
       termsAccepted: false,
     },
   });
+
+  const handleResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check if file is PDF or document
+      if (file.type === 'application/pdf' || 
+          file.type === 'application/msword' || 
+          file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        setResumeFile(file);
+      } else {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload a PDF or Word document",
+          variant: "destructive",
+        });
+        e.target.value = '';
+      }
+    }
+  };
 
   const onSubmit = async (data: RegisterFormValues) => {
     if (data.password !== data.confirmPassword) {
@@ -69,9 +90,19 @@ const TechnicianRegister = () => {
       return;
     }
 
+    if (!resumeFile) {
+      toast({
+        title: "Resume required",
+        description: "Please upload your resume to complete your application",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      await register(
+      // Register the technician
+      const technicianData = await register(
         data.name, 
         data.email, 
         data.password, 
@@ -80,9 +111,13 @@ const TechnicianRegister = () => {
         data.experience, 
         data.specialties
       );
+      
+      // Send the application email with resume
+      await emailService.sendTechnicianApplicationEmail(technicianData, resumeFile);
+      
       toast({
         title: "Registration successful!",
-        description: "Your account is now pending verification",
+        description: "Your application and resume have been submitted for review",
       });
       navigate("/technician/verification");
     } catch (error) {
@@ -217,6 +252,42 @@ const TechnicianRegister = () => {
                     </FormItem>
                   )}
                 />
+                
+                {/* Resume upload field */}
+                <div className="space-y-2">
+                  <FormLabel htmlFor="resume">Upload Your Resume (PDF or Word)</FormLabel>
+                  <div className="border-2 border-dashed border-gray-200 rounded-md p-4">
+                    <div className="flex items-center justify-center space-x-2">
+                      <label
+                        htmlFor="resume"
+                        className="flex items-center justify-center w-full cursor-pointer"
+                      >
+                        <div className="flex flex-col items-center space-y-2 text-center">
+                          <Upload className="h-6 w-6 text-gray-500" />
+                          <span className="text-sm text-gray-500">
+                            {resumeFile ? resumeFile.name : "Click to upload or drag and drop"}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            PDF, DOC or DOCX (max 5MB)
+                          </span>
+                        </div>
+                        <input
+                          id="resume"
+                          type="file"
+                          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                          className="sr-only"
+                          onChange={handleResumeChange}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                  {resumeFile && (
+                    <div className="flex items-center space-x-2 text-sm text-green-600">
+                      <Check className="h-4 w-4" />
+                      <span>Resume uploaded successfully</span>
+                    </div>
+                  )}
+                </div>
                 
                 <FormField
                   control={form.control}

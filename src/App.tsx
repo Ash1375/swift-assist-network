@@ -30,6 +30,10 @@ import TechnicianRegister from "./pages/technician/TechnicianRegister";
 import TechnicianVerification from "./pages/technician/TechnicianVerification";
 import TechnicianDashboard from "./pages/technician/TechnicianDashboard";
 
+// Admin pages
+import ApproveTechnician from "./pages/admin/ApproveTechnician";
+import RejectTechnician from "./pages/admin/RejectTechnician";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -95,6 +99,10 @@ const App = () => (
                 <Route path="verification" element={<TechnicianVerification />} />
                 <Route path="dashboard" element={<TechnicianDashboard />} />
               </Route>
+              
+              {/* Admin routes - for email approval/rejection links */}
+              <Route path="/admin/approve-technician/:technicianId" element={<ApproveTechnician />} />
+              <Route path="/admin/reject-technician/:technicianId" element={<RejectTechnician />} />
               
               {/* 404 page */}
               <Route path="*" element={<NotFound />} />

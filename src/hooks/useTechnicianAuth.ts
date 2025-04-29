@@ -17,6 +17,7 @@ export const useTechnicianAuth = () => {
     const authenticatedTechnician = await technicianAuthService.login(email, password);
     setTechnician(authenticatedTechnician);
     localStorage.setItem("towbuddy_technician", JSON.stringify(authenticatedTechnician));
+    return authenticatedTechnician;
   };
 
   const register = async (
@@ -33,6 +34,15 @@ export const useTechnicianAuth = () => {
     );
     setTechnician(registeredTechnician);
     localStorage.setItem("towbuddy_technician", JSON.stringify(registeredTechnician));
+    return registeredTechnician;
+  };
+
+  const approveTechnician = async (technicianId: string) => {
+    return technicianAuthService.approveTechnician(technicianId);
+  };
+
+  const rejectTechnician = async (technicianId: string) => {
+    return technicianAuthService.rejectTechnician(technicianId);
   };
 
   const logout = () => {
@@ -45,7 +55,8 @@ export const useTechnicianAuth = () => {
     isAuthenticated: !!technician,
     login,
     register,
+    approveTechnician,
+    rejectTechnician,
     logout,
   };
 };
-

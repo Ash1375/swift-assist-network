@@ -6,8 +6,10 @@ import { useTechnicianAuth as useTechnicianAuthHook } from "@/hooks/useTechnicia
 const TechnicianAuthContext = createContext<TechnicianAuthContextType>({
   technician: null,
   isAuthenticated: false,
-  login: async () => {},
-  register: async () => {},
+  login: async () => ({}),
+  register: async () => ({}),
+  approveTechnician: async () => false,
+  rejectTechnician: async () => false,
   logout: () => {},
 });
 

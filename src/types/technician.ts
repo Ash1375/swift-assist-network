@@ -18,7 +18,7 @@ export type TechnicianWithPassword = Omit<Technician, 'verificationStatus'> & {
 export type TechnicianAuthContextType = {
   technician: Technician | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<any>;
   register: (
     name: string, 
     email: string, 
@@ -27,6 +27,8 @@ export type TechnicianAuthContextType = {
     address: string,
     experience: number,
     specialties: string[]
-  ) => Promise<void>;
+  ) => Promise<any>;
+  approveTechnician: (technicianId: string) => Promise<boolean>;
+  rejectTechnician: (technicianId: string) => Promise<boolean>;
   logout: () => void;
 };
