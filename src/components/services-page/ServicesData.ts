@@ -1,7 +1,8 @@
 
 import { 
   Anchor, Wrench, Battery, Key, 
-  Fuel, LifeBuoy, Car, Bike, Truck
+  Fuel, LifeBuoy, Car, Bike, Truck, 
+  Circle // Added Circle icon for the "All Vehicles" category
 } from "lucide-react";
 import { ServiceDetails, VehicleCategory } from "./types";
 
@@ -178,7 +179,7 @@ export const services: ServiceDetails[] = [
 ];
 
 export const vehicleCategories: VehicleCategory[] = [
-  { id: "all", name: "All Vehicles" },
+  { id: "all", name: "All Vehicles", icon: Circle }, // Added icon property
   { id: "car", name: "Cars", icon: Car, subtypes: ["SUV", "Hatchback", "Sedan", "MPV", "Other Cars"] },
   { id: "bike", name: "Bikes", icon: Bike, subtypes: ["Sport Bike", "Cruiser", "Commuter", "Scooter", "Other Bikes"] },
   { id: "commercial", name: "Commercial", icon: Truck, subtypes: ["Truck", "Van", "Bus", "Construction Vehicle", "Other Commercial"] }
