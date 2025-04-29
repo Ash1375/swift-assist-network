@@ -3,36 +3,17 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useTechnicianAuth } from "@/contexts/TechnicianAuthContext";
 import { toast } from "@/hooks/use-toast";
-import { UserPlus, Check, Upload } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { emailService } from "@/services/emailService";
-
-type RegisterFormValues = {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phone: string;
-  address: string;
-  experience: number;
-  specialties: string[];
-  termsAccepted: boolean;
-};
-
-const specialtiesOptions = [
-  { id: "towing", label: "Towing" },
-  { id: "tire-change", label: "Tire Change" },
-  { id: "jump-start", label: "Jump Start" },
-  { id: "fuel-delivery", label: "Fuel Delivery" },
-  { id: "lockout", label: "Lockout Service" },
-  { id: "winching", label: "Winching" },
-];
+import TechnicianFormFields from "@/components/technician/TechnicianFormFields";
+import ResumeUpload from "@/components/technician/ResumeUpload";
+import SpecialtiesSelect from "@/components/technician/SpecialtiesSelect";
+import TermsAcceptance from "@/components/technician/TermsAcceptance";
+import { RegisterFormValues, specialtiesOptions } from "@/types/technician-registration";
 
 const TechnicianRegister = () => {
   const { register } = useTechnicianAuth();
@@ -147,219 +128,13 @@ const TechnicianRegister = () => {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John Smith" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="tech@example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="(123) 456-7890" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="experience"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Years of Experience</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            min="0" 
-                            max="50" 
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <TechnicianFormFields form={form} />
                 
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Address</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="123 Main St, City, State, Zip" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <ResumeUpload resumeFile={resumeFile} handleResumeChange={handleResumeChange} />
                 
-                {/* Resume upload field */}
-                <div className="space-y-2">
-                  <FormLabel htmlFor="resume">Upload Your Resume (PDF or Word)</FormLabel>
-                  <div className="border-2 border-dashed border-gray-200 rounded-md p-4">
-                    <div className="flex items-center justify-center space-x-2">
-                      <label
-                        htmlFor="resume"
-                        className="flex items-center justify-center w-full cursor-pointer"
-                      >
-                        <div className="flex flex-col items-center space-y-2 text-center">
-                          <Upload className="h-6 w-6 text-gray-500" />
-                          <span className="text-sm text-gray-500">
-                            {resumeFile ? resumeFile.name : "Click to upload or drag and drop"}
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            PDF, DOC or DOCX (max 5MB)
-                          </span>
-                        </div>
-                        <input
-                          id="resume"
-                          type="file"
-                          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                          className="sr-only"
-                          onChange={handleResumeChange}
-                        />
-                      </label>
-                    </div>
-                  </div>
-                  {resumeFile && (
-                    <div className="flex items-center space-x-2 text-sm text-green-600">
-                      <Check className="h-4 w-4" />
-                      <span>Resume uploaded successfully</span>
-                    </div>
-                  )}
-                </div>
+                <SpecialtiesSelect form={form} specialtiesOptions={specialtiesOptions} />
                 
-                <FormField
-                  control={form.control}
-                  name="specialties"
-                  render={() => (
-                    <FormItem>
-                      <div className="mb-4">
-                        <FormLabel>Service Specialties</FormLabel>
-                        <FormDescription>
-                          Select the services you can provide
-                        </FormDescription>
-                      </div>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {specialtiesOptions.map((option) => (
-                          <FormField
-                            key={option.id}
-                            control={form.control}
-                            name="specialties"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={option.id}
-                                  className="flex flex-row items-start space-x-3 space-y-0"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(option.id)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...field.value, option.id])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== option.id
-                                              )
-                                            )
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal">
-                                    {option.label}
-                                  </FormLabel>
-                                </FormItem>
-                              )
-                            }}
-                          />
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="termsAccepted"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>
-                          I accept the <Link to="/terms" className="text-primary">terms and conditions</Link>
-                        </FormLabel>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
+                <TermsAcceptance form={form} />
                 
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
