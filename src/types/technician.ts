@@ -1,4 +1,6 @@
 
+export type VerificationStatus = "pending" | "verified" | "rejected";
+
 export type Technician = {
   id: string;
   name: string;
@@ -11,15 +13,15 @@ export type Technician = {
   serviceAreaRange: number;
   experience: number;
   specialties: string[];
-  pricing?: Record<string, number>;
-  verification_status: "pending" | "verified" | "rejected";
+  pricing: Record<string, number>;
+  verification_status: VerificationStatus;
 };
 
 export type TechnicianWithPassword = Technician & {
   password: string;
 };
 
-export type TechnicianAuthContextType = {
+export interface TechnicianAuthContextType {
   technician: Technician | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<any>;
@@ -40,4 +42,4 @@ export type TechnicianAuthContextType = {
   approveTechnician: (technicianId: string) => Promise<boolean>;
   rejectTechnician: (technicianId: string) => Promise<boolean>;
   logout: () => void;
-};
+}

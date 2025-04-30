@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -17,6 +16,7 @@ import SpecialtiesSelect from "@/components/technician/SpecialtiesSelect";
 import PricingFields from "@/components/technician/PricingFields";
 import TermsAcceptance from "@/components/technician/TermsAcceptance";
 import { RegisterFormValues, specialtiesOptions } from "@/types/technician-registration";
+import { emailService } from "@/services/emailService";
 
 const TechnicianRegister = () => {
   const { register } = useTechnicianAuth();
@@ -98,6 +98,15 @@ const TechnicianRegister = () => {
   const uploadResume = async (technicianId: string) => {
     if (!resumeFile) return null;
     
+    // Check if bucket exists, create if not
+    const { data: buckets } = await supabase.storage.listBuckets();
+    if (!buckets?.find(bucket => bucket.name === 'technician_resumes')) {
+      await supabase.storage.createBucket('technician_resumes', {
+        public: false,
+        fileSizeLimit: 10485760 // 10MB
+      });
+    }
+    
     const fileExt = resumeFile.name.split('.').pop();
     const fileName = `${technicianId}_resume.${fileExt}`;
     const filePath = `${technicianId}/${fileName}`;
@@ -111,75 +120,12 @@ const TechnicianRegister = () => {
       return null;
     }
     
-    return data.path;
-  };
-
-  const sendApplicationEmail = async (technicianData: any, resumeUrl: string | null) => {
-    try {
-      // Convert pricing object to formatted string for email
-      const pricingList = Object.entries(technicianData.pricing)
-        .map(([key, value]) => {
-          const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-          return `<li><strong>${formattedKey}:</strong> $${value}</li>`;
-        })
-        .join('');
-        
-      const emailContent = {
-        to: "admin@towbuddy.com", // Replace with your actual email
-        subject: `New Technician Application: ${technicianData.name}`,
-        html: `
-          <h2>New Technician Application</h2>
-          <p>A new technician has applied to join Towbuddy:</p>
-          <hr />
-          <h3>Technician Details:</h3>
-          <ul>
-            <li><strong>Name:</strong> ${technicianData.name}</li>
-            <li><strong>Email:</strong> ${technicianData.email}</li>
-            <li><strong>Phone:</strong> ${technicianData.phone}</li>
-            <li><strong>Address:</strong> ${technicianData.address}</li>
-            <li><strong>Region:</strong> ${technicianData.region}</li>
-            <li><strong>District:</strong> ${technicianData.district}</li>
-            <li><strong>State:</strong> ${technicianData.state}</li>
-            <li><strong>Service Area Range:</strong> ${technicianData.serviceAreaRange} miles</li>
-            <li><strong>Experience:</strong> ${technicianData.experience} years</li>
-            <li><strong>Specialties:</strong> ${technicianData.specialties.join(", ")}</li>
-          </ul>
-          
-          <h3>Pricing:</h3>
-          <ul>
-            ${pricingList}
-          </ul>
-          
-          <hr />
-          ${resumeUrl ? `<p>Resume: <a href="${resumeUrl}" target="_blank">View Resume</a></p>` : '<p>No resume attached</p>'}
-          
-          <div style="margin: 20px 0;">
-            <p>Please review the application and select one of the options below:</p>
-            <div>
-              <a href="${window.location.origin}/admin/approve-technician/${technicianData.id}" 
-                 style="padding: 10px 20px; background-color: #22c55e; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">
-                Approve Application
-              </a>
-              <a href="${window.location.origin}/admin/reject-technician/${technicianData.id}" 
-                 style="padding: 10px 20px; background-color: #ef4444; color: white; text-decoration: none; border-radius: 5px;">
-                Reject Application
-              </a>
-            </div>
-          </div>
-          
-          <p>Thank you,<br />Towbuddy Team</p>
-        `,
-      };
-      
-      // In production, this would call an edge function to send the email
-      // For now, we'll log it to console
-      console.log("Application email would be sent:", emailContent);
-      
-      return true;
-    } catch (error) {
-      console.error("Error sending application email:", error);
-      return false;
-    }
+    // Get a URL for the resume
+    const { data: urlData } = await supabase.storage
+      .from('technician_resumes')
+      .createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7 days
+    
+    return urlData?.signedUrl || null;
   };
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -210,7 +156,7 @@ const TechnicianRegister = () => {
       const resumeUrl = await uploadResume(technicianData.id);
       
       // Send the application email with resume
-      await sendApplicationEmail(technicianData, resumeUrl);
+      await emailService.sendTechnicianApplicationEmail(technicianData, resumeUrl);
       
       toast.success("Your application has been submitted for review");
       navigate("/technician/verification");

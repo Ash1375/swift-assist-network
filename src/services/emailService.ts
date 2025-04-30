@@ -52,7 +52,7 @@ export const emailService = {
           <li><strong>Region:</strong> ${technicianData.region}</li>
           <li><strong>District:</strong> ${technicianData.district}</li>
           <li><strong>State:</strong> ${technicianData.state}</li>
-          <li><strong>Service Area Range:</strong> ${technicianData.service_area_range} miles</li>
+          <li><strong>Service Area Range:</strong> ${technicianData.serviceAreaRange} miles</li>
           <li><strong>Experience:</strong> ${technicianData.experience} years</li>
           <li><strong>Specialties:</strong> ${technicianData.specialties.join(", ")}</li>
         </ul>
@@ -83,7 +83,7 @@ export const emailService = {
       `;
       
       return await emailService.send({
-        to: "admin@towbuddy.com", // Replace with your actual email
+        to: "ash970462@gmail.com", // Updated to the specified admin email
         subject: `New Technician Application: ${technicianData.name}`,
         html,
         replyTo: technicianData.email

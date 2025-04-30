@@ -1,77 +1,144 @@
 
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client"; 
 import { Button } from "@/components/ui/button";
-import { useTechnicianAuth } from "@/contexts/TechnicianAuthContext";
-import { CheckCircle, AlertCircle } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "@/components/ui/sonner"; 
+import { emailService } from "@/services/emailService";
+import { Loader2 } from "lucide-react";
 
 const ApproveTechnician = () => {
-  const { technicianId } = useParams<{ technicianId: string }>();
-  const { approveTechnician } = useTechnicianAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
+  const { technicianId } = useParams();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [technicianName, setTechnicianName] = useState("");
+  const [technicianEmail, setTechnicianEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const processApproval = async () => {
-      if (!technicianId) {
-        setError("Invalid technician ID");
-        return;
-      }
-      
-      setIsLoading(true);
+    const fetchTechnicianData = async () => {
       try {
-        await approveTechnician(technicianId);
-        setIsComplete(true);
-      } catch (err) {
-        setError("Failed to approve technician. They may no longer exist in the system.");
+        const { data: technician, error } = await supabase
+          .from('technicians')
+          .select('name, email, verification_status')
+          .eq('id', technicianId)
+          .single();
+        
+        if (error) throw error;
+        
+        if (technician) {
+          setTechnicianName(technician.name);
+          setTechnicianEmail(technician.email);
+          
+          // Check if already approved
+          if (technician.verification_status === 'verified') {
+            setError("This technician has already been approved.");
+          }
+        } else {
+          setError("Technician not found.");
+        }
+      } catch (error: any) {
+        console.error("Error fetching technician:", error);
+        setError(error.message || "An error occurred while fetching technician data");
       } finally {
         setIsLoading(false);
       }
     };
     
-    processApproval();
-  }, [technicianId, approveTechnician]);
+    fetchTechnicianData();
+  }, [technicianId]);
 
-  return (
-    <div className="container py-12 flex flex-col items-center">
-      <div className="max-w-md w-full">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center">Technician Approval</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center space-y-4 py-6">
-            {isLoading ? (
-              <div className="text-center">
-                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em]"></div>
-                <p className="mt-4">Processing technician approval...</p>
-              </div>
-            ) : error ? (
-              <div className="text-center">
-                <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
-                <h3 className="mt-4 text-lg font-semibold">Error</h3>
-                <p className="mt-2 text-sm text-gray-500">{error}</p>
-                <Button className="mt-4" variant="outline" asChild>
-                  <Link to="/">Return to Home</Link>
-                </Button>
-              </div>
-            ) : (
-              <div className="text-center">
-                <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-                <h3 className="mt-4 text-lg font-semibold">Technician Approved</h3>
-                <p className="mt-2 text-sm text-gray-500">
-                  The technician has been successfully approved and can now access the platform.
-                  They will receive a confirmation email.
-                </p>
-                <Button className="mt-4" asChild>
-                  <Link to="/">Return to Home</Link>
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+  const handleApproval = async () => {
+    if (!technicianId) return;
+    
+    setIsSubmitting(true);
+    try {
+      // Update technician status in database
+      const { error } = await supabase
+        .from('technicians')
+        .update({ verification_status: 'verified' })
+        .eq('id', technicianId);
+        
+      if (error) throw error;
+      
+      // Send approval email
+      await emailService.sendTechnicianStatusEmail(
+        technicianEmail,
+        technicianName,
+        true
+      );
+      
+      toast.success("Technician approved successfully");
+      navigate("/");
+    } catch (error: any) {
+      console.error("Error approving technician:", error);
+      toast.error(error.message || "Failed to approve technician");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
+    );
+  }
+  
+  return (
+    <div className="container py-12 max-w-md">
+      <Card>
+        <CardHeader>
+          <CardTitle>Approve Technician</CardTitle>
+          <CardDescription>
+            Review and approve this technician application
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {error ? (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              {error}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p>
+                You are about to approve <strong>{technicianName}</strong> as a verified technician.
+              </p>
+              <p>
+                An email notification will be sent to {technicianEmail} informing them about the approval.
+              </p>
+              <p className="text-amber-600">
+                This action cannot be undone. Please confirm to proceed.
+              </p>
+            </div>
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/")}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleApproval}
+            disabled={!!error || isSubmitting}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
+              </>
+            ) : (
+              "Approve Technician"
+            )}
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 };
