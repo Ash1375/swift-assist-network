@@ -32,8 +32,25 @@ export const useTechnicianAuth = () => {
         
       if (techFetchError) throw techFetchError;
       
-      setTechnician(technicianData);
-      localStorage.setItem("towbuddy_technician", JSON.stringify(technicianData));
+      // Map database fields to our Technician type
+      const mappedTechnician: Technician = {
+        id: technicianData.id,
+        name: technicianData.name,
+        email: technicianData.email,
+        phone: technicianData.phone,
+        address: technicianData.address,
+        region: technicianData.region,
+        district: technicianData.district,
+        state: technicianData.state,
+        serviceAreaRange: technicianData.service_area_range,
+        experience: technicianData.experience,
+        specialties: technicianData.specialties,
+        pricing: technicianData.pricing,
+        verification_status: technicianData.verification_status
+      };
+      
+      setTechnician(mappedTechnician);
+      localStorage.setItem("towbuddy_technician", JSON.stringify(mappedTechnician));
       return technicianData;
     } catch (error) {
       console.error("Login error:", error);
@@ -88,8 +105,25 @@ export const useTechnicianAuth = () => {
         
       if (error) throw error;
       
-      setTechnician(data);
-      localStorage.setItem("towbuddy_technician", JSON.stringify(data));
+      // Map database fields to our Technician type
+      const mappedTechnician: Technician = {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        region: data.region,
+        district: data.district,
+        state: data.state,
+        serviceAreaRange: data.service_area_range,
+        experience: data.experience,
+        specialties: data.specialties,
+        pricing: data.pricing,
+        verification_status: data.verification_status
+      };
+      
+      setTechnician(mappedTechnician);
+      localStorage.setItem("towbuddy_technician", JSON.stringify(mappedTechnician));
       return data;
     } catch (error) {
       console.error("Registration error:", error);

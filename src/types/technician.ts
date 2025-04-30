@@ -5,14 +5,18 @@ export type Technician = {
   email: string;
   phone: string;
   address: string;
+  region: string;
+  district: string;
+  state: string;
+  serviceAreaRange: number;
   experience: number;
   specialties: string[];
-  verificationStatus: "pending" | "verified" | "rejected";
+  pricing?: Record<string, number>;
+  verification_status: "pending" | "verified" | "rejected";
 };
 
-export type TechnicianWithPassword = Omit<Technician, 'verificationStatus'> & {
+export type TechnicianWithPassword = Technician & {
   password: string;
-  verificationStatus: "pending" | "verified" | "rejected";
 };
 
 export type TechnicianAuthContextType = {
@@ -25,8 +29,13 @@ export type TechnicianAuthContextType = {
     password: string, 
     phone: string, 
     address: string,
+    region: string,
+    district: string,
+    state: string,
+    serviceAreaRange: number,
     experience: number,
-    specialties: string[]
+    specialties: string[],
+    pricing: Record<string, number>
   ) => Promise<any>;
   approveTechnician: (technicianId: string) => Promise<boolean>;
   rejectTechnician: (technicianId: string) => Promise<boolean>;

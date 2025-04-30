@@ -89,11 +89,7 @@ const TechnicianRegister = () => {
           file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
         setResumeFile(file);
       } else {
-        toast({
-          title: "Invalid file type",
-          description: "Please upload a PDF or Word document",
-          variant: "destructive",
-        });
+        toast.error("Invalid file type. Please upload a PDF or Word document");
         e.target.value = '';
       }
     }
@@ -188,11 +184,7 @@ const TechnicianRegister = () => {
 
   const onSubmit = async (data: RegisterFormValues) => {
     if (!resumeFile) {
-      toast({
-        title: "Resume required",
-        description: "Please upload your resume to complete your application",
-        variant: "destructive",
-      });
+      toast.error("Please upload your resume to complete your application");
       return;
     }
 
@@ -220,18 +212,11 @@ const TechnicianRegister = () => {
       // Send the application email with resume
       await sendApplicationEmail(technicianData, resumeUrl);
       
-      toast({
-        title: "Registration successful!",
-        description: "Your application has been submitted for review",
-      });
+      toast.success("Your application has been submitted for review");
       navigate("/technician/verification");
     } catch (error: any) {
       console.error(error);
-      toast({
-        title: "Registration failed",
-        description: error.message || "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast.error(error.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
