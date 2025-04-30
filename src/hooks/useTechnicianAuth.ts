@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
-import { technicianAuthService } from "@/services/technicianAuthService";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useTechnicianAuth = () => {
   const [technician, setTechnician] = useState<Technician | null>(null);
@@ -14,10 +14,31 @@ export const useTechnicianAuth = () => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const authenticatedTechnician = await technicianAuthService.login(email, password);
-    setTechnician(authenticatedTechnician);
-    localStorage.setItem("towbuddy_technician", JSON.stringify(authenticatedTechnician));
-    return authenticatedTechnician;
+    try {
+      // Authenticate with Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      // Fetch technician profile from the database
+      const { data: technicianData, error: techFetchError } = await supabase
+        .from('technicians')
+        .select('*')
+        .eq('email', email)
+        .single();
+        
+      if (techFetchError) throw techFetchError;
+      
+      setTechnician(technicianData);
+      localStorage.setItem("towbuddy_technician", JSON.stringify(technicianData));
+      return technicianData;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
   };
 
   const register = async (
@@ -26,28 +47,90 @@ export const useTechnicianAuth = () => {
     password: string, 
     phone: string, 
     address: string,
+    region: string,
+    district: string,
+    state: string,
+    serviceAreaRange: number,
     experience: number,
-    specialties: string[]
+    specialties: string[],
+    pricing: Record<string, number>
   ) => {
-    const registeredTechnician = await technicianAuthService.register(
-      name, email, password, phone, address, experience, specialties
-    );
-    setTechnician(registeredTechnician);
-    localStorage.setItem("towbuddy_technician", JSON.stringify(registeredTechnician));
-    return registeredTechnician;
+    try {
+      // Create a new user in Supabase auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      
+      if (authError) throw authError;
+      
+      // Add the technician to the technicians table
+      const technicianData = {
+        name,
+        email,
+        phone,
+        address,
+        region,
+        district,
+        state,
+        service_area_range: serviceAreaRange,
+        experience,
+        specialties,
+        pricing,
+        verification_status: 'pending'
+      };
+      
+      const { data, error } = await supabase
+        .from('technicians')
+        .insert(technicianData)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      setTechnician(data);
+      localStorage.setItem("towbuddy_technician", JSON.stringify(data));
+      return data;
+    } catch (error) {
+      console.error("Registration error:", error);
+      throw error;
+    }
   };
 
   const approveTechnician = async (technicianId: string) => {
-    return technicianAuthService.approveTechnician(technicianId);
+    try {
+      const { error } = await supabase
+        .from('technicians')
+        .update({ verification_status: 'verified' })
+        .eq('id', technicianId);
+        
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error approving technician:", error);
+      return false;
+    }
   };
 
   const rejectTechnician = async (technicianId: string) => {
-    return technicianAuthService.rejectTechnician(technicianId);
+    try {
+      const { error } = await supabase
+        .from('technicians')
+        .update({ verification_status: 'rejected' })
+        .eq('id', technicianId);
+        
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error rejecting technician:", error);
+      return false;
+    }
   };
 
   const logout = () => {
-    technicianAuthService.logout();
+    supabase.auth.signOut();
     setTechnician(null);
+    localStorage.removeItem("towbuddy_technician");
   };
 
   return {

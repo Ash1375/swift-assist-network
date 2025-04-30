@@ -1,86 +1,99 @@
 
+import { supabase } from "@/integrations/supabase/client";
+
 interface EmailData {
   to: string;
   subject: string;
-  body: string;
-  attachments?: {
-    filename: string;
-    content: string | Blob;
-  }[];
+  html: string;
+  replyTo?: string;
 }
 
-// In a real application, this would integrate with a proper email service like SendGrid or AWS SES
-// For demo purposes, we'll simulate email sending
 export const emailService = {
   send: async (data: EmailData): Promise<boolean> => {
-    console.log("Sending email:", data);
-    return new Promise((resolve) => {
-      // Simulate email sending with a delay
-      setTimeout(() => {
-        console.log(`Email sent to ${data.to} with subject: ${data.subject}`);
-        resolve(true);
-      }, 1000);
-    });
-  },
-  
-  // Helper function to send technician application email
-  sendTechnicianApplicationEmail: async (
-    technicianData: any, 
-    resumeFile?: File
-  ): Promise<boolean> => {
-    const adminEmail = "ashop1355@gmail.com";
-    
-    // Generate approval/rejection links
-    // In a real app, these would be actual URLs with tokens
-    const approveLink = `${window.location.origin}/admin/approve-technician/${technicianData.id}`;
-    const rejectLink = `${window.location.origin}/admin/reject-technician/${technicianData.id}`;
-    
-    const emailContent = `
-      <h2>New Technician Application</h2>
-      <p>A new technician has applied to join Towbuddy:</p>
-      <hr />
-      <h3>Technician Details:</h3>
-      <ul>
-        <li><strong>Name:</strong> ${technicianData.name}</li>
-        <li><strong>Email:</strong> ${technicianData.email}</li>
-        <li><strong>Phone:</strong> ${technicianData.phone}</li>
-        <li><strong>Address:</strong> ${technicianData.address}</li>
-        <li><strong>Experience:</strong> ${technicianData.experience} years</li>
-        <li><strong>Specialties:</strong> ${technicianData.specialties.join(", ")}</li>
-      </ul>
-      <hr />
-      <p>Resume is attached to this email.</p>
-      <div style="margin: 20px 0;">
-        <p>Please review the application and select one of the options below:</p>
-        <div style="display: flex; gap: 10px;">
-          <a href="${approveLink}" style="padding: 10px 20px; background-color: #22c55e; color: white; text-decoration: none; border-radius: 5px;">Approve Application</a>
-          <a href="${rejectLink}" style="padding: 10px 20px; background-color: #ef4444; color: white; text-decoration: none; border-radius: 5px;">Reject Application</a>
-        </div>
-      </div>
-      <p>You can also respond to this email directly for any questions.</p>
-      <p>Thank you,<br />Towbuddy Team</p>
-    `;
-    
-    const emailData: EmailData = {
-      to: adminEmail,
-      subject: `New Technician Application: ${technicianData.name}`,
-      body: emailContent
-    };
-    
-    // If resume is provided, add it as an attachment
-    if (resumeFile) {
-      emailData.attachments = [
-        {
-          filename: `${technicianData.name.replace(/\s+/g, '_')}_resume.pdf`,
-          content: resumeFile
-        }
-      ];
+    try {
+      const { to, subject, html, replyTo } = data;
+
+      const { error } = await supabase.functions.invoke('send-technician-email', {
+        body: { to, subject, html, replyTo }
+      });
+
+      if (error) {
+        console.error('Error sending email:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Email service error:', error);
+      return false;
     }
-    
-    return await emailService.send(emailData);
   },
   
-  // Helper function to notify technician of their application result
+  sendTechnicianApplicationEmail: async (technicianData: any, resumeUrl: string | null): Promise<boolean> => {
+    try {
+      // Convert pricing object to formatted string for email
+      const pricingList = Object.entries(technicianData.pricing)
+        .map(([key, value]) => {
+          const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+          return `<li><strong>${formattedKey}:</strong> $${value}</li>`;
+        })
+        .join('');
+        
+      const html = `
+        <h2>New Technician Application</h2>
+        <p>A new technician has applied to join Towbuddy:</p>
+        <hr />
+        <h3>Technician Details:</h3>
+        <ul>
+          <li><strong>Name:</strong> ${technicianData.name}</li>
+          <li><strong>Email:</strong> ${technicianData.email}</li>
+          <li><strong>Phone:</strong> ${technicianData.phone}</li>
+          <li><strong>Address:</strong> ${technicianData.address}</li>
+          <li><strong>Region:</strong> ${technicianData.region}</li>
+          <li><strong>District:</strong> ${technicianData.district}</li>
+          <li><strong>State:</strong> ${technicianData.state}</li>
+          <li><strong>Service Area Range:</strong> ${technicianData.service_area_range} miles</li>
+          <li><strong>Experience:</strong> ${technicianData.experience} years</li>
+          <li><strong>Specialties:</strong> ${technicianData.specialties.join(", ")}</li>
+        </ul>
+        
+        <h3>Pricing:</h3>
+        <ul>
+          ${pricingList}
+        </ul>
+        
+        <hr />
+        ${resumeUrl ? `<p>Resume: <a href="${resumeUrl}" target="_blank">View Resume</a></p>` : '<p>No resume attached</p>'}
+        
+        <div style="margin: 20px 0;">
+          <p>Please review the application and select one of the options below:</p>
+          <div>
+            <a href="${window.location.origin}/admin/approve-technician/${technicianData.id}" 
+               style="padding: 10px 20px; background-color: #22c55e; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">
+              Approve Application
+            </a>
+            <a href="${window.location.origin}/admin/reject-technician/${technicianData.id}" 
+               style="padding: 10px 20px; background-color: #ef4444; color: white; text-decoration: none; border-radius: 5px;">
+              Reject Application
+            </a>
+          </div>
+        </div>
+        
+        <p>Thank you,<br />Towbuddy Team</p>
+      `;
+      
+      return await emailService.send({
+        to: "admin@towbuddy.com", // Replace with your actual email
+        subject: `New Technician Application: ${technicianData.name}`,
+        html,
+        replyTo: technicianData.email
+      });
+    } catch (error) {
+      console.error("Error sending application email:", error);
+      return false;
+    }
+  },
+  
   sendTechnicianStatusEmail: async (
     technicianEmail: string, 
     name: string, 
@@ -90,7 +103,7 @@ export const emailService = {
       ? "Your Towbuddy Application has been Approved!" 
       : "Update on Your Towbuddy Application";
       
-    const body = isApproved
+    const html = isApproved
       ? `
         <h2>Congratulations, ${name}!</h2>
         <p>Your application to join the Towbuddy technician network has been approved.</p>
@@ -111,7 +124,7 @@ export const emailService = {
     return await emailService.send({
       to: technicianEmail,
       subject,
-      body
+      html
     });
   }
 };

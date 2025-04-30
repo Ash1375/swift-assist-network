@@ -2,16 +2,19 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTechnicianAuth } from "@/contexts/TechnicianAuthContext";
-import { toast } from "@/hooks/use-toast";
-import { UserPlus } from "lucide-react";
-import { emailService } from "@/services/emailService";
+import { toast } from "@/components/ui/sonner";
+import { UserPlus, Upload } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import TechnicianFormFields from "@/components/technician/TechnicianFormFields";
 import ResumeUpload from "@/components/technician/ResumeUpload";
 import SpecialtiesSelect from "@/components/technician/SpecialtiesSelect";
+import PricingFields from "@/components/technician/PricingFields";
 import TermsAcceptance from "@/components/technician/TermsAcceptance";
 import { RegisterFormValues, specialtiesOptions } from "@/types/technician-registration";
 
@@ -21,7 +24,37 @@ const TechnicianRegister = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   
+  const formSchema = z.object({
+    name: z.string().min(2, "Full name is required"),
+    email: z.string().email("Valid email is required"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string(),
+    phone: z.string().min(10, "Valid phone number is required"),
+    address: z.string().min(5, "Address is required"),
+    region: z.string().min(1, "Region is required"),
+    district: z.string().min(1, "District is required"),
+    state: z.string().min(1, "State is required"),
+    serviceAreaRange: z.number().min(1, "Service area range is required"),
+    experience: z.number().min(0, "Experience is required"),
+    specialties: z.array(z.string()).min(1, "Select at least one specialty"),
+    pricing: z.object({
+      towing: z.number().min(0, "Price required"),
+      tireChange: z.number().min(0, "Price required"),
+      jumpStart: z.number().min(0, "Price required"),
+      fuelDelivery: z.number().min(0, "Price required"),
+      lockout: z.number().min(0, "Price required"),
+      winching: z.number().min(0, "Price required")
+    }),
+    termsAccepted: z.boolean().refine(val => val === true, {
+      message: "You must accept the terms and conditions",
+    })
+  }).refine(data => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"]
+  });
+  
   const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -29,8 +62,20 @@ const TechnicianRegister = () => {
       confirmPassword: "",
       phone: "",
       address: "",
+      region: "",
+      district: "",
+      state: "",
+      serviceAreaRange: 10,
       experience: 0,
       specialties: [],
+      pricing: {
+        towing: 0,
+        tireChange: 0,
+        jumpStart: 0,
+        fuelDelivery: 0,
+        lockout: 0,
+        winching: 0
+      },
       termsAccepted: false,
     },
   });
@@ -54,23 +99,94 @@ const TechnicianRegister = () => {
     }
   };
 
+  const uploadResume = async (technicianId: string) => {
+    if (!resumeFile) return null;
+    
+    const fileExt = resumeFile.name.split('.').pop();
+    const fileName = `${technicianId}_resume.${fileExt}`;
+    const filePath = `${technicianId}/${fileName}`;
+    
+    const { data, error } = await supabase.storage
+      .from('technician_resumes')
+      .upload(filePath, resumeFile);
+      
+    if (error) {
+      console.error('Error uploading resume:', error);
+      return null;
+    }
+    
+    return data.path;
+  };
+
+  const sendApplicationEmail = async (technicianData: any, resumeUrl: string | null) => {
+    try {
+      // Convert pricing object to formatted string for email
+      const pricingList = Object.entries(technicianData.pricing)
+        .map(([key, value]) => {
+          const formattedKey = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+          return `<li><strong>${formattedKey}:</strong> $${value}</li>`;
+        })
+        .join('');
+        
+      const emailContent = {
+        to: "admin@towbuddy.com", // Replace with your actual email
+        subject: `New Technician Application: ${technicianData.name}`,
+        html: `
+          <h2>New Technician Application</h2>
+          <p>A new technician has applied to join Towbuddy:</p>
+          <hr />
+          <h3>Technician Details:</h3>
+          <ul>
+            <li><strong>Name:</strong> ${technicianData.name}</li>
+            <li><strong>Email:</strong> ${technicianData.email}</li>
+            <li><strong>Phone:</strong> ${technicianData.phone}</li>
+            <li><strong>Address:</strong> ${technicianData.address}</li>
+            <li><strong>Region:</strong> ${technicianData.region}</li>
+            <li><strong>District:</strong> ${technicianData.district}</li>
+            <li><strong>State:</strong> ${technicianData.state}</li>
+            <li><strong>Service Area Range:</strong> ${technicianData.serviceAreaRange} miles</li>
+            <li><strong>Experience:</strong> ${technicianData.experience} years</li>
+            <li><strong>Specialties:</strong> ${technicianData.specialties.join(", ")}</li>
+          </ul>
+          
+          <h3>Pricing:</h3>
+          <ul>
+            ${pricingList}
+          </ul>
+          
+          <hr />
+          ${resumeUrl ? `<p>Resume: <a href="${resumeUrl}" target="_blank">View Resume</a></p>` : '<p>No resume attached</p>'}
+          
+          <div style="margin: 20px 0;">
+            <p>Please review the application and select one of the options below:</p>
+            <div>
+              <a href="${window.location.origin}/admin/approve-technician/${technicianData.id}" 
+                 style="padding: 10px 20px; background-color: #22c55e; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">
+                Approve Application
+              </a>
+              <a href="${window.location.origin}/admin/reject-technician/${technicianData.id}" 
+                 style="padding: 10px 20px; background-color: #ef4444; color: white; text-decoration: none; border-radius: 5px;">
+                Reject Application
+              </a>
+            </div>
+          </div>
+          
+          <p>Thank you,<br />Towbuddy Team</p>
+        `,
+      };
+      
+      // In production, this would call an edge function to send the email
+      // For now, we'll log it to console
+      console.log("Application email would be sent:", emailContent);
+      
+      return true;
+    } catch (error) {
+      console.error("Error sending application email:", error);
+      return false;
+    }
+  };
+
   const onSubmit = async (data: RegisterFormValues) => {
-    if (data.password !== data.confirmPassword) {
-      form.setError("confirmPassword", {
-        type: "manual",
-        message: "Passwords do not match",
-      });
-      return;
-    }
-
-    if (!data.termsAccepted) {
-      form.setError("termsAccepted", {
-        type: "manual",
-        message: "You must accept the terms and conditions",
-      });
-      return;
-    }
-
     if (!resumeFile) {
       toast({
         title: "Resume required",
@@ -88,24 +204,32 @@ const TechnicianRegister = () => {
         data.email, 
         data.password, 
         data.phone, 
-        data.address, 
+        data.address,
+        data.region,
+        data.district,
+        data.state,
+        data.serviceAreaRange,
         data.experience, 
-        data.specialties
+        data.specialties,
+        data.pricing
       );
       
+      // Upload resume
+      const resumeUrl = await uploadResume(technicianData.id);
+      
       // Send the application email with resume
-      await emailService.sendTechnicianApplicationEmail(technicianData, resumeFile);
+      await sendApplicationEmail(technicianData, resumeUrl);
       
       toast({
         title: "Registration successful!",
-        description: "Your application and resume have been submitted for review",
+        description: "Your application has been submitted for review",
       });
       navigate("/technician/verification");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       toast({
         title: "Registration failed",
-        description: "Email may already be in use",
+        description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -115,39 +239,54 @@ const TechnicianRegister = () => {
 
   return (
     <div className="container py-12 flex flex-col items-center">
-      <div className="max-w-3xl w-full">
+      <div className="max-w-4xl w-full">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold">Join Our Technician Network</h1>
-          <p className="text-muted-foreground mt-2">Create an account to start providing services with Towbuddy</p>
+          <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
+            Become part of our growing network of skilled roadside assistance professionals. 
+            Complete the form below to submit your application.
+          </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Technician Registration</CardTitle>
+        <Card className="border-2 border-primary/10 shadow-lg">
+          <CardHeader className="bg-primary-foreground">
+            <CardTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5" /> 
+              Technician Application Form
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <TechnicianFormFields form={form} />
                 
-                <ResumeUpload resumeFile={resumeFile} handleResumeChange={handleResumeChange} />
+                <PricingFields form={form} />
                 
-                <SpecialtiesSelect form={form} specialtiesOptions={specialtiesOptions} />
+                <Card className="mb-6">
+                  <CardContent className="pt-6">
+                    <h3 className="text-lg font-medium mb-4">Professional Details</h3>
+                    <div className="space-y-6">
+                      <ResumeUpload resumeFile={resumeFile} handleResumeChange={handleResumeChange} />
+                      
+                      <SpecialtiesSelect form={form} specialtiesOptions={specialtiesOptions} />
+                    </div>
+                  </CardContent>
+                </Card>
                 
                 <TermsAcceptance form={form} />
                 
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
                   {isLoading ? (
                     <span className="flex items-center justify-center">
                       <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Submitting...
+                      Submitting Application...
                     </span>
                   ) : (
                     <span className="flex items-center justify-center">
-                      <UserPlus className="mr-2 h-4 w-4" /> Register as Technician
+                      <Upload className="mr-2 h-4 w-4" /> Submit Application
                     </span>
                   )}
                 </Button>
