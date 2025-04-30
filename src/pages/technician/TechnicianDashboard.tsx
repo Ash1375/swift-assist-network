@@ -18,7 +18,7 @@ const TechnicianDashboard = () => {
     return <Navigate to="/technician/login" replace />;
   }
   
-  if (technician?.verificationStatus !== "verified") {
+  if (technician?.verification_status !== "verified") {
     return <Navigate to="/technician/verification" replace />;
   }
 

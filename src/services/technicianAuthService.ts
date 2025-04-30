@@ -27,8 +27,13 @@ export const technicianAuthService = {
     password: string, 
     phone: string, 
     address: string,
+    region: string,
+    district: string,
+    state: string,
+    serviceAreaRange: number,
     experience: number,
-    specialties: string[]
+    specialties: string[],
+    pricing: Record<string, number>
   ): Promise<Technician> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -44,9 +49,14 @@ export const technicianAuthService = {
             password,
             phone,
             address,
+            region,
+            district,
+            state,
+            serviceAreaRange,
             experience,
             specialties,
-            verificationStatus: "pending",
+            pricing,
+            verification_status: "pending",
           };
           
           demoTechnicians.push(newTechnician);
@@ -68,7 +78,7 @@ export const technicianAuthService = {
           return;
         }
         
-        demoTechnicians[technicianIndex].verificationStatus = "verified";
+        demoTechnicians[technicianIndex].verification_status = "verified";
         
         // Send approval email to technician
         emailService.sendTechnicianStatusEmail(
@@ -92,7 +102,7 @@ export const technicianAuthService = {
           return;
         }
         
-        demoTechnicians[technicianIndex].verificationStatus = "rejected";
+        demoTechnicians[technicianIndex].verification_status = "rejected";
         
         // Send rejection email to technician
         emailService.sendTechnicianStatusEmail(

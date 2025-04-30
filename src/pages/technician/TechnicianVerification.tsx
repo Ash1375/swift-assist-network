@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +13,7 @@ const TechnicianVerification = () => {
   }
 
   const renderStatusContent = () => {
-    switch (technician?.verificationStatus) {
+    switch (technician?.verification_status) {
       case "pending":
         return (
           <div className="flex flex-col items-center py-6">

@@ -45,8 +45,10 @@ export const useTechnicianAuth = () => {
         serviceAreaRange: technicianData.service_area_range,
         experience: technicianData.experience,
         specialties: technicianData.specialties,
-        pricing: technicianData.pricing,
-        verification_status: technicianData.verification_status
+        // Convert the JSON pricing to Record<string, number>
+        pricing: technicianData.pricing as Record<string, number>,
+        // Ensure verification_status is one of the allowed enum values
+        verification_status: technicianData.verification_status as "pending" | "verified" | "rejected"
       };
       
       setTechnician(mappedTechnician);
@@ -118,8 +120,10 @@ export const useTechnicianAuth = () => {
         serviceAreaRange: data.service_area_range,
         experience: data.experience,
         specialties: data.specialties,
-        pricing: data.pricing,
-        verification_status: data.verification_status
+        // Convert the JSON pricing to Record<string, number>
+        pricing: data.pricing as Record<string, number>,
+        // Ensure verification_status is one of the allowed enum values
+        verification_status: data.verification_status as "pending" | "verified" | "rejected"
       };
       
       setTechnician(mappedTechnician);

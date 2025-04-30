@@ -38,8 +38,13 @@ export const useTechnicianAuthState = () => {
     password: string, 
     phone: string, 
     address: string,
+    region: string,
+    district: string,
+    state: string,
+    serviceAreaRange: number,
     experience: number,
-    specialties: string[]
+    specialties: string[],
+    pricing: Record<string, number>
   ) => {
     return new Promise<Technician>((resolve, reject) => {
       setTimeout(() => {
@@ -55,9 +60,14 @@ export const useTechnicianAuthState = () => {
             password,
             phone,
             address,
+            region,
+            district,
+            state,
+            serviceAreaRange,
             experience,
             specialties,
-            verificationStatus: "pending",
+            pricing,
+            verification_status: "pending",
           };
           
           demoTechnicians.push(newTechnician);
