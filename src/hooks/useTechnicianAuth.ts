@@ -145,7 +145,7 @@ export const useTechnicianAuth = () => {
     pricing: Record<string, number>
   ) => {
     try {
-      // Create a new user in Supabase auth
+      // First create a user account in Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -159,8 +159,13 @@ export const useTechnicianAuth = () => {
       
       if (authError) throw authError;
       
-      // Add the technician to the technicians table
+      if (!authData.user) {
+        throw new Error("Failed to create user account");
+      }
+      
+      // Then create the technician record
       const technicianData = {
+        id: authData.user.id, // Use the auth user's ID as the technician ID
         name,
         email,
         phone,
@@ -181,7 +186,10 @@ export const useTechnicianAuth = () => {
         .select()
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error("Error creating technician record:", error);
+        throw error;
+      }
       
       // Map database fields to our Technician type
       const mappedTechnician: Technician = {

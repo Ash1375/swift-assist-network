@@ -16,7 +16,6 @@ import SpecialtiesSelect from "@/components/technician/SpecialtiesSelect";
 import PricingFields from "@/components/technician/PricingFields";
 import TermsAcceptance from "@/components/technician/TermsAcceptance";
 import { RegisterFormValues, specialtiesOptions } from "@/types/technician-registration";
-import { emailService } from "@/services/emailService";
 
 const TechnicianRegister = () => {
   const { register } = useTechnicianAuth();
@@ -98,34 +97,39 @@ const TechnicianRegister = () => {
   const uploadResume = async (technicianId: string) => {
     if (!resumeFile) return null;
     
-    // Check if bucket exists, create if not
-    const { data: buckets } = await supabase.storage.listBuckets();
-    if (!buckets?.find(bucket => bucket.name === 'technician_resumes')) {
-      await supabase.storage.createBucket('technician_resumes', {
-        public: false,
-        fileSizeLimit: 10485760 // 10MB
-      });
-    }
-    
-    const fileExt = resumeFile.name.split('.').pop();
-    const fileName = `${technicianId}_resume.${fileExt}`;
-    const filePath = `${technicianId}/${fileName}`;
-    
-    const { data, error } = await supabase.storage
-      .from('technician_resumes')
-      .upload(filePath, resumeFile);
+    try {
+      // Check if bucket exists, create if not
+      const { data: buckets } = await supabase.storage.listBuckets();
+      if (!buckets?.find(bucket => bucket.name === 'technician_resumes')) {
+        await supabase.storage.createBucket('technician_resumes', {
+          public: false,
+          fileSizeLimit: 10485760 // 10MB
+        });
+      }
       
-    if (error) {
-      console.error('Error uploading resume:', error);
+      const fileExt = resumeFile.name.split('.').pop();
+      const fileName = `${technicianId}_resume.${fileExt}`;
+      const filePath = `${technicianId}/${fileName}`;
+      
+      const { data, error } = await supabase.storage
+        .from('technician_resumes')
+        .upload(filePath, resumeFile);
+        
+      if (error) {
+        console.error('Error uploading resume:', error);
+        return null;
+      }
+      
+      // Get a URL for the resume
+      const { data: urlData } = await supabase.storage
+        .from('technician_resumes')
+        .createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7 days
+      
+      return urlData?.signedUrl || null;
+    } catch (error) {
+      console.error("Error in resume upload:", error);
       return null;
     }
-    
-    // Get a URL for the resume
-    const { data: urlData } = await supabase.storage
-      .from('technician_resumes')
-      .createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7 days
-    
-    return urlData?.signedUrl || null;
   };
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -155,9 +159,7 @@ const TechnicianRegister = () => {
       // Upload resume
       const resumeUrl = await uploadResume(technicianData.id);
       
-      // Send the application email with resume
-      await emailService.sendTechnicianApplicationEmail(technicianData, resumeUrl);
-      
+      // Notify success and navigate to verification page
       toast.success("Your application has been submitted for review");
       navigate("/technician/verification");
     } catch (error: any) {
