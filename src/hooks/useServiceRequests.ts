@@ -42,10 +42,10 @@ export const useServiceRequests = () => {
         status: 'pending'
       };
       
-      // Use any() to access 'service_requests' table which isn't in the type definition yet
+      // Use type assertion to access 'service_requests' table which isn't in the type definition yet
       const { data, error } = await supabase
-        .from('service_requests')
-        .insert(request)
+        .from('service_requests' as any)
+        .insert(request as any)
         .select()
         .single();
         
@@ -67,9 +67,9 @@ export const useServiceRequests = () => {
     
     setIsLoading(true);
     try {
-      // Use any() to access 'service_requests' and join with 'technicians' table
+      // Use type assertion to access 'service_requests' and join with 'technicians' table
       const { data, error } = await supabase
-        .from('service_requests')
+        .from('service_requests' as any)
         .select(`
           *,
           technicians (
@@ -96,9 +96,9 @@ export const useServiceRequests = () => {
   const getTechnicianRequests = async (technicianId: string) => {
     setIsLoading(true);
     try {
-      // Use any() to access 'service_requests' and join with 'profiles' table
+      // Use type assertion to access 'service_requests' and join with 'profiles' table
       const { data, error } = await supabase
-        .from('service_requests')
+        .from('service_requests' as any)
         .select(`
           *,
           profiles:user_id (
@@ -132,9 +132,9 @@ export const useServiceRequests = () => {
         updates.completed_at = new Date().toISOString();
       }
       
-      // Use any() to update 'service_requests' table which isn't in the type definition yet
+      // Use type assertion to update 'service_requests' table which isn't in the type definition yet
       const { error } = await supabase
-        .from('service_requests')
+        .from('service_requests' as any)
         .update(updates)
         .eq('id', requestId);
         

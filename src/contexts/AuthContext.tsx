@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
@@ -40,7 +39,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const setupAuth = async () => {
@@ -51,9 +49,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           if (event === 'SIGNED_IN' && newSession) {
             try {
-              // Use any() to query 'profiles' table which isn't in the type definition yet
+              // Use a type assertion to bypass type checking for the profiles table
               const { data: profile, error } = await supabase
-                .from('profiles')
+                .from('profiles' as any)
                 .select('*')
                 .eq('id', newSession.user.id)
                 .single();
@@ -63,9 +61,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               if (profile) {
                 setUser({
                   id: newSession.user.id,
-                  name: profile.full_name || newSession.user.email?.split('@')[0] || 'User',
+                  name: (profile as any).full_name || newSession.user.email?.split('@')[0] || 'User',
                   email: newSession.user.email || '',
-                  subscription: profile.subscription_tier || 'free',
+                  subscription: (profile as any).subscription_tier || 'free',
                 });
               } else {
                 // Fallback if profile not found
@@ -91,9 +89,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (currentSession?.user) {
         try {
-          // Use any() to query 'profiles' table which isn't in the type definition yet
+          // Use a type assertion to bypass type checking for the profiles table
           const { data: profile, error } = await supabase
-            .from('profiles')
+            .from('profiles' as any)
             .select('*')
             .eq('id', currentSession.user.id)
             .single();
@@ -103,9 +101,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (profile) {
             setUser({
               id: currentSession.user.id,
-              name: profile.full_name || currentSession.user.email?.split('@')[0] || 'User',
+              name: (profile as any).full_name || currentSession.user.email?.split('@')[0] || 'User',
               email: currentSession.user.email || '',
-              subscription: profile.subscription_tier || 'free',
+              subscription: (profile as any).subscription_tier || 'free',
             });
           } else {
             // Fallback if profile not found
@@ -169,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       await supabase.auth.signOut();
-      navigate('/');
+      window.location.href = '/';
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("Failed to log out. Please try again.");
@@ -180,9 +178,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!user?.id) throw new Error("Not authenticated");
       
-      // Use any() to update 'profiles' table which isn't in the type definition yet
+      // Use a type assertion to bypass type checking for the profiles table
       const { error } = await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .update({
           full_name: data.name,
           updated_at: new Date().toISOString(),
