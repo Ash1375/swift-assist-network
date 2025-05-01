@@ -51,11 +51,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           if (event === 'SIGNED_IN' && newSession) {
             try {
-              const { data: profile } = await supabase
+              // Use any() to query 'profiles' table which isn't in the type definition yet
+              const { data: profile, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', newSession.user.id)
                 .single();
+              
+              if (error) throw error;
               
               if (profile) {
                 setUser({
@@ -88,11 +91,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (currentSession?.user) {
         try {
-          const { data: profile } = await supabase
+          // Use any() to query 'profiles' table which isn't in the type definition yet
+          const { data: profile, error } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', currentSession.user.id)
             .single();
+          
+          if (error) throw error;
           
           if (profile) {
             setUser({
@@ -174,6 +180,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!user?.id) throw new Error("Not authenticated");
       
+      // Use any() to update 'profiles' table which isn't in the type definition yet
       const { error } = await supabase
         .from('profiles')
         .update({

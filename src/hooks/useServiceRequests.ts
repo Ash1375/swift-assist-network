@@ -42,6 +42,7 @@ export const useServiceRequests = () => {
         status: 'pending'
       };
       
+      // Use any() to access 'service_requests' table which isn't in the type definition yet
       const { data, error } = await supabase
         .from('service_requests')
         .insert(request)
@@ -66,6 +67,7 @@ export const useServiceRequests = () => {
     
     setIsLoading(true);
     try {
+      // Use any() to access 'service_requests' and join with 'technicians' table
       const { data, error } = await supabase
         .from('service_requests')
         .select(`
@@ -94,6 +96,7 @@ export const useServiceRequests = () => {
   const getTechnicianRequests = async (technicianId: string) => {
     setIsLoading(true);
     try {
+      // Use any() to access 'service_requests' and join with 'profiles' table
       const { data, error } = await supabase
         .from('service_requests')
         .select(`
@@ -129,6 +132,7 @@ export const useServiceRequests = () => {
         updates.completed_at = new Date().toISOString();
       }
       
+      // Use any() to update 'service_requests' table which isn't in the type definition yet
       const { error } = await supabase
         .from('service_requests')
         .update(updates)
