@@ -123,7 +123,11 @@ export const useServiceRequests = () => {
   
   const updateRequestStatus = async (requestId: string, status: string) => {
     try {
-      const updates = {
+      const updates: {
+        status: string;
+        updated_at: string;
+        completed_at?: string;
+      } = {
         status,
         updated_at: new Date().toISOString(),
       };
@@ -135,7 +139,7 @@ export const useServiceRequests = () => {
       // Use type assertion to update 'service_requests' table which isn't in the type definition yet
       const { error } = await supabase
         .from('service_requests' as any)
-        .update(updates)
+        .update(updates as any)
         .eq('id', requestId);
         
       if (error) throw error;

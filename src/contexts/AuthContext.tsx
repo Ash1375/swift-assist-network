@@ -20,6 +20,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<any>;
   logout: () => void;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
+  updateSubscription: (subscription: "free" | "basic" | "premium" | "enterprise" | "none") => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -31,6 +32,7 @@ const AuthContext = createContext<AuthContextType>({
   register: async () => ({}),
   logout: () => {},
   updateProfile: async () => {},
+  updateSubscription: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -198,6 +200,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateSubscription = async (subscription: "free" | "basic" | "premium" | "enterprise" | "none") => {
+    try {
+      if (!user?.id) throw new Error("Not authenticated");
+      
+      // Use a type assertion to bypass type checking for the profiles table
+      const { error } = await supabase
+        .from('profiles' as any)
+        .update({
+          subscription_tier: subscription,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+        
+      if (error) throw error;
+      
+      setUser(prev => prev ? { ...prev, subscription } : null);
+      toast.success(`Subscription updated to ${subscription} successfully`);
+    } catch (error) {
+      console.error("Error updating subscription:", error);
+      toast.error("Failed to update subscription");
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -209,6 +235,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         logout,
         updateProfile,
+        updateSubscription,
       }}
     >
       {children}

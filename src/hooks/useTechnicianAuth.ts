@@ -36,7 +36,7 @@ export const useTechnicianAuth = () => {
               serviceAreaRange: techData.service_area_range,
               experience: techData.experience,
               specialties: techData.specialties || [],
-              pricing: techData.pricing || {},
+              pricing: techData.pricing ? (techData.pricing as Record<string, number>) : {},
               verification_status: techData.verification_status as "pending" | "verified" | "rejected"
             };
             
