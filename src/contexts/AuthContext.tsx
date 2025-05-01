@@ -1,118 +1,195 @@
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/sonner";
 
-// Define the user type
-type User = {
+interface UserProfile {
   id: string;
   name: string;
   email: string;
-  subscription: "none" | "basic" | "premium" | "enterprise";
-};
+  subscription: "free" | "basic" | "premium" | "enterprise" | "none";
+}
 
-// Define the auth context type
-type AuthContextType = {
-  user: User | null;
+interface AuthContextType {
+  user: UserProfile | null;
+  session: Session | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<any>;
+  register: (name: string, email: string, password: string) => Promise<any>;
   logout: () => void;
-  updateSubscription: (plan: "none" | "basic" | "premium" | "enterprise") => void;
-};
+  updateProfile: (data: Partial<UserProfile>) => Promise<void>;
+}
 
-// Create the context with a default value
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  session: null,
   isAuthenticated: false,
-  login: async () => {},
-  register: async () => {},
+  loading: true,
+  login: async () => ({}),
+  register: async () => ({}),
   logout: () => {},
-  updateSubscription: () => {},
+  updateProfile: async () => {},
 });
 
-// Demo users for our mock authentication
-const demoUsers = [
-  {
-    id: "1",
-    name: "Demo User",
-    email: "demo@example.com",
-    password: "password123",
-    subscription: "none" as const,
-  },
-];
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
 
-  // Check if user is already logged in from localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem("towbuddy_user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    const setupAuth = async () => {
+      // Set up auth state listener FIRST
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, newSession) => {
+          setSession(newSession);
+          
+          if (event === 'SIGNED_IN' && newSession) {
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', newSession.user.id)
+                .single();
+              
+              if (profile) {
+                setUser({
+                  id: newSession.user.id,
+                  name: profile.full_name || newSession.user.email?.split('@')[0] || 'User',
+                  email: newSession.user.email || '',
+                  subscription: profile.subscription_tier || 'free',
+                });
+              } else {
+                // Fallback if profile not found
+                setUser({
+                  id: newSession.user.id,
+                  name: newSession.user.email?.split('@')[0] || 'User',
+                  email: newSession.user.email || '',
+                  subscription: 'free',
+                });
+              }
+            } catch (error) {
+              console.error("Error fetching user profile:", error);
+            }
+          } else if (event === 'SIGNED_OUT') {
+            setUser(null);
+          }
+        }
+      );
+      
+      // THEN check for existing session
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      setSession(currentSession);
+      
+      if (currentSession?.user) {
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', currentSession.user.id)
+            .single();
+          
+          if (profile) {
+            setUser({
+              id: currentSession.user.id,
+              name: profile.full_name || currentSession.user.email?.split('@')[0] || 'User',
+              email: currentSession.user.email || '',
+              subscription: profile.subscription_tier || 'free',
+            });
+          } else {
+            // Fallback if profile not found
+            setUser({
+              id: currentSession.user.id,
+              name: currentSession.user.email?.split('@')[0] || 'User',
+              email: currentSession.user.email || '',
+              subscription: 'free',
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
+      }
+      
+      setLoading(false);
+      
+      return () => {
+        subscription.unsubscribe();
+      };
+    };
+    
+    setupAuth();
   }, []);
 
-  // Login function - simulates authentication
   const login = async (email: string, password: string) => {
-    return new Promise<void>((resolve, reject) => {
-      // Simulate API call delay
-      setTimeout(() => {
-        const foundUser = demoUsers.find(
-          (u) => u.email === email && u.password === password
-        );
-        
-        if (foundUser) {
-          const { password, ...userWithoutPassword } = foundUser;
-          setUser(userWithoutPassword);
-          localStorage.setItem("towbuddy_user", JSON.stringify(userWithoutPassword));
-          resolve();
-        } else {
-          reject(new Error("Invalid email or password"));
-        }
-      }, 500);
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      return data;
+    } catch (error: any) {
+      console.error("Login error:", error);
+      throw error;
+    }
   };
 
-  // Register function - simulates user registration
   const register = async (name: string, email: string, password: string) => {
-    return new Promise<void>((resolve, reject) => {
-      // Simulate API call delay
-      setTimeout(() => {
-        const existingUser = demoUsers.find((u) => u.email === email);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+          },
+        },
+      });
+      
+      if (error) throw error;
+      return data;
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/');
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to log out. Please try again.");
+    }
+  };
+  
+  const updateProfile = async (data: Partial<UserProfile>) => {
+    try {
+      if (!user?.id) throw new Error("Not authenticated");
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: data.name,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
         
-        if (existingUser) {
-          reject(new Error("Email already in use"));
-        } else {
-          const newUser = {
-            id: (demoUsers.length + 1).toString(),
-            name,
-            email,
-            password,
-            subscription: "none" as const,
-          };
-          
-          demoUsers.push(newUser);
-          
-          const { password: _, ...userWithoutPassword } = newUser;
-          setUser(userWithoutPassword);
-          localStorage.setItem("towbuddy_user", JSON.stringify(userWithoutPassword));
-          resolve();
-        }
-      }, 500);
-    });
-  };
-
-  // Logout function
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("towbuddy_user");
-  };
-
-  // Update subscription
-  const updateSubscription = (plan: "none" | "basic" | "premium" | "enterprise") => {
-    if (user) {
-      const updatedUser = { ...user, subscription: plan };
-      setUser(updatedUser);
-      localStorage.setItem("towbuddy_user", JSON.stringify(updatedUser));
+      if (error) throw error;
+      
+      setUser(prev => prev ? { ...prev, ...data } : null);
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile");
+      throw error;
     }
   };
 
@@ -120,17 +197,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
+        session,
         isAuthenticated: !!user,
+        loading,
         login,
         register,
         logout,
-        updateSubscription,
+        updateProfile,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-
-// Custom hook to use the auth context
-export const useAuth = () => useContext(AuthContext);

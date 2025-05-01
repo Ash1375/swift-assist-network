@@ -1,34 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-interface EmailData {
-  to: string;
-  subject: string;
-  html: string;
-  replyTo?: string;
-}
-
 export const emailService = {
-  send: async (data: EmailData): Promise<boolean> => {
-    try {
-      const { to, subject, html, replyTo } = data;
-
-      const { error } = await supabase.functions.invoke('send-technician-email', {
-        body: { to, subject, html, replyTo }
-      });
-
-      if (error) {
-        console.error('Error sending email:', error);
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Email service error:', error);
-      return false;
-    }
-  },
-  
   sendTechnicianApplicationEmail: async (technicianData: any, resumeUrl: string | null): Promise<boolean> => {
     try {
       // Convert pricing object to formatted string for email
@@ -82,12 +55,21 @@ export const emailService = {
         <p>Thank you,<br />Towbuddy Team</p>
       `;
       
-      return await emailService.send({
-        to: "ash970462@gmail.com", // Updated to the specified admin email
-        subject: `New Technician Application: ${technicianData.name}`,
-        html,
-        replyTo: technicianData.email
+      const { data, error } = await supabase.functions.invoke("send-technician-email", {
+        body: {
+          to: "ash970462@gmail.com", // Admin email
+          subject: `New Technician Application: ${technicianData.name}`,
+          html,
+          replyTo: technicianData.email
+        }
       });
+      
+      if (error) {
+        console.error("Error sending application email:", error);
+        return false;
+      }
+      
+      return true;
     } catch (error) {
       console.error("Error sending application email:", error);
       return false;
@@ -99,32 +81,46 @@ export const emailService = {
     name: string, 
     isApproved: boolean
   ): Promise<boolean> => {
-    const subject = isApproved 
-      ? "Your Towbuddy Application has been Approved!" 
-      : "Update on Your Towbuddy Application";
+    try {
+      const subject = isApproved 
+        ? "Your Towbuddy Application has been Approved!" 
+        : "Update on Your Towbuddy Application";
+        
+      const html = isApproved
+        ? `
+          <h2>Congratulations, ${name}!</h2>
+          <p>Your application to join the Towbuddy technician network has been approved.</p>
+          <p>You can now log in to your technician dashboard and start accepting service requests.</p>
+          <p><a href="${window.location.origin}/technician/login" style="padding: 10px 20px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 5px;">Log in to Your Dashboard</a></p>
+          <p>Thank you for joining our team!</p>
+          <p>Regards,<br />Towbuddy Team</p>
+        `
+        : `
+          <h2>Hello ${name},</h2>
+          <p>We have reviewed your application to join the Towbuddy technician network.</p>
+          <p>Unfortunately, we cannot accept your application at this time.</p>
+          <p>Please contact our support team if you have any questions.</p>
+          <p>Thank you for your interest in Towbuddy.</p>
+          <p>Regards,<br />Towbuddy Team</p>
+        `;
       
-    const html = isApproved
-      ? `
-        <h2>Congratulations, ${name}!</h2>
-        <p>Your application to join the Towbuddy technician network has been approved.</p>
-        <p>You can now log in to your technician dashboard and start accepting service requests.</p>
-        <p><a href="${window.location.origin}/technician/login" style="padding: 10px 20px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 5px;">Log in to Your Dashboard</a></p>
-        <p>Thank you for joining our team!</p>
-        <p>Regards,<br />Towbuddy Team</p>
-      `
-      : `
-        <h2>Hello ${name},</h2>
-        <p>We have reviewed your application to join the Towbuddy technician network.</p>
-        <p>Unfortunately, we cannot accept your application at this time.</p>
-        <p>Please contact our support team if you have any questions.</p>
-        <p>Thank you for your interest in Towbuddy.</p>
-        <p>Regards,<br />Towbuddy Team</p>
-      `;
-    
-    return await emailService.send({
-      to: technicianEmail,
-      subject,
-      html
-    });
+      const { data, error } = await supabase.functions.invoke("send-technician-email", {
+        body: {
+          to: technicianEmail,
+          subject,
+          html
+        }
+      });
+      
+      if (error) {
+        console.error("Error sending status email:", error);
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error sending status email:", error);
+      return false;
+    }
   }
 };

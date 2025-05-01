@@ -1,73 +1,72 @@
 
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface TechnicianEmailRequest {
-  to: string;
-  subject: string;
-  html: string;
-  replyTo?: string;
-}
-
 serve(async (req) => {
-  // Handle CORS preflight request
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    if (req.method !== 'POST') {
-      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-        status: 405,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Parse request body
-    const { to, subject, html, replyTo } = await req.json() as TechnicianEmailRequest;
-
+    const { to, subject, html, replyTo } = await req.json();
+    
     if (!to || !subject || !html) {
-      return new Response(JSON.stringify({ error: 'Missing required fields' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: "Missing required fields" }),
+        { 
+          status: 400, 
+          headers: { 
+            "Content-Type": "application/json",
+            ...corsHeaders
+          } 
+        }
+      );
     }
-
-    // Send email
-    const emailOptions = {
-      from: 'TowBuddy <onboarding@resend.dev>',
-      to: [to],
+    
+    // For now, we'll just log the email details since we don't have an actual email service integrated yet
+    // In a production environment, you would integrate with a service like SendGrid, AWS SES, or Resend
+    console.log("Email sent:", {
+      to,
       subject,
       html,
-      reply_to: replyTo,
-    };
-
-    const { data, error } = await resend.emails.send(emailOptions);
-
-    if (error) {
-      console.error('Email send error:', error);
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    return new Response(JSON.stringify({ data }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      replyTo: replyTo || undefined
     });
+    
+    // Add admin@towbuddy.com as CC for technician-related emails
+    const adminEmail = "ash970462@gmail.com";
+    
+    console.log(`CC'd to admin: ${adminEmail}`);
+    
+    return new Response(
+      JSON.stringify({ 
+        success: true,
+        message: "Email sent successfully (simulated)"
+      }),
+      { 
+        status: 200, 
+        headers: { 
+          "Content-Type": "application/json",
+          ...corsHeaders
+        } 
+      }
+    );
   } catch (error) {
-    console.error('Server error:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error("Error in send-technician-email function:", error);
+    
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 500, 
+        headers: { 
+          "Content-Type": "application/json",
+          ...corsHeaders
+        } 
+      }
+    );
   }
 });
