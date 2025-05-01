@@ -17,13 +17,10 @@ const About = () => {
           <div>
             <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
             <p className="text-lg text-gray-700 mb-4">
-              At SwiftAssist, our mission is to provide fast, reliable, and professional roadside assistance when you need it most. We understand that vehicle breakdowns are stressful and can happen at the most inconvenient times.
+              At TowBuddyCo, our mission is to revolutionize roadside assistance by building a seamless and reliable network that connects travelers with nearby technicians in times of need. We are committed to creating a trustworthy ecosystem where help is just a click away—ensuring safety, convenience, and peace of mind for everyone on the road.
             </p>
             <p className="text-lg text-gray-700 mb-4">
-              That's why we're committed to offering 24/7 emergency services with quick response times and fair pricing. Our goal is to get you back on the road safely and minimize the disruption to your day.
-            </p>
-            <p className="text-lg text-gray-700">
-              With a network of skilled technicians and modern equipment, we tackle everything from flat tires to complex mechanical issues with the same level of professionalism and care.
+              Whether it's a flat tire, fuel shortage, or battery issue, our goal is to empower people with fast and dependable support wherever they are.
             </p>
           </div>
           <div className="bg-gray-100 rounded-lg p-8">
