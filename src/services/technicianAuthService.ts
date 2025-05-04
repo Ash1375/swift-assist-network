@@ -1,26 +1,68 @@
 
-import { Technician, TechnicianWithPassword } from "@/types/technician";
-import { demoTechnicians } from "@/mocks/technicians";
-import { emailService } from "./emailService";
+import { Technician } from "@/types/technician";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/sonner";
 
 export const technicianAuthService = {
-  login: async (email: string, password: string): Promise<Technician> => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const foundTechnician = demoTechnicians.find(
-          (t) => t.email === email && t.password === password
-        );
+  fetchTechnicianProfile: async (email: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('technicians')
+        .select('*')
+        .eq('email', email)
+        .single();
         
-        if (foundTechnician) {
-          const { password: _, ...technicianWithoutPassword } = foundTechnician;
-          resolve(technicianWithoutPassword);
-        } else {
-          reject(new Error("Invalid email or password"));
-        }
-      }, 500);
-    });
+      if (error) throw error;
+      
+      return mapTechnicianData(data);
+    } catch (error) {
+      console.error("Error fetching technician profile:", error);
+      throw error;
+    }
   },
-
+  
+  validateStoredTechnician: async (technicianId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('technicians')
+        .select('verification_status')
+        .eq('id', technicianId)
+        .single();
+        
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error validating stored technician:", error);
+      throw error;
+    }
+  },
+  
+  login: async (email: string, password: string) => {
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (authError) throw authError;
+      
+      const { data: technicianData, error: techFetchError } = await supabase
+        .from('technicians')
+        .select('*')
+        .eq('email', email)
+        .single();
+        
+      if (techFetchError) {
+        throw new Error("Email not registered as a technician. Please use the technician registration page.");
+      }
+      
+      return mapTechnicianData(technicianData);
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
+  },
+  
   register: async (
     name: string, 
     email: string, 
@@ -34,89 +76,86 @@ export const technicianAuthService = {
     experience: number,
     specialties: string[],
     pricing: Record<string, number>
-  ): Promise<Technician> => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const existingTechnician = demoTechnicians.find((t) => t.email === email);
-        
-        if (existingTechnician) {
-          reject(new Error("Email already in use"));
-        } else {
-          const newTechnician: TechnicianWithPassword = {
-            id: (demoTechnicians.length + 1).toString(),
-            name,
-            email,
-            password,
-            phone,
-            address,
-            region,
-            district,
-            state,
-            serviceAreaRange,
-            experience,
-            specialties,
-            pricing,
-            verification_status: "pending",
-          };
-          
-          demoTechnicians.push(newTechnician);
-          
-          const { password: _, ...technicianWithoutPassword } = newTechnician;
-          resolve(technicianWithoutPassword);
+  ) => {
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            is_technician: true,
+            name
+          },
         }
-      }, 500);
-    });
+      });
+      
+      if (authError) throw authError;
+      
+      if (!authData.user) {
+        throw new Error("Failed to create user account");
+      }
+      
+      const technicianData = {
+        id: authData.user.id,
+        name,
+        email,
+        phone,
+        address,
+        region,
+        district,
+        state,
+        service_area_range: serviceAreaRange,
+        experience,
+        specialties,
+        pricing,
+        verification_status: 'pending'
+      };
+      
+      const { data, error } = await supabase
+        .from('technicians')
+        .insert(technicianData)
+        .select()
+        .single();
+        
+      if (error) {
+        console.error("Error creating technician record:", error);
+        throw error;
+      }
+      
+      return mapTechnicianData(data);
+    } catch (error) {
+      console.error("Registration error:", error);
+      throw error;
+    }
   },
-
-  approveTechnician: async (technicianId: string): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const technicianIndex = demoTechnicians.findIndex(t => t.id === technicianId);
-        
-        if (technicianIndex === -1) {
-          reject(new Error("Technician not found"));
-          return;
-        }
-        
-        demoTechnicians[technicianIndex].verification_status = "verified";
-        
-        // Send approval email to technician
-        emailService.sendTechnicianStatusEmail(
-          demoTechnicians[technicianIndex].email,
-          demoTechnicians[technicianIndex].name,
-          true
-        );
-        
-        resolve(true);
-      }, 500);
-    });
-  },
-
-  rejectTechnician: async (technicianId: string): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const technicianIndex = demoTechnicians.findIndex(t => t.id === technicianId);
-        
-        if (technicianIndex === -1) {
-          reject(new Error("Technician not found"));
-          return;
-        }
-        
-        demoTechnicians[technicianIndex].verification_status = "rejected";
-        
-        // Send rejection email to technician
-        emailService.sendTechnicianStatusEmail(
-          demoTechnicians[technicianIndex].email,
-          demoTechnicians[technicianIndex].name,
-          false
-        );
-        
-        resolve(true);
-      }, 500);
-    });
-  },
-
-  logout: () => {
-    localStorage.removeItem("towbuddy_technician");
+  
+  logout: async () => {
+    try {
+      await supabase.auth.signOut();
+      localStorage.removeItem("towbuddy_technician");
+      return true;
+    } catch (error) {
+      console.error("Logout error:", error);
+      throw error;
+    }
   }
+};
+
+// Helper function to map database fields to our Technician type
+const mapTechnicianData = (data: any): Technician => {
+  return {
+    id: data.id,
+    name: data.name,
+    email: data.email,
+    phone: data.phone,
+    address: data.address,
+    region: data.region,
+    district: data.district,
+    state: data.state,
+    serviceAreaRange: data.service_area_range,
+    experience: data.experience,
+    specialties: data.specialties || [],
+    pricing: data.pricing ? (data.pricing as Record<string, number>) : {},
+    verification_status: data.verification_status as "pending" | "verified" | "rejected"
+  };
 };
