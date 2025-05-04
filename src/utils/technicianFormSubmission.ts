@@ -24,10 +24,15 @@ export const submitTechnicianApplication = async (
 ) => {
   try {
     // Format pricing data from the form
-    const formattedPricing: Record<string, number> = {};
-    data.pricing.forEach(item => {
-      formattedPricing[item.service] = parseFloat(item.price);
-    });
+    // The pricing in RegisterFormValues is an object, not an array
+    const formattedPricing: Record<string, number> = {
+      towing: data.pricing.towing,
+      tireChange: data.pricing.tireChange,
+      jumpStart: data.pricing.jumpStart,
+      fuelDelivery: data.pricing.fuelDelivery,
+      lockout: data.pricing.lockout,
+      winching: data.pricing.winching
+    };
     
     // Register the technician
     const technician = await register(
