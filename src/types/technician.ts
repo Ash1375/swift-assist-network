@@ -24,6 +24,7 @@ export type TechnicianWithPassword = Technician & {
 export interface TechnicianAuthContextType {
   technician: Technician | null;
   isAuthenticated: boolean;
+  isLoading: boolean;  // Added this line to fix the TypeScript error
   login: (email: string, password: string) => Promise<any>;
   register: (
     name: string, 
