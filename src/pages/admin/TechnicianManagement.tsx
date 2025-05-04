@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,10 +12,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Search, Filter } from "lucide-react";
 import { mapTechnicianData } from "@/utils/technicianMappers";
 
+type FilterStatus = 'all' | 'pending' | 'verified' | 'rejected';
+
 const TechnicianManagement = () => {
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'verified' | 'rejected'>('all');
+  const [filter, setFilter] = useState<FilterStatus>('all');
   const [search, setSearch] = useState('');
   
   useEffect(() => {
@@ -61,6 +64,11 @@ const TechnicianManagement = () => {
     }
   };
   
+  const handleFilterChange = (value: string) => {
+    // Type assertion to ensure value is of the correct type
+    setFilter(value as FilterStatus);
+  };
+  
   return (
     <div className="container py-8">
       <div className="mb-4 flex items-center justify-between">
@@ -77,7 +85,7 @@ const TechnicianManagement = () => {
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
           </div>
           
-          <Select value={filter} onValueChange={setFilter}>
+          <Select value={filter} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[180px]">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Filter by status" />
