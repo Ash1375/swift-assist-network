@@ -61,7 +61,7 @@ const Emergency = () => {
           setCurrentLocation(address);
           toast({
             title: "Location detected",
-            description: "We've found your location automatically.",
+            description: "We've found your location in Tamil Nadu automatically.",
           });
         } catch (error) {
           console.error("Error getting location:", error);
@@ -98,7 +98,7 @@ const Emergency = () => {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-red-100">
           <div className="bg-gradient-to-r from-red-600 to-red-700 p-6 text-white">
             <h1 className="text-2xl font-bold mb-2">Emergency Assistance</h1>
-            <p className="opacity-90">We're locating you to send help ASAP</p>
+            <p className="opacity-90">We're locating you to send help anywhere in Tamil Nadu</p>
           </div>
 
           <div className="p-6 space-y-6">
@@ -114,7 +114,7 @@ const Emergency = () => {
               <div className="border border-gray-200 rounded-lg p-4">
                 <h2 className="font-semibold flex items-center gap-2 mb-3">
                   <MapPin className="h-5 w-5 text-red-600" />
-                  Your Location
+                  Your Location in Tamil Nadu
                 </h2>
 
                 {isLoadingLocation ? (
@@ -160,7 +160,7 @@ const Emergency = () => {
 
               <p className="text-xs text-center text-gray-500 mt-2">
                 Our emergency team will contact you immediately.
-                Standard service charges apply.
+                Standard service charges apply (₹).
               </p>
             </div>
           </div>

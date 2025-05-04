@@ -16,7 +16,7 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
       <CardContent className="pt-6">
         <h3 className="text-lg font-medium mb-4">Your Service Pricing</h3>
         <FormDescription className="mb-4">
-          Set your rates for each service you offer (in USD)
+          Set your rates for each service you offer (in ₹)
         </FormDescription>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -27,7 +27,7 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
               <FormItem>
                 <FormLabel>Towing Service</FormLabel>
                 <div className="flex items-center">
-                  <span className="text-xl mr-2">$</span>
+                  <span className="text-xl mr-2">₹</span>
                   <FormControl>
                     <Input 
                       type="number"
@@ -51,7 +51,7 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
               <FormItem>
                 <FormLabel>Tire Change</FormLabel>
                 <div className="flex items-center">
-                  <span className="text-xl mr-2">$</span>
+                  <span className="text-xl mr-2">₹</span>
                   <FormControl>
                     <Input 
                       type="number"
@@ -75,7 +75,7 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
               <FormItem>
                 <FormLabel>Jump Start</FormLabel>
                 <div className="flex items-center">
-                  <span className="text-xl mr-2">$</span>
+                  <span className="text-xl mr-2">₹</span>
                   <FormControl>
                     <Input 
                       type="number"
@@ -99,7 +99,7 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
               <FormItem>
                 <FormLabel>Fuel Delivery</FormLabel>
                 <div className="flex items-center">
-                  <span className="text-xl mr-2">$</span>
+                  <span className="text-xl mr-2">₹</span>
                   <FormControl>
                     <Input 
                       type="number"
@@ -123,7 +123,7 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
               <FormItem>
                 <FormLabel>Lockout Service</FormLabel>
                 <div className="flex items-center">
-                  <span className="text-xl mr-2">$</span>
+                  <span className="text-xl mr-2">₹</span>
                   <FormControl>
                     <Input 
                       type="number"
@@ -147,7 +147,7 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
               <FormItem>
                 <FormLabel>Winching</FormLabel>
                 <div className="flex items-center">
-                  <span className="text-xl mr-2">$</span>
+                  <span className="text-xl mr-2">₹</span>
                   <FormControl>
                     <Input 
                       type="number"

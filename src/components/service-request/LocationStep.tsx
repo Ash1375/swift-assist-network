@@ -55,11 +55,11 @@ const LocationStep = ({
           name="location" 
           value={formData.location} 
           onChange={onInputChange} 
-          placeholder="Enter your precise location, nearby landmarks, or address"
+          placeholder="Enter your precise location, nearby landmarks, or full address with pincode"
           className="min-h-[100px] border-gray-300 focus:border-red-500 focus:ring focus:ring-red-200"
           required
         />
-        <p className="text-xs text-gray-500">Please provide as much detail as possible to help the technician find you</p>
+        <p className="text-xs text-gray-500">Please provide nearby landmarks and locality name to help the technician find you quickly in Tamil Nadu</p>
       </div>
     </div>
   );

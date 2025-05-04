@@ -33,19 +33,49 @@ export const specialtiesOptions = [
 ];
 
 export const regionOptions = [
-  "North", "South", "East", "West", "Central", 
-  "Northeast", "Northwest", "Southeast", "Southwest"
+  "North Tamil Nadu", 
+  "South Tamil Nadu", 
+  "East Tamil Nadu", 
+  "West Tamil Nadu", 
+  "Central Tamil Nadu"
 ];
 
+// Tamil Nadu districts
 export const stateOptions = [
-  "Alabama", "Alaska", "Arizona", "Arkansas", "California",
-  "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
-  "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
-  "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
-  "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri",
-  "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
-  "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
-  "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
-  "South Dakota", "Tennessee", "Texas", "Utah", "Vermont",
-  "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+  "Tamil Nadu"
 ];
+
+export const tamilNaduDistricts = [
+  "Ariyalur", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", 
+  "Dindigul", "Erode", "Kanchipuram", "Kanyakumari", "Karur", 
+  "Krishnagiri", "Madurai", "Nagapattinam", "Namakkal", "Nilgiris",
+  "Perambalur", "Pudukkottai", "Ramanathapuram", "Salem", "Sivaganga",
+  "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli",
+  "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore",
+  "Viluppuram", "Virudhunagar"
+];
+
+// Major localities in Tamil Nadu districts
+export const localityOptions: Record<string, string[]> = {
+  "Chennai": [
+    "T. Nagar", "Adyar", "Anna Nagar", "Velachery", "Mylapore", 
+    "Tambaram", "Porur", "Guindy", "Egmore", "Chromepet", "Besant Nagar",
+    "Kilpauk", "Kodambakkam", "Nungambakkam", "Sholinganallur"
+  ],
+  "Coimbatore": [
+    "Peelamedu", "RS Puram", "Singanallur", "Saibaba Colony", "Ganapathy", 
+    "Ramanathapuram", "Gandhipuram", "Ukkadam", "Hopes College", "Thudiyalur"
+  ],
+  "Madurai": [
+    "Goripalayam", "Annanagar", "Teppakulam", "Arapalayam", "Pasumalai",
+    "Mattuthavani", "KK Nagar", "Tirupparankundram", "Ellis Nagar", "Vilangudi"
+  ],
+  "Salem": [
+    "Alagapuram", "Hasthampatti", "Kondalampatti", "Kitchipalayam", "Fairlands",
+    "Shevapet", "Suramangalam", "Ammapet", "Gorimedu", "Kannankurichi"
+  ],
+  "Tiruchirappalli": [
+    "Srirangam", "Thillai Nagar", "Woraiyur", "K.K. Nagar", "Thennur",
+    "Palakkarai", "Cantonment", "Crawford", "Edamalaipatti Pudur", "Ariyamangalam"
+  ]
+};

@@ -1,11 +1,11 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
-import { RegisterFormValues, regionOptions, stateOptions } from "@/types/technician-registration";
+import { RegisterFormValues, regionOptions, stateOptions, tamilNaduDistricts, localityOptions } from "@/types/technician-registration";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface TechnicianFormFieldsProps {
@@ -13,6 +13,18 @@ interface TechnicianFormFieldsProps {
 }
 
 const TechnicianFormFields = ({ form }: TechnicianFormFieldsProps) => {
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [availableLocalities, setAvailableLocalities] = useState<string[]>([]);
+
+  // Update localities when district changes
+  useEffect(() => {
+    if (selectedDistrict && localityOptions[selectedDistrict]) {
+      setAvailableLocalities(localityOptions[selectedDistrict]);
+    } else {
+      setAvailableLocalities([]);
+    }
+  }, [selectedDistrict]);
+
   return (
     <>
       <Card className="mb-6">
@@ -82,7 +94,7 @@ const TechnicianFormFields = ({ form }: TechnicianFormFieldsProps) => {
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="(123) 456-7890" {...field} />
+                    <Input placeholder="+91 9876543210" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -117,7 +129,7 @@ const TechnicianFormFields = ({ form }: TechnicianFormFieldsProps) => {
               <FormItem className="mt-6">
                 <FormLabel>Full Address</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="123 Main St, City, Zip" {...field} />
+                  <Textarea placeholder="123 Main St, Locality, District, Pincode" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -159,9 +171,24 @@ const TechnicianFormFields = ({ form }: TechnicianFormFieldsProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>District</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter district" {...field} />
-                  </FormControl>
+                  <Select 
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setSelectedDistrict(value);
+                    }} 
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select district" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="max-h-[200px] overflow-y-auto">
+                      {tamilNaduDistricts.map(district => (
+                        <SelectItem key={district} value={district}>{district}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -173,13 +200,13 @@ const TechnicianFormFields = ({ form }: TechnicianFormFieldsProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>State</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value || "Tamil Nadu"}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select state" />
+                        <SelectValue placeholder="Tamil Nadu" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="max-h-[200px] overflow-y-auto">
+                    <SelectContent>
                       {stateOptions.map(state => (
                         <SelectItem key={state} value={state}>{state}</SelectItem>
                       ))}
@@ -190,12 +217,37 @@ const TechnicianFormFields = ({ form }: TechnicianFormFieldsProps) => {
               )}
             />
             
+            {selectedDistrict && availableLocalities.length > 0 && (
+              <FormField
+                control={form.control}
+                name="locality"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Locality</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select locality" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="max-h-[200px] overflow-y-auto">
+                        {availableLocalities.map(locality => (
+                          <SelectItem key={locality} value={locality}>{locality}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            
             <FormField
               control={form.control}
               name="serviceAreaRange"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Service Area Range (miles)</FormLabel>
+                  <FormLabel>Service Area Range (km)</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 

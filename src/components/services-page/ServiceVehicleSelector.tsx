@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { MapPin, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { VehicleCategory } from "./types";
+import { tamilNaduDistricts } from "@/types/technician-registration";
 
 type ServiceVehicleSelectorProps = {
   vehicleCategories: VehicleCategory[];
@@ -25,6 +27,8 @@ const ServiceVehicleSelector = ({
   onVehicleTypeSelect,
   onVehicleSubtypeSelect,
 }: ServiceVehicleSelectorProps) => {
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  
   // Get the selected vehicle category
   const selectedVehicleCategory = selectedVehicleType 
     ? vehicleCategories.find(c => c.id === selectedVehicleType) 
@@ -80,9 +84,23 @@ const ServiceVehicleSelector = ({
         {selectedVehicleSubtype && (
           <form className="space-y-4 animate-fade-in">
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
+              <Select onValueChange={setSelectedDistrict}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select district" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[200px] overflow-y-auto">
+                  {tamilNaduDistricts.map(district => (
+                    <SelectItem key={district} value={district}>{district}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Your Location</label>
               <div className="flex gap-2">
-                <Input placeholder="Enter your location" />
+                <Input placeholder="Enter your location in Tamil Nadu" />
                 <Button type="button" variant="outline" size="icon">
                   <MapPin className="h-4 w-4" />
                 </Button>
@@ -92,7 +110,7 @@ const ServiceVehicleSelector = ({
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-              <Input type="tel" placeholder="Enter contact number" />
+              <Input type="tel" placeholder="Enter contact number (+91)" />
             </div>
             
             <div>
@@ -110,7 +128,7 @@ const ServiceVehicleSelector = ({
                   I agree to terms and conditions
                 </label>
                 <p className="text-xs text-gray-500">
-                  You will be charged only after service completion.
+                  You will be charged only after service completion. All prices are in ₹ (INR).
                 </p>
               </div>
             </div>
