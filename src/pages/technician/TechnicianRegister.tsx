@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -16,6 +17,7 @@ import SpecialtiesSelect from "@/components/technician/SpecialtiesSelect";
 import PricingFields from "@/components/technician/PricingFields";
 import TermsAcceptance from "@/components/technician/TermsAcceptance";
 import { RegisterFormValues, specialtiesOptions } from "@/types/technician-registration";
+import { emailService } from "@/services/emailService";
 
 const TechnicianRegister = () => {
   const { register } = useTechnicianAuth();
@@ -158,6 +160,9 @@ const TechnicianRegister = () => {
       
       // Upload resume
       const resumeUrl = await uploadResume(technicianData.id);
+      
+      // Send email notification about the new technician application
+      await emailService.sendTechnicianApplicationEmail(technicianData, resumeUrl);
       
       // Notify success and navigate to verification page
       toast.success("Your application has been submitted for review");

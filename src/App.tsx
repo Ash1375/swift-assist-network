@@ -31,8 +31,11 @@ import TechnicianVerification from "./pages/technician/TechnicianVerification";
 import TechnicianDashboard from "./pages/technician/TechnicianDashboard";
 
 // Admin pages
+import AdminLayout from "./components/admin/AdminLayout";
 import ApproveTechnician from "./pages/admin/ApproveTechnician";
 import RejectTechnician from "./pages/admin/RejectTechnician";
+import TechnicianManagement from "./pages/admin/TechnicianManagement";
+import TechnicianDetails from "./pages/admin/TechnicianDetails";
 
 const queryClient = new QueryClient();
 
@@ -100,7 +103,13 @@ const App = () => (
                 <Route path="dashboard" element={<TechnicianDashboard />} />
               </Route>
               
-              {/* Admin routes - for email approval/rejection links */}
+              {/* Admin routes with AdminLayout */}
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route path="technicians" element={<TechnicianManagement />} />
+                <Route path="technician/:technicianId" element={<TechnicianDetails />} />
+              </Route>
+              
+              {/* Admin routes without layout (for approval/rejection processes) */}
               <Route path="/admin/approve-technician/:technicianId" element={<ApproveTechnician />} />
               <Route path="/admin/reject-technician/:technicianId" element={<RejectTechnician />} />
               
