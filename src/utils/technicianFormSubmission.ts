@@ -1,52 +1,59 @@
 
 import { toast } from "@/components/ui/sonner";
 import { RegisterFormValues } from "@/types/technician-registration";
-import { uploadResume } from "./resumeUploadUtils";
-import { emailService } from "@/services/emailService";
+import { resumeService } from "@/services/resumeService";
 
 export const submitTechnicianApplication = async (
   data: RegisterFormValues,
   resumeFile: File | null,
-  registerFunction: Function,
-  onSuccessCallback: Function
+  register: (
+    name: string, 
+    email: string, 
+    password: string, 
+    phone: string, 
+    address: string,
+    region: string,
+    district: string,
+    state: string,
+    serviceAreaRange: number,
+    experience: number,
+    specialties: string[],
+    pricing: Record<string, number>
+  ) => Promise<any>,
+  onSuccess: () => void
 ) => {
-  if (!resumeFile) {
-    toast.error("Please upload your resume to complete your application");
-    return false;
-  }
-
   try {
+    // Format pricing data from the form
+    const formattedPricing: Record<string, number> = {};
+    data.pricing.forEach(item => {
+      formattedPricing[item.service] = parseFloat(item.price);
+    });
+    
     // Register the technician
-    const technicianData = await registerFunction(
-      data.name, 
-      data.email, 
-      data.password, 
-      data.phone, 
+    const technician = await register(
+      data.name,
+      data.email,
+      data.password,
+      data.phone,
       data.address,
       data.region,
       data.district,
       data.state,
-      data.serviceAreaRange,
-      data.experience, 
+      Number(data.serviceAreaRange),
+      Number(data.experience),
       data.specialties,
-      data.pricing
+      formattedPricing
     );
+
+    // Upload resume if provided
+    if (resumeFile && technician && technician.id) {
+      await resumeService.uploadResume(technician.id, resumeFile);
+    }
     
-    // Upload resume
-    const resumeUrl = await uploadResume(technicianData.id, resumeFile);
-    
-    // Send email notification about the new technician application
-    await emailService.sendTechnicianApplicationEmail(technicianData, resumeUrl);
-    
-    // Notify success
-    toast.success("Your application has been submitted for review");
-    
-    // Execute callback (like navigation)
-    onSuccessCallback();
-    return true;
+    toast.success("Registration successful! Your application is under review.");
+    onSuccess();
   } catch (error: any) {
-    console.error(error);
-    toast.error(error.message || "An unexpected error occurred");
-    return false;
+    console.error("Registration error:", error);
+    toast.error(error.message || "Registration failed. Please try again.");
   }
 };
