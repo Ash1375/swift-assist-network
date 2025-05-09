@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -23,6 +22,13 @@ const ServiceAreaFields = ({ form }: ServiceAreaFieldsProps) => {
       setAvailableLocalities([]);
     }
   }, [selectedDistrict]);
+
+  // Set default value for state field if empty
+  useEffect(() => {
+    if (!form.getValues("state")) {
+      form.setValue("state", "Tamil Nadu", { shouldValidate: true });
+    }
+  }, [form]);
 
   return (
     <Card className="mb-6">
@@ -87,7 +93,7 @@ const ServiceAreaFields = ({ form }: ServiceAreaFieldsProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>State</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value || "Tamil Nadu"}>
+                <Select onValueChange={field.onChange} value={field.value || "Tamil Nadu"}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Tamil Nadu" />

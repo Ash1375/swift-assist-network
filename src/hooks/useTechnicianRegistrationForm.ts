@@ -51,7 +51,7 @@ export const useTechnicianRegistrationForm = () => {
       address: "",
       region: "",
       district: "",
-      state: "",
+      state: "Tamil Nadu", // Pre-set default state value
       locality: "",
       serviceAreaRange: 10,
       experience: 0,
