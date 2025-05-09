@@ -69,7 +69,7 @@ export const useTechnicianAuth = () => {
     region: string,
     district: string,
     state: string,
-    locality: string = "", // Added locality parameter with default empty string
+    locality: string, // Added locality parameter 
     serviceAreaRange: number,
     experience: number,
     specialties: string[],

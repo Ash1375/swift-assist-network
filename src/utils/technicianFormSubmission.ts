@@ -15,6 +15,7 @@ export const submitTechnicianApplication = async (
     region: string,
     district: string,
     state: string,
+    locality: string, // Added locality parameter
     serviceAreaRange: number,
     experience: number,
     specialties: string[],
@@ -44,6 +45,7 @@ export const submitTechnicianApplication = async (
       data.region,
       data.district,
       data.state,
+      data.locality || "", // Pass the locality with a default empty string
       Number(data.serviceAreaRange),
       Number(data.experience),
       data.specialties,

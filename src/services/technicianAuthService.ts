@@ -72,6 +72,7 @@ export const technicianAuthService = {
     region: string,
     district: string,
     state: string,
+    locality: string, // Added locality parameter
     serviceAreaRange: number,
     experience: number,
     specialties: string[],
@@ -104,6 +105,7 @@ export const technicianAuthService = {
         region,
         district,
         state,
+        locality, // Added locality field
         service_area_range: serviceAreaRange,
         experience,
         specialties,
@@ -152,6 +154,7 @@ const mapTechnicianData = (data: any): Technician => {
     region: data.region,
     district: data.district,
     state: data.state,
+    locality: data.locality, // Added locality field
     serviceAreaRange: data.service_area_range,
     experience: data.experience,
     specialties: data.specialties || [],
