@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import TechnicianFormFields from "@/components/technician/TechnicianFormFields";
+import PersonalInfoFields from "@/components/technician/PersonalInfoFields";
+import ServiceAreaFields from "@/components/technician/ServiceAreaFields";
 import ResumeUpload from "@/components/technician/ResumeUpload";
 import SpecialtiesSelect from "@/components/technician/SpecialtiesSelect";
 import PricingFields from "@/components/technician/PricingFields";
@@ -44,8 +45,8 @@ const TechnicianRegistrationForm: React.FC<TechnicianRegistrationFormProps> = ({
       <CardContent className="pt-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
-            <TechnicianFormFields form={form} />
-            
+            <PersonalInfoFields form={form} />
+            <ServiceAreaFields form={form} />
             <PricingFields form={form} />
             
             <Card className="mb-6">

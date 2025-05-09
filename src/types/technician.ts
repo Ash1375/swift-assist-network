@@ -25,7 +25,7 @@ export type TechnicianWithPassword = Technician & {
 export interface TechnicianAuthContextType {
   technician: Technician | null;
   isAuthenticated: boolean;
-  isLoading: boolean;  // Added this line to fix the TypeScript error
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<any>;
   register: (
     name: string, 
@@ -36,6 +36,7 @@ export interface TechnicianAuthContextType {
     region: string,
     district: string,
     state: string,
+    locality: string, // Added locality parameter
     serviceAreaRange: number,
     experience: number,
     specialties: string[],
