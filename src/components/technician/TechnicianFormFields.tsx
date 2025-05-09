@@ -224,7 +224,10 @@ const TechnicianFormFields = ({ form }: TechnicianFormFieldsProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Locality</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select locality" />

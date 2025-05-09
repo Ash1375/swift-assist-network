@@ -9,6 +9,7 @@ export type RegisterFormValues = {
   region: string;
   district: string;
   state: string;
+  locality?: string;  // Add the locality field as optional
   serviceAreaRange: number;
   experience: number;
   specialties: string[];

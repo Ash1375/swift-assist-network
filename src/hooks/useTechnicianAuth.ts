@@ -69,6 +69,7 @@ export const useTechnicianAuth = () => {
     region: string,
     district: string,
     state: string,
+    locality: string = "", // Added locality parameter with default empty string
     serviceAreaRange: number,
     experience: number,
     specialties: string[],
@@ -76,7 +77,7 @@ export const useTechnicianAuth = () => {
   ) => {
     const technicianData = await technicianAuthService.register(
       name, email, password, phone, address,
-      region, district, state, serviceAreaRange,
+      region, district, state, locality, serviceAreaRange,
       experience, specialties, pricing
     );
     

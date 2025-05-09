@@ -10,6 +10,7 @@ export type Technician = {
   region: string;
   district: string;
   state: string;
+  locality?: string; // Added locality field
   serviceAreaRange: number;
   experience: number;
   specialties: string[];
