@@ -1,4 +1,6 @@
+
 import { Shield, Clock, CheckSquare, MapPin, User, Users, Car, Award } from "lucide-react";
+import AnimatedCounter from "@/components/AnimatedCounter";
 
 const About = () => {
   return (
@@ -54,22 +56,30 @@ const About = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center">
               <User className="h-10 w-10 text-red-600 mx-auto mb-4" />
-              <p className="text-4xl font-bold text-gray-900 mb-2">50,000+</p>
+              <p className="text-4xl font-bold text-gray-900 mb-2">
+                <AnimatedCounter end={50000} suffix="+" duration={2500} />
+              </p>
               <p className="text-gray-600">Satisfied Customers</p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center">
               <Users className="h-10 w-10 text-red-600 mx-auto mb-4" />
-              <p className="text-4xl font-bold text-gray-900 mb-2">200+</p>
+              <p className="text-4xl font-bold text-gray-900 mb-2">
+                <AnimatedCounter end={200} suffix="+" duration={2000} />
+              </p>
               <p className="text-gray-600">Expert Technicians</p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center">
               <Car className="h-10 w-10 text-red-600 mx-auto mb-4" />
-              <p className="text-4xl font-bold text-gray-900 mb-2">100,000+</p>
+              <p className="text-4xl font-bold text-gray-900 mb-2">
+                <AnimatedCounter end={100000} suffix="+" duration={3000} />
+              </p>
               <p className="text-gray-600">Services Completed</p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center">
               <Award className="h-10 w-10 text-red-600 mx-auto mb-4" />
-              <p className="text-4xl font-bold text-gray-900 mb-2">15+</p>
+              <p className="text-4xl font-bold text-gray-900 mb-2">
+                <AnimatedCounter end={15} suffix="+" duration={1500} />
+              </p>
               <p className="text-gray-600">Years of Experience</p>
             </div>
           </div>
