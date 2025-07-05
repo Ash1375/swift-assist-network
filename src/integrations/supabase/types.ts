@@ -9,7 +9,149 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          subscription_tier: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          subscription_tier?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          subscription_tier?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      service_requests: {
+        Row: {
+          address: string
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          service_type: string
+          status: string | null
+          technician_id: string | null
+          updated_at: string | null
+          user_id: string
+          vehicle_model: string | null
+          vehicle_type: string
+        }
+        Insert: {
+          address: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          service_type: string
+          status?: string | null
+          technician_id?: string | null
+          updated_at?: string | null
+          user_id: string
+          vehicle_model?: string | null
+          vehicle_type: string
+        }
+        Update: {
+          address?: string
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          service_type?: string
+          status?: string | null
+          technician_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+          vehicle_model?: string | null
+          vehicle_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_requests_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "technicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technicians: {
+        Row: {
+          address: string
+          created_at: string | null
+          district: string
+          email: string
+          experience: number
+          id: string
+          locality: string | null
+          name: string
+          phone: string
+          pricing: Json | null
+          region: string
+          service_area_range: number
+          specialties: string[] | null
+          state: string
+          updated_at: string | null
+          verification_status: string | null
+        }
+        Insert: {
+          address: string
+          created_at?: string | null
+          district: string
+          email: string
+          experience?: number
+          id?: string
+          locality?: string | null
+          name: string
+          phone: string
+          pricing?: Json | null
+          region: string
+          service_area_range?: number
+          specialties?: string[] | null
+          state: string
+          updated_at?: string | null
+          verification_status?: string | null
+        }
+        Update: {
+          address?: string
+          created_at?: string | null
+          district?: string
+          email?: string
+          experience?: number
+          id?: string
+          locality?: string | null
+          name?: string
+          phone?: string
+          pricing?: Json | null
+          region?: string
+          service_area_range?: number
+          specialties?: string[] | null
+          state?: string
+          updated_at?: string | null
+          verification_status?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
