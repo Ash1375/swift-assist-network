@@ -9,57 +9,96 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      technicians: {
+      ai_training_data: {
         Row: {
-          address: string
+          category: string
           created_at: string | null
-          district: string
-          email: string
-          experience: number
           id: string
-          name: string
-          phone: string
-          pricing: Json
-          region: string
-          service_area_range: number
-          specialties: string[]
-          state: string
-          updated_at: string | null
-          verification_status: string
+          prompt: string
+          response: string
+          room_id: string
+          source: string | null
         }
         Insert: {
-          address: string
+          category: string
           created_at?: string | null
-          district: string
-          email: string
-          experience: number
           id?: string
-          name: string
-          phone: string
-          pricing: Json
-          region: string
-          service_area_range: number
-          specialties: string[]
-          state: string
-          updated_at?: string | null
-          verification_status?: string
+          prompt: string
+          response: string
+          room_id: string
+          source?: string | null
         }
         Update: {
-          address?: string
+          category?: string
           created_at?: string | null
-          district?: string
-          email?: string
-          experience?: number
           id?: string
-          name?: string
-          phone?: string
-          pricing?: Json
-          region?: string
-          service_area_range?: number
-          specialties?: string[]
-          state?: string
+          prompt?: string
+          response?: string
+          room_id?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          author: string
+          content: string
+          created_at: string | null
+          id: string
+          is_bot: boolean | null
+          room_id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          author: string
+          content: string
+          created_at?: string | null
+          id?: string
+          is_bot?: boolean | null
+          room_id: string
           updated_at?: string | null
-          verification_status?: string
+          user_id?: string | null
+        }
+        Update: {
+          author?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_bot?: boolean | null
+          room_id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_chat_preferences: {
+        Row: {
+          chat_context: Json | null
+          created_at: string | null
+          id: string
+          preferred_topics: Json | null
+          room_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          chat_context?: Json | null
+          created_at?: string | null
+          id?: string
+          preferred_topics?: Json | null
+          room_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          chat_context?: Json | null
+          created_at?: string | null
+          id?: string
+          preferred_topics?: Json | null
+          room_id?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
