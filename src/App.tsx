@@ -72,16 +72,16 @@ const App = () => (
                     <Header />
                     <main className="flex-grow">
                       <Routes>
-                        <Route path="/services" element={<ServicesPage />} />
-                        <Route path="/about" element={<About />} />
-                        <Route path="/contact" element={<Contact />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/subscription" element={<Subscription />} />
-                        <Route path="/emergency" element={<Emergency />} />
-                        <Route path="/request-service/:serviceId" element={<ServiceRequest />} />
-                        <Route path="/request-tracking/:requestId" element={<RequestTracking />} />
-                        <Route path="/settings" element={<Settings />} />
+                        <Route path="services" element={<ServicesPage />} />
+                        <Route path="about" element={<About />} />
+                        <Route path="contact" element={<Contact />} />
+                        <Route path="login" element={<Login />} />
+                        <Route path="register" element={<Register />} />
+                        <Route path="subscription" element={<Subscription />} />
+                        <Route path="emergency" element={<Emergency />} />
+                        <Route path="request-service/:serviceId" element={<ServiceRequest />} />
+                        <Route path="request-tracking/:requestId" element={<RequestTracking />} />
+                        <Route path="settings" element={<Settings />} />
                       </Routes>
                     </main>
                     <Footer />
