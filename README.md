@@ -1,73 +1,81 @@
-# Welcome to your Lovable project
+# TowBuddy - Roadside Assistance Platform
 
-## Project info
+## About This Project
 
-**URL**: https://lovable.dev/projects/8d1377d0-f8b4-4c3a-ad7e-cc95cbfa297d
+TowBuddy is a comprehensive roadside assistance platform that connects vehicle owners with nearby technicians for quick and reliable service.
 
-## How can I edit this code?
+## Getting Started
 
-There are several ways of editing your application.
+### Prerequisites
 
-**Use Lovable**
+- Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8d1377d0-f8b4-4c3a-ad7e-cc95cbfa297d) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to the project directory
+cd towbuddy
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Features
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- 24/7 Roadside Assistance
+- Real-time Technician Matching
+- Service Request Tracking
+- User Authentication & Profiles
+- Admin Dashboard for Technician Management
+- Responsive Design
 
-**Use GitHub Codespaces**
+## Technologies Used
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **Build Tool**: Vite
+- **UI Components**: shadcn/ui
+- **Backend**: Supabase (Authentication, Database, Real-time)
+- **Routing**: React Router DOM
 
-## What technologies are used for this project?
+## Project Structure
 
-This project is built with:
+```
+src/
+├── components/          # Reusable UI components
+├── pages/              # Page components
+├── hooks/              # Custom React hooks
+├── services/           # API service functions
+├── contexts/           # React contexts
+├── integrations/       # Third-party integrations
+└── lib/               # Utility functions
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Development
 
-## How can I deploy this project?
+To start the development server:
 
-Simply open [Lovable](https://lovable.dev/projects/8d1377d0-f8b4-4c3a-ad7e-cc95cbfa297d) and click on Share -> Publish.
+```sh
+npm run dev
+```
 
-## Can I connect a custom domain to my Lovable project?
+The application will be available at `http://localhost:8080`
 
-Yes, you can!
+## Building for Production
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```sh
+npm run build
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
