@@ -3,12 +3,13 @@ import { Button } from "./ui/button";
 import TechnicianCard from "./technician/TechnicianCard";
 import SortControls from "./technician/SortControls";
 import { Technician } from "./technician/types";
+import defaultAvatar from "@/assets/default-avatar.png";
 
 const mockTechnicians: Technician[] = [
   {
     id: "tech-1",
     name: "Rajesh Kumar",
-    avatar: "/placeholder.svg",
+    avatar: defaultAvatar,
     rating: 4.8,
     price: 599,
     currency: "₹",
@@ -22,7 +23,7 @@ const mockTechnicians: Technician[] = [
   {
     id: "tech-2",
     name: "Ananya Singh",
-    avatar: "/placeholder.svg",
+    avatar: defaultAvatar,
     rating: 4.6,
     price: 499,
     currency: "₹",
@@ -35,7 +36,7 @@ const mockTechnicians: Technician[] = [
   {
     id: "tech-3",
     name: "Vikram Patel",
-    avatar: "/placeholder.svg",
+    avatar: defaultAvatar,
     rating: 4.9,
     price: 799,
     currency: "₹",
@@ -49,7 +50,7 @@ const mockTechnicians: Technician[] = [
   {
     id: "tech-4",
     name: "Priya Desai",
-    avatar: "/placeholder.svg",
+    avatar: defaultAvatar,
     rating: 4.5,
     price: 549,
     currency: "₹",

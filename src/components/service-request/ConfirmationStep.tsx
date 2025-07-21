@@ -5,6 +5,7 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { AlertCircle, Star } from "lucide-react";
+import defaultAvatar from "@/assets/default-avatar.png";
 
 interface ConfirmationStepProps {
   service: ServiceType;
@@ -43,7 +44,7 @@ const ConfirmationStep = ({ service, formData, onInputChange }: ConfirmationStep
         <CardContent>
           <div className="flex items-center gap-4">
             <Avatar className="h-12 w-12 border-2 border-gray-100">
-              <AvatarImage src="/placeholder.svg" alt="Technician" />
+              <AvatarImage src={defaultAvatar} alt="Technician" />
               <AvatarFallback className="bg-red-100 text-red-800 font-semibold">
                 RT
               </AvatarFallback>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/hooks/use-toast"
+import defaultAvatar from "@/assets/default-avatar.png";
 
 const ProfileSettings = () => {
   const [profile, setProfile] = useState({
@@ -34,7 +35,7 @@ const ProfileSettings = () => {
       <CardContent>
         <div className="flex flex-col items-center mb-6">
           <Avatar className="h-24 w-24 mb-4">
-            <AvatarImage src={profile.avatar || "/placeholder.svg"} />
+            <AvatarImage src={profile.avatar || defaultAvatar} />
             <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <Button variant="outline" size="sm">
