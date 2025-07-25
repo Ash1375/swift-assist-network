@@ -2,7 +2,7 @@
 import { 
   Anchor, Wrench, Battery, Key, 
   Fuel, LifeBuoy, Car, Bike, Truck, 
-  Circle // Added Circle icon for the "All Vehicles" category
+  Circle, Zap // Added Circle icon for the "All Vehicles" category and Zap for EV charging
 } from "lucide-react";
 import { ServiceDetails, VehicleCategory } from "./types";
 
@@ -156,6 +156,28 @@ export const services: ServiceDetails[] = [
     ]
   },
   {
+    id: "ev-charging",
+    name: "EV Portable Charger",
+    icon: Zap,
+    description: "Electric vehicle running low on battery? Our portable EV charger service will get you charged up and back on the road.",
+    details: "We provide emergency portable charging for electric vehicles when you're stranded with low battery. Our high-capacity portable chargers work with all EV models and can provide enough charge to reach the nearest charging station.",
+    features: [
+      "Portable DC fast charging up to 50kW",
+      "Compatible with all EV models in Indian market",
+      "Battery health diagnostics",
+      "Charging station locator service",
+      "Emergency charge to reach nearest station",
+      "Available 24/7 for EV emergencies"
+    ],
+    process: [
+      "Assess EV model and battery specifications",
+      "Connect portable charger with appropriate connector",
+      "Monitor charging progress and battery health",
+      "Provide sufficient charge for safe travel",
+      "Guide to nearest available charging station"
+    ]
+  },
+  {
     id: "other",
     name: "Other Services",
     icon: Wrench,
@@ -182,5 +204,158 @@ export const vehicleCategories: VehicleCategory[] = [
   { id: "all", name: "All Vehicles", icon: Circle }, // Added icon property
   { id: "car", name: "Cars", icon: Car, subtypes: ["SUV", "Hatchback", "Sedan", "MPV", "Other Cars"] },
   { id: "bike", name: "Bikes", icon: Bike, subtypes: ["Sport Bike", "Cruiser", "Commuter", "Scooter", "Other Bikes"] },
-  { id: "commercial", name: "Commercial", icon: Truck, subtypes: ["Truck", "Van", "Bus", "Construction Vehicle", "Other Commercial"] }
+  { id: "commercial", name: "Commercial", icon: Truck, subtypes: ["Truck", "Van", "Bus", "Construction Vehicle", "Other Commercial"] },
+  { id: "ev", name: "Electric Vehicles", icon: Zap, subtypes: ["Electric Cars", "Electric Bikes", "Electric Scooters", "Electric Auto"] }
+];
+
+// EV Vehicle data for Indian market with battery specifications
+export const evVehiclesIndia = [
+  // Electric Cars
+  {
+    id: "tata-nexon-ev",
+    name: "Tata Nexon EV",
+    type: "Electric Cars",
+    batteryCapacity: "30.2 kWh",
+    range: "312 km",
+    chargingType: "CCS2",
+    brand: "Tata"
+  },
+  {
+    id: "tata-tigor-ev",
+    name: "Tata Tigor EV",
+    type: "Electric Cars", 
+    batteryCapacity: "26 kWh",
+    range: "306 km",
+    chargingType: "CCS2",
+    brand: "Tata"
+  },
+  {
+    id: "mg-zs-ev",
+    name: "MG ZS EV",
+    type: "Electric Cars",
+    batteryCapacity: "50.3 kWh", 
+    range: "461 km",
+    chargingType: "CCS2",
+    brand: "MG"
+  },
+  {
+    id: "hyundai-kona-ev",
+    name: "Hyundai Kona Electric",
+    type: "Electric Cars",
+    batteryCapacity: "39.2 kWh",
+    range: "452 km", 
+    chargingType: "CCS2",
+    brand: "Hyundai"
+  },
+  {
+    id: "mahindra-e-verito",
+    name: "Mahindra e-Verito",
+    type: "Electric Cars",
+    batteryCapacity: "18.55 kWh",
+    range: "140 km",
+    chargingType: "Type 2",
+    brand: "Mahindra"
+  },
+  {
+    id: "bmw-i3",
+    name: "BMW i3",
+    type: "Electric Cars",
+    batteryCapacity: "42.2 kWh",
+    range: "285 km",
+    chargingType: "CCS2", 
+    brand: "BMW"
+  },
+  // Electric Bikes
+  {
+    id: "ather-450x",
+    name: "Ather 450X",
+    type: "Electric Bikes",
+    batteryCapacity: "2.9 kWh",
+    range: "105 km",
+    chargingType: "Type 2",
+    brand: "Ather"
+  },
+  {
+    id: "tvs-iqube",
+    name: "TVS iQube Electric",
+    type: "Electric Bikes", 
+    batteryCapacity: "2.25 kWh",
+    range: "75 km",
+    chargingType: "Standard",
+    brand: "TVS"
+  },
+  {
+    id: "bajaj-chetak",
+    name: "Bajaj Chetak Electric",
+    type: "Electric Bikes",
+    batteryCapacity: "3 kWh",
+    range: "95 km",
+    chargingType: "Standard",
+    brand: "Bajaj"
+  },
+  {
+    id: "hero-vida-v1",
+    name: "Hero Vida V1",
+    type: "Electric Bikes",
+    batteryCapacity: "3.44 kWh", 
+    range: "165 km",
+    chargingType: "Standard",
+    brand: "Hero"
+  },
+  {
+    id: "ola-s1-pro",
+    name: "Ola S1 Pro",
+    type: "Electric Bikes",
+    batteryCapacity: "3.97 kWh",
+    range: "181 km", 
+    chargingType: "Standard",
+    brand: "Ola"
+  },
+  // Electric Scooters
+  {
+    id: "ampere-magnus",
+    name: "Ampere Magnus",
+    type: "Electric Scooters",
+    batteryCapacity: "1.44 kWh",
+    range: "65 km",
+    chargingType: "Standard",
+    brand: "Ampere"
+  },
+  {
+    id: "okinawa-praise",
+    name: "Okinawa Praise Pro",
+    type: "Electric Scooters", 
+    batteryCapacity: "1.75 kWh",
+    range: "88 km",
+    chargingType: "Standard",
+    brand: "Okinawa"
+  },
+  {
+    id: "pure-etrance",
+    name: "Pure EPluto 7G",
+    type: "Electric Scooters",
+    batteryCapacity: "1.5 kWh",
+    range: "80 km",
+    chargingType: "Standard", 
+    brand: "Pure EV"
+  },
+  // Electric Auto
+  {
+    id: "mahindra-e-alfa-mini",
+    name: "Mahindra e-Alfa Mini",
+    type: "Electric Auto",
+    batteryCapacity: "8.5 kWh",
+    range: "85 km",
+    chargingType: "Standard",
+    brand: "Mahindra"
+  },
+  {
+    id: "piaggio-ape-e-city",
+    name: "Piaggio Ape E-City", 
+    type: "Electric Auto",
+    batteryCapacity: "8.1 kWh",
+    range: "80 km",
+    chargingType: "Standard",
+    brand: "Piaggio"
+  }
 ];

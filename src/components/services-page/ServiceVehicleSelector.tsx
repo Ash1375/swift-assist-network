@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { VehicleCategory } from "./types";
 import { tamilNaduDistricts } from "@/types/technician-registration";
+import EVVehicleSelector from "./EVVehicleSelector";
 
 type ServiceVehicleSelectorProps = {
   vehicleCategories: VehicleCategory[];
@@ -28,6 +29,7 @@ const ServiceVehicleSelector = ({
   onVehicleSubtypeSelect,
 }: ServiceVehicleSelectorProps) => {
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedEVVehicle, setSelectedEVVehicle] = useState<any>(null);
   
   // Get the selected vehicle category
   const selectedVehicleCategory = selectedVehicleType 
@@ -36,6 +38,22 @@ const ServiceVehicleSelector = ({
   
   // Make sure subtypes exist before trying to map over them
   const vehicleSubtypes = selectedVehicleCategory?.subtypes || [];
+
+  // Handle EV charging service specially
+  if (serviceId === "ev-charging") {
+    return (
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg animate-fade-in">
+        <h4 className="font-medium text-lg mb-4">EV Emergency Charging Service</h4>
+        <EVVehicleSelector 
+          onVehicleSelect={setSelectedEVVehicle}
+          onRequestService={() => {
+            // Navigate to service request with EV details
+            window.location.href = `/request-service/${serviceId}?vehicle=${encodeURIComponent(JSON.stringify(selectedEVVehicle))}`;
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6 p-4 bg-gray-50 rounded-lg animate-fade-in">
