@@ -247,6 +247,29 @@
   @apply bg-gradient-to-br from-orange-500 to-orange-600 text-white;
 }
 
+.icon-bg-emerald {
+  @apply bg-gradient-to-br from-emerald-500 to-emerald-600 text-white;
+}
+
+.badge-emerald {
+  @apply bg-emerald-100 text-emerald-800;
+}
+
+/* Grid pattern background */
+.bg-grid-pattern {
+  background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Hover scale animation */
+.hover-scale {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
 /* Call to action button glow effect */
 .btn-glow {
   position: relative;
