@@ -303,3 +303,57 @@
     background-position: 200%;
   }
 }
+
+/* Enhanced vehicle selection styles */
+.vehicle-brand-dropdown {
+  background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,250,252,0.95));
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(229, 231, 235, 0.8);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.vehicle-brand-dropdown:hover {
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 12px 40px rgba(239, 68, 68, 0.15);
+}
+
+.vehicle-selection-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(248,250,252,0.95));
+  border: 2px solid rgba(229, 231, 235, 0.6);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vehicle-selection-card.selected {
+  background: linear-gradient(145deg, rgba(254, 242, 242, 0.98), rgba(254, 226, 226, 0.95));
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.brand-logo-container {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Enhanced dropdown animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
