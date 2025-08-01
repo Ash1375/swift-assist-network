@@ -1,19 +1,22 @@
 
 import { ServiceType, ServiceRequestFormData } from "./types";
+import { PaymentData } from "./PaymentStep";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { AlertCircle, Star } from "lucide-react";
+import { Badge } from "../ui/badge";
+import { AlertCircle, Star, CreditCard, Banknote, Clock, CheckCircle2 } from "lucide-react";
 import defaultAvatar from "@/assets/default-avatar.png";
 
 interface ConfirmationStepProps {
   service: ServiceType;
   formData: ServiceRequestFormData;
+  paymentData?: PaymentData | null;
   onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-const ConfirmationStep = ({ service, formData, onInputChange }: ConfirmationStepProps) => {
+const ConfirmationStep = ({ service, formData, paymentData, onInputChange }: ConfirmationStepProps) => {
   return (
     <div className="space-y-6 animate-fade-in">
       <h2 className="text-xl font-semibold mb-4">Request Summary</h2>
@@ -97,6 +100,59 @@ const ConfirmationStep = ({ service, formData, onInputChange }: ConfirmationStep
           </div>
         </CardContent>
       </Card>
+
+      {/* Payment Information */}
+      {paymentData && (
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-lg text-green-800">
+              {paymentData.timing === "before" ? <CreditCard className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
+              Payment Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Payment Timing:</span>
+                <Badge variant={paymentData.timing === "before" ? "default" : "secondary"} className={
+                  paymentData.timing === "before" 
+                    ? "bg-green-600 hover:bg-green-700" 
+                    : "bg-orange-100 text-orange-700"
+                }>
+                  {paymentData.timing === "before" ? "Paid Online" : "Pay After Service"}
+                </Badge>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Payment Method:</span>
+                <div className="flex items-center gap-2">
+                  {paymentData.method === "cash" && <Banknote className="h-4 w-4 text-orange-600" />}
+                  {paymentData.method === "upi" && <CreditCard className="h-4 w-4 text-purple-600" />}
+                  {paymentData.method === "card" && <CreditCard className="h-4 w-4 text-blue-600" />}
+                  {paymentData.method === "netbanking" && <CreditCard className="h-4 w-4 text-green-600" />}
+                  <span className="capitalize font-medium">{paymentData.method}</span>
+                </div>
+              </div>
+              
+              {paymentData.razorpayOrderId && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Transaction ID:</span>
+                  <span className="text-xs font-mono bg-white px-2 py-1 rounded border">
+                    {paymentData.razorpayOrderId.slice(0, 20)}...
+                  </span>
+                </div>
+              )}
+              
+              {paymentData.timing === "before" && (
+                <div className="flex items-center gap-2 text-green-700 bg-green-100 p-2 rounded-lg">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span className="text-sm font-medium">Payment Confirmed</span>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       
       <div>
         <Label htmlFor="details">Additional Details (Optional)</Label>

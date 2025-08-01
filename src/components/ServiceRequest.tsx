@@ -3,12 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
-import { Check, MapPin, Car, User, Wrench } from "lucide-react";
+import { Check, MapPin, Car, User, Wrench, CreditCard } from "lucide-react";
 import { ServiceRequestFormData, ServiceType } from "./service-request/types";
 import PersonalInfoStep from "./service-request/PersonalInfoStep";
 import VehicleInfoStep from "./service-request/VehicleInfoStep";
 import LocationStep from "./service-request/LocationStep";
 import TechnicianSelection from "./TechnicianSelection";
+import PaymentStep, { PaymentData } from "./service-request/PaymentStep";
 import ConfirmationStep from "./service-request/ConfirmationStep";
 
 const services: Record<string, ServiceType> = {
@@ -108,6 +109,19 @@ const stepDetails = [
     tooltip: "Choose a technician"
   },
   {
+    name: "Payment",
+    icon: (active: boolean, completed: boolean) => (
+      <div className={`rounded-full border-4 flex items-center justify-center transition-all duration-300
+        ${completed ? "bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-200 shadow-xl animate-glow"
+          : active ? "bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 border-orange-200 shadow-lg animate-glow"
+          : "bg-gray-200 border-gray-100"}
+      `}>
+        <CreditCard className={`h-6 w-6 ${completed || active ? "text-white" : "text-gray-400"}`} />
+      </div>
+    ),
+    tooltip: "Choose payment method"
+  },
+  {
     name: "Confirm",
     icon: (active: boolean, completed: boolean) => (
       <div className={`rounded-full border-4 flex items-center justify-center transition-all duration-300
@@ -135,6 +149,8 @@ const ServiceRequest = () => {
     details: "",
     selectedTechnicianId: ""
   });
+  
+  const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
   
   const [currentLocation, setCurrentLocation] = useState("");
   const [isGettingLocation, setIsGettingLocation] = useState(false);
@@ -170,6 +186,11 @@ const ServiceRequest = () => {
       ...formData,
       selectedTechnicianId: technicianId
     });
+    setStep(step + 1);
+  };
+
+  const handlePaymentConfirm = (payment: PaymentData) => {
+    setPaymentData(payment);
     setStep(step + 1);
   };
 
@@ -359,15 +380,23 @@ const ServiceRequest = () => {
             )}
 
             {step === 5 && (
+              <PaymentStep 
+                servicePrice={parseInt(service.estimatedPrice.split('₹')[1]?.split(' ')[0] || "599")}
+                onPaymentConfirm={handlePaymentConfirm}
+              />
+            )}
+
+            {step === 6 && (
               <ConfirmationStep 
                 service={service}
                 formData={formData}
+                paymentData={paymentData}
                 onInputChange={handleInputChange}
               />
             )}
 
             <div className="mt-8 flex justify-between">
-              {step > 1 && step !== 4 && (
+              {step > 1 && step !== 4 && step !== 5 && (
                 <Button type="button" variant="outline" onClick={prevStep}>
                   Back
                 </Button>
@@ -376,7 +405,7 @@ const ServiceRequest = () => {
                 <Button type="button" className="bg-red-600 hover:bg-red-700 ml-auto" onClick={nextStep}>
                   Next
                 </Button>
-              ) : step === 5 ? (
+              ) : step === 6 ? (
                 <Button type="submit" className="bg-red-600 hover:bg-red-700 ml-auto">
                   Confirm and Submit
                 </Button>
