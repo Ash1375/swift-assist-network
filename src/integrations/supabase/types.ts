@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string | null
+          id: string
+          paid_at: string | null
+          payment_method: string | null
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          service_request_id: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          service_request_id: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          service_request_id?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_service_request_id_fkey"
+            columns: ["service_request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -45,14 +95,22 @@ export type Database = {
         Row: {
           address: string
           completed_at: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
           created_at: string | null
           description: string | null
+          estimated_cost: number | null
           id: string
           location_lat: number | null
           location_lng: number | null
+          payment_method: string | null
+          payment_status: string | null
+          payment_timing: string | null
           service_type: string
           status: string | null
           technician_id: string | null
+          total_amount: number | null
           updated_at: string | null
           user_id: string
           vehicle_model: string | null
@@ -61,14 +119,22 @@ export type Database = {
         Insert: {
           address: string
           completed_at?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           description?: string | null
+          estimated_cost?: number | null
           id?: string
           location_lat?: number | null
           location_lng?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          payment_timing?: string | null
           service_type: string
           status?: string | null
           technician_id?: string | null
+          total_amount?: number | null
           updated_at?: string | null
           user_id: string
           vehicle_model?: string | null
@@ -77,14 +143,22 @@ export type Database = {
         Update: {
           address?: string
           completed_at?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           description?: string | null
+          estimated_cost?: number | null
           id?: string
           location_lat?: number | null
           location_lng?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          payment_timing?: string | null
           service_type?: string
           status?: string | null
           technician_id?: string | null
+          total_amount?: number | null
           updated_at?: string | null
           user_id?: string
           vehicle_model?: string | null
@@ -96,6 +170,44 @@ export type Database = {
             columns: ["technician_id"]
             isOneToOne: false
             referencedRelation: "technicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_timeline: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          service_request_id: string
+          status: string
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          service_request_id: string
+          status: string
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          service_request_id?: string
+          status?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_timeline_service_request_id_fkey"
+            columns: ["service_request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
             referencedColumns: ["id"]
           },
         ]
