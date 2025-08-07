@@ -121,7 +121,7 @@ const Map = () => {
   const [selectedStation, setSelectedStation] = useState<ServiceStation | null>(null);
 
   useEffect(() => {
-    // Simulate getting user location
+    // Get user location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -170,19 +170,6 @@ const Map = () => {
     }
   };
 
-  const getStationColor = (type: string) => {
-    switch (type) {
-      case 'fuel':
-        return 'bg-blue-600 shadow-blue-200';
-      case 'ev-charging':
-        return 'bg-emerald-600 shadow-emerald-200';
-      case 'garage':
-        return 'bg-orange-600 shadow-orange-200';
-      default:
-        return 'bg-slate-600 shadow-slate-200';
-    }
-  };
-
   const getStationGradient = (type: string) => {
     switch (type) {
       case 'fuel':
@@ -197,13 +184,11 @@ const Map = () => {
   };
 
   const handleConnectVendor = (station: ServiceStation) => {
-    // Route through app to connect with vendor
     console.log('Connecting to vendor through app:', station.name);
     // Here you would navigate to vendor connection page or open connection modal
   };
 
   const handleBookService = (station: ServiceStation) => {
-    // Route through app booking system
     console.log('Booking service through app:', station.name);
     // Here you would navigate to booking page
   };
