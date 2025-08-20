@@ -41,7 +41,7 @@ const Header = () => {
     >
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center">
-          <span className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-700">Towbuddy</span>
+          <span className="text-xl md:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-700">Towbuddy</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -49,8 +49,8 @@ const Header = () => {
             to="/" 
             className={`font-medium transition-colors ${
               isActive('/') 
-                ? "text-red-600" 
-                : "text-gray-700 hover:text-red-600"
+                ? "text-primary" 
+                : "text-gray-700 hover:text-primary"
             }`}
           >
             Home
@@ -59,8 +59,8 @@ const Header = () => {
             to="/services" 
             className={`font-medium transition-colors ${
               isActive('/services') 
-                ? "text-red-600" 
-                : "text-gray-700 hover:text-red-600"
+                ? "text-primary" 
+                : "text-gray-700 hover:text-primary"
             }`}
           >
             Services
@@ -69,8 +69,8 @@ const Header = () => {
             to="/about" 
             className={`font-medium transition-colors ${
               isActive('/about') 
-                ? "text-red-600" 
-                : "text-gray-700 hover:text-red-600"
+                ? "text-primary" 
+                : "text-gray-700 hover:text-primary"
             }`}
           >
             About
@@ -79,8 +79,8 @@ const Header = () => {
             to="/contact" 
             className={`font-medium transition-colors ${
               isActive('/contact') 
-                ? "text-red-600" 
-                : "text-gray-700 hover:text-red-600"
+                ? "text-primary" 
+                : "text-gray-700 hover:text-primary"
             }`}
           >
             Contact
@@ -89,8 +89,8 @@ const Header = () => {
             to="/subscription" 
             className={`font-medium transition-colors ${
               isActive('/subscription') 
-                ? "text-red-600" 
-                : "text-gray-700 hover:text-red-600"
+                ? "text-primary" 
+                : "text-gray-700 hover:text-primary"
             }`}
           >
             Pricing
@@ -98,7 +98,7 @@ const Header = () => {
         </nav>
 
         <div className="flex items-center gap-4">
-          <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 hidden md:flex animate-pulse-red" asChild>
+          <Button className="bg-gradient-to-r from-primary to-blue-700 hover:from-blue-700 hover:to-blue-800 hidden md:flex animate-pulse-blue" asChild>
             <Link to="/request-service/emergency">
               <PhoneCall className="mr-2 h-4 w-4" />
               Emergency Call
@@ -121,9 +121,9 @@ const Header = () => {
           <div className="container py-4 flex flex-col gap-4">
             <Link 
               to="/" 
-              className={`font-medium py-2 transition-colors ${
+              className={`font-medium py-3 text-base transition-colors ${
                 isActive('/') 
-                  ? "text-red-600" 
+                  ? "text-primary" 
                   : "text-gray-700"
               }`}
               onClick={() => setMobileMenuOpen(false)}
@@ -132,9 +132,9 @@ const Header = () => {
             </Link>
             <Link 
               to="/services" 
-              className={`font-medium py-2 transition-colors ${
+              className={`font-medium py-3 text-base transition-colors ${
                 isActive('/services') 
-                  ? "text-red-600" 
+                  ? "text-primary" 
                   : "text-gray-700"
               }`}
               onClick={() => setMobileMenuOpen(false)}
@@ -143,9 +143,9 @@ const Header = () => {
             </Link>
             <Link 
               to="/about" 
-              className={`font-medium py-2 transition-colors ${
+              className={`font-medium py-3 text-base transition-colors ${
                 isActive('/about') 
-                  ? "text-red-600" 
+                  ? "text-primary" 
                   : "text-gray-700"
               }`}
               onClick={() => setMobileMenuOpen(false)}
@@ -154,9 +154,9 @@ const Header = () => {
             </Link>
             <Link 
               to="/contact" 
-              className={`font-medium py-2 transition-colors ${
+              className={`font-medium py-3 text-base transition-colors ${
                 isActive('/contact') 
-                  ? "text-red-600" 
+                  ? "text-primary" 
                   : "text-gray-700"
               }`}
               onClick={() => setMobileMenuOpen(false)}
@@ -165,9 +165,9 @@ const Header = () => {
             </Link>
             <Link 
               to="/subscription" 
-              className={`font-medium py-2 transition-colors ${
+              className={`font-medium py-3 text-base transition-colors ${
                 isActive('/subscription') 
-                  ? "text-red-600" 
+                  ? "text-primary" 
                   : "text-gray-700"
               }`}
               onClick={() => setMobileMenuOpen(false)}
@@ -179,7 +179,7 @@ const Header = () => {
               <UserMenu />
             </div>
             
-            <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 w-full mt-2" asChild>
+            <Button className="bg-gradient-to-r from-primary to-blue-700 hover:from-blue-700 hover:to-blue-800 w-full mt-4 py-3 text-base" asChild>
               <Link 
                 to="/request-service/emergency"
                 onClick={() => setMobileMenuOpen(false)}
