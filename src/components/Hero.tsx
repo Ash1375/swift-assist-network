@@ -1,6 +1,6 @@
 
 import { Button } from "./ui/button";
-import { ArrowRight, PhoneCall, MapPin, Wrench } from "lucide-react";
+import { ArrowRight, PhoneCall, MapPin, Wrench, Anchor, Battery } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Hero = () => {
@@ -25,18 +25,44 @@ const Hero = () => {
           We're just a click away.
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md sm:max-w-none px-4">
-          <Button className="bg-white text-primary hover:bg-gray-100 px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg btn-glow group w-full sm:w-auto" size="lg" asChild>
-            <Link to="/services">
-              View Services <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </Button>
-          <Button className="bg-blue-700 border-2 border-white text-white hover:bg-blue-800 px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg animate-pulse-blue w-full sm:w-auto" size="lg" asChild>
+        <div className="flex flex-col gap-4 w-full max-w-md mx-auto px-4">
+          <Button className="bg-white text-primary hover:bg-gray-100 px-8 py-6 text-lg btn-glow group w-full" size="lg" asChild>
             <Link to="/emergency">
-              <PhoneCall className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <PhoneCall className="mr-2 h-5 w-5" />
               Emergency Call
             </Link>
           </Button>
+        </div>
+
+        {/* Quick Service Access */}
+        <div className="mt-8 w-full max-w-4xl mx-auto px-4">
+          <p className="text-center text-white/90 mb-4 text-sm">Or choose a service:</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Link to="/request-service/towing" className="group">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <Anchor className="h-6 w-6 text-yellow-300 mx-auto mb-2" />
+                <span className="text-white text-sm font-medium">Towing</span>
+              </div>
+            </Link>
+            <Link to="/request-service/flat-tire" className="group">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <Wrench className="h-6 w-6 text-yellow-300 mx-auto mb-2" />
+                <span className="text-white text-sm font-medium">Tire Fix</span>
+              </div>
+            </Link>
+            <Link to="/request-service/battery" className="group">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <Battery className="h-6 w-6 text-yellow-300 mx-auto mb-2" />
+                <span className="text-white text-sm font-medium">Battery</span>
+              </div>
+            </Link>
+            <Link to="#services" className="group">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <ArrowRight className="h-6 w-6 text-yellow-300 mx-auto mb-2" />
+                <span className="text-white text-sm font-medium">All Services</span>
+              </div>
+            </Link>
+          </div>
         </div>
         
         <div className="mt-12 flex items-center gap-3 sm:gap-6 justify-center flex-wrap px-4">
