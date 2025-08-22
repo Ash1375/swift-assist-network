@@ -136,91 +136,102 @@ const Services = () => {
   };
 
   return (
-    <section className="py-12 sm:py-16 bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden" id="services">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full blur-3xl opacity-20"></div>
-      <div className="absolute bottom-10 left-10 w-96 h-96 bg-gradient-to-br from-blue-100 to-purple-200 rounded-full blur-3xl opacity-20"></div>
+    <section className="py-16 sm:py-20 bg-gradient-to-b from-background to-accent/20 relative overflow-hidden" id="services">
+      {/* Elegant background elements */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
+      <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full blur-3xl opacity-60"></div>
+      <div className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-tr from-accent/10 to-primary/10 rounded-full blur-3xl opacity-60"></div>
       
       <div className="container relative z-10 px-4">
-        <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-blue-600 rounded-2xl mb-4 sm:mb-6 shadow-lg">
-            <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+        {/* Header Section */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-3xl mb-6 shadow-xl">
+            <ArrowRight className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-600 to-blue-700">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               Our Services
             </span>
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Professional roadside assistance available 24/7
           </p>
         </div>
 
-        {/* Popular Services - Mobile Optimized */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12">
+        {/* Services Grid - More Elegant Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
           {services.slice(0, 8).map((service, index) => (
             <Link 
               key={service.id}
               to={`/request-service/${service.id}`}
-              className="group relative rounded-xl border border-gray-200/50 p-3 sm:p-4 hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-primary/50 hover:scale-105"
+              className="group relative"
             >
-              {service.badge && index < 4 && (
-                <div className="absolute -top-2 -right-2 z-10">
-                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-bold shadow-sm ${service.badge}`}>
-                    {service.badgeText}
-                  </span>
-                </div>
-              )}
-              
-              <div className="flex flex-col items-center text-center">
-                <div className={`relative p-2 sm:p-3 rounded-xl mb-2 sm:mb-3 ${service.color} group-hover:scale-110 transition-transform duration-300 shadow-md`}>
-                  <service.icon className="h-4 w-4 sm:h-6 sm:w-6 text-white drop-shadow-sm" />
-                </div>
+              <div className="relative bg-card/60 backdrop-blur-xl border border-border/50 rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-card/80 overflow-hidden">
+                {/* Subtle gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
                 
-                <h3 className="text-xs sm:text-sm font-bold text-gray-800 group-hover:text-primary transition-colors duration-300 leading-tight">
-                  {service.name}
-                </h3>
+                {/* Badge for featured services */}
+                {service.badge && index < 4 && (
+                  <div className="absolute -top-3 -right-3 z-10">
+                    <div className="bg-gradient-to-r from-primary to-accent px-3 py-1 rounded-full shadow-lg">
+                      <span className="text-xs font-bold text-white">
+                        {service.badgeText}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="relative z-10 flex flex-col items-center text-center">
+                  <div className="relative mb-4">
+                    <div className={`p-4 rounded-2xl mb-1 bg-gradient-to-br from-primary/20 to-accent/20 group-hover:scale-110 transition-all duration-500 shadow-lg ${service.color}`}>
+                      <service.icon className="h-8 w-8 text-white drop-shadow-sm" />
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
+                    {service.name}
+                  </h3>
+                </div>
               </div>
             </Link>
           ))}
         </div>
 
-        {/* Detailed Service View */}
+        {/* Detailed Service View - Enhanced */}
         {selectedService && (
-          <div className="mb-8 sm:mb-12">
+          <div className="mb-16">
             {(() => {
               const service = services.find(s => s.id === selectedService);
               if (!service) return null;
               
               return (
-                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-gray-200/50 max-w-2xl mx-auto">
-                  <div className="flex items-center justify-between mb-4">
+                <div className="bg-card/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-border/50 max-w-3xl mx-auto">
+                  <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-xl ${service.color} shadow-lg`}>
-                        <service.icon className="h-6 w-6 text-white" />
+                      <div className={`p-4 rounded-2xl ${service.color} shadow-xl`}>
+                        <service.icon className="h-8 w-8 text-white" />
                       </div>
-                      <h3 className="text-xl sm:text-2xl font-bold text-gray-800">{service.name}</h3>
+                      <h3 className="text-2xl font-bold text-foreground">{service.name}</h3>
                     </div>
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       onClick={() => setSelectedService(null)}
-                      className="text-gray-500 hover:text-gray-700"
+                      className="text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-full w-10 h-10"
                     >
                       ×
                     </Button>
                   </div>
                   
-                  <p className="text-gray-600 mb-4 leading-relaxed">{service.details}</p>
+                  <p className="text-muted-foreground mb-6 leading-relaxed text-lg">{service.details}</p>
                   
                   <Button 
                     asChild 
-                    className="bg-gradient-to-r from-primary to-blue-700 hover:from-blue-700 hover:to-blue-800 w-full py-4 rounded-xl text-base font-semibold"
+                    className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 w-full py-6 rounded-2xl text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300"
                   >
                     <Link to={`/request-service/${service.id}`}>
                       Request This Service
-                      <ArrowRight className="ml-2 h-5 w-5" />
+                      <ArrowRight className="ml-2 h-6 w-6" />
                     </Link>
                   </Button>
                 </div>
@@ -229,25 +240,34 @@ const Services = () => {
           </div>
         )}
 
-        {/* Emergency CTA */}
+        {/* Emergency CTA - More Elegant */}
         <div className="text-center">
-          <div className="bg-gradient-to-r from-primary to-blue-700 rounded-2xl p-4 sm:p-6 shadow-xl">
-            <h3 className="text-lg sm:text-xl font-bold text-white mb-2">
-              Need Emergency Help?
-            </h3>
-            <p className="text-blue-100 mb-4 text-sm sm:text-base">
-              24/7 support available
-            </p>
-            <Button 
-              size="lg" 
-              className="bg-white text-primary hover:bg-gray-100 font-bold px-6 py-3 rounded-xl shadow-lg text-sm sm:text-base"
-              asChild
-            >
-              <Link to="/emergency">
-                <PhoneCall className="mr-2 h-4 w-4" />
-                Emergency Call
-              </Link>
-            </Button>
+          <div className="relative bg-gradient-to-r from-primary via-accent to-primary rounded-3xl p-8 shadow-2xl overflow-hidden">
+            {/* Animated background elements */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-accent/90"></div>
+            <div className="absolute top-0 left-0 w-full h-full opacity-20">
+              <div className="absolute top-4 left-4 w-20 h-20 bg-white/20 rounded-full blur-xl animate-pulse"></div>
+              <div className="absolute bottom-4 right-4 w-16 h-16 bg-white/20 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s'}}></div>
+            </div>
+            
+            <div className="relative z-10">
+              <h3 className="text-2xl font-bold text-white mb-3">
+                Need Emergency Help?
+              </h3>
+              <p className="text-primary-foreground/80 mb-6 text-lg">
+                24/7 support available - We're just one call away
+              </p>
+              <Button 
+                size="lg" 
+                className="bg-white/95 text-primary hover:bg-white hover:scale-105 font-bold px-8 py-4 rounded-2xl shadow-xl text-lg backdrop-blur-sm transition-all duration-300"
+                asChild
+              >
+                <Link to="/emergency">
+                  <PhoneCall className="mr-3 h-6 w-6" />
+                  Emergency Call
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
