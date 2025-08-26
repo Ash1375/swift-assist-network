@@ -41,6 +41,10 @@ import TechnicianManagement from "./pages/admin/TechnicianManagement";
 import TechnicianDetails from "./pages/admin/TechnicianDetails";
 import TechnicianApplications from "./pages/admin/TechnicianApplications";
 
+// Marketplace pages
+import Marketplace from "./pages/Marketplace";
+import ProductDetail from "./pages/ProductDetail";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -82,6 +86,8 @@ const App = () => (
                         <Route path="request-service/:serviceId" element={<ServiceRequest />} />
                         <Route path="request-tracking/:requestId" element={<RequestTracking />} />
                         <Route path="settings" element={<Settings />} />
+                        <Route path="marketplace" element={<Marketplace />} />
+                        <Route path="marketplace/product/:id" element={<ProductDetail />} />
                       </Routes>
                     </main>
                     <Footer />
@@ -98,6 +104,8 @@ const App = () => (
                   <Route path="request-service/:serviceId" element={<ServiceRequest />} />
                   <Route path="request-tracking/:requestId" element={<RequestTracking />} />
                   <Route path="settings" element={<Settings />} />
+                  <Route path="marketplace" element={<Marketplace />} />
+                  <Route path="marketplace/product/:id" element={<ProductDetail />} />
                 </Route>
                 
                 {/* Technician portal routes */}

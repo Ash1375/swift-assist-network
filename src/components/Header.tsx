@@ -95,6 +95,16 @@ const Header = () => {
           >
             Pricing
           </Link>
+          <Link 
+            to="/marketplace" 
+            className={`font-medium transition-colors ${
+              isActive('/marketplace') 
+                ? "text-primary" 
+                : "text-gray-700 hover:text-primary"
+            }`}
+          >
+            Marketplace
+          </Link>
         </nav>
 
         <div className="flex items-center gap-4">
@@ -173,6 +183,17 @@ const Header = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Pricing
+            </Link>
+            <Link 
+              to="/marketplace" 
+              className={`font-medium py-3 text-base transition-colors ${
+                isActive('/marketplace') 
+                  ? "text-primary" 
+                  : "text-gray-700"
+              }`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Marketplace
             </Link>
             
             <div className="py-2">

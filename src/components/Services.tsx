@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { 
   Car, Bike, Truck, Wrench, Battery, Key, 
-  Fuel, LifeBuoy, Anchor, MapPin, ArrowRight, Zap, PhoneCall
+  Fuel, LifeBuoy, Anchor, MapPin, ArrowRight, Zap, PhoneCall,
+  Truck as TowTruck, Gauge, Settings, Unlock, Droplets, ShieldCheck, BatteryCharging
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
@@ -12,8 +13,8 @@ const services = [
   {
     id: "towing",
     name: "Towing Services",
-    icon: Anchor,
-    color: "icon-bg-red",
+    icon: TowTruck,
+    color: "bg-gradient-to-br from-red-500 to-red-600",
     badge: "badge-red",
     badgeText: "Most Popular",
     description: "Vehicle breakdown? Our towing service quickly transports your vehicle to the nearest repair shop or your preferred location.",
@@ -22,8 +23,8 @@ const services = [
   {
     id: "flat-tire",
     name: "Flat Tire Repair",
-    icon: Wrench,
-    color: "icon-bg-blue",
+    icon: Gauge,
+    color: "bg-gradient-to-br from-blue-500 to-blue-600",
     badge: "badge-blue",
     badgeText: "Fast Service",
     description: "Experienced technicians will fix or replace your flat tire on the spot to get you back on the road quickly.",
@@ -32,8 +33,8 @@ const services = [
   {
     id: "battery",
     name: "Battery Jumpstart",
-    icon: Battery,
-    color: "icon-bg-purple",
+    icon: BatteryCharging,
+    color: "bg-gradient-to-br from-purple-500 to-purple-600",
     badge: "badge-purple",
     badgeText: "Quick Fix",
     description: "Dead battery? Our technicians will jumpstart your vehicle or provide a replacement battery if needed.",
@@ -42,8 +43,8 @@ const services = [
   {
     id: "mechanical",
     name: "Mechanical Issues",
-    icon: Wrench,
-    color: "icon-bg-orange",
+    icon: Settings,
+    color: "bg-gradient-to-br from-orange-500 to-orange-600",
     badge: "badge-orange",
     badgeText: "Expert Help",
     description: "Our skilled mechanics can diagnose and fix common mechanical problems on the spot.",
@@ -52,8 +53,8 @@ const services = [
   {
     id: "fuel",
     name: "Fuel Delivery",
-    icon: Fuel,
-    color: "icon-bg-green",
+    icon: Droplets,
+    color: "bg-gradient-to-br from-green-500 to-green-600",
     badge: "badge-green",
     badgeText: "Quick Relief",
     description: "Run out of fuel? We'll deliver the fuel you need to get back on the road.",
@@ -62,8 +63,8 @@ const services = [
   {
     id: "lockout",
     name: "Lockout Assistance",
-    icon: Key,
-    color: "icon-bg-yellow",
+    icon: Unlock,
+    color: "bg-gradient-to-br from-yellow-500 to-yellow-600",
     badge: "badge-yellow",
     badgeText: "Safe Entry",
     description: "Locked your keys inside? Our specialists will help you regain access to your vehicle safely.",
@@ -72,8 +73,8 @@ const services = [
   {
     id: "winching",
     name: "Winching Services",
-    icon: LifeBuoy,
-    color: "icon-bg-blue",
+    icon: ShieldCheck,
+    color: "bg-gradient-to-br from-indigo-500 to-indigo-600",
     badge: "badge-blue",
     badgeText: "Heavy Duty",
     description: "Vehicle stuck in mud, snow, or a ditch? Our winching service will pull you out safely.",
@@ -83,7 +84,7 @@ const services = [
     id: "ev-charging",
     name: "EV Portable Charger",
     icon: Zap,
-    color: "icon-bg-emerald",
+    color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
     badge: "badge-emerald",
     badgeText: "Eco-Friendly",
     description: "Electric vehicle running low on battery? Our portable EV charger service will get you charged up and back on the road.",
@@ -93,7 +94,7 @@ const services = [
     id: "other",
     name: "Other Services",
     icon: Wrench,
-    color: "icon-bg-purple",
+    color: "bg-gradient-to-br from-gray-500 to-gray-600",
     badge: "badge-purple",
     badgeText: "Custom Help",
     description: "Need another type of assistance? Contact us for any roadside emergency.",

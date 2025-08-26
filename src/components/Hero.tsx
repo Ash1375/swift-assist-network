@@ -1,6 +1,6 @@
 
 import { Button } from "./ui/button";
-import { ArrowRight, PhoneCall, MapPin, Wrench, Anchor, Battery } from "lucide-react";
+import { ArrowRight, PhoneCall, MapPin, Wrench, Anchor, Battery, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Hero = () => {
@@ -77,6 +77,28 @@ const Hero = () => {
           </div>
         </div>
         
+        {/* Marketplace CTA */}
+        <div className="mt-12 w-full max-w-2xl mx-auto px-4">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 text-center">
+            <h3 className="text-2xl font-bold mb-3">
+              Auto Parts Marketplace
+            </h3>
+            <p className="text-white/80 mb-6">
+              Premium tyres and automobile spares at wholesale & retail prices
+            </p>
+            <Button 
+              variant="outline" 
+              className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:scale-105 transition-all duration-300" 
+              asChild
+            >
+              <Link to="/marketplace">
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                Shop Now
+              </Link>
+            </Button>
+          </div>
+        </div>
+
         {/* Trust Indicators */}
         <div className="mt-16 flex items-center gap-8 justify-center flex-wrap px-4">
           <div className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-xl px-6 py-4 rounded-2xl border border-white/20">
