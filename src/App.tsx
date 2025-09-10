@@ -44,6 +44,7 @@ import TechnicianApplications from "./pages/admin/TechnicianApplications";
 // Marketplace pages
 import Marketplace from "./pages/Marketplace";
 import ProductDetail from "./pages/ProductDetail";
+import ServiceCommunicationPage from "./pages/ServiceCommunicationPage";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,7 @@ const App = () => (
                         <Route path="settings" element={<Settings />} />
                         <Route path="marketplace" element={<Marketplace />} />
                         <Route path="marketplace/product/:id" element={<ProductDetail />} />
+                        <Route path="service-communication/:serviceId" element={<ServiceCommunicationPage />} />
                       </Routes>
                     </main>
                     <Footer />
@@ -106,6 +108,7 @@ const App = () => (
                   <Route path="settings" element={<Settings />} />
                   <Route path="marketplace" element={<Marketplace />} />
                   <Route path="marketplace/product/:id" element={<ProductDetail />} />
+                  <Route path="service-communication/:serviceId" element={<ServiceCommunicationPage />} />
                 </Route>
                 
                 {/* Technician portal routes */}

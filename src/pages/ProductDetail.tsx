@@ -16,8 +16,6 @@ interface Product {
   name: string;
   description: string;
   brand: string;
-  model: string;
-  specifications: any;
   wholesale_price: number;
   retail_price: number;
   stock_quantity: number;
@@ -184,7 +182,7 @@ const ProductDetail = () => {
             <div>
               <Badge variant="secondary" className="mb-2">{product.category?.name}</Badge>
               <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-              <p className="text-lg text-muted-foreground">{product.brand} {product.model && `• ${product.model}`}</p>
+              <p className="text-lg text-muted-foreground">{product.brand}</p>
             </div>
 
             <div className="flex items-center gap-4">
@@ -332,18 +330,7 @@ const ProductDetail = () => {
                   <CardTitle>Product Specifications</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {product.specifications && Object.keys(product.specifications).length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Object.entries(product.specifications).map(([key, value]) => (
-                        <div key={key} className="flex justify-between p-3 bg-accent/10 rounded-lg">
-                          <span className="font-medium capitalize">{key.replace('_', ' ')}:</span>
-                          <span>{String(value)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">No specifications available.</p>
-                  )}
+                  <p className="text-muted-foreground">Detailed specifications will be available soon.</p>
                 </CardContent>
               </Card>
             </TabsContent>

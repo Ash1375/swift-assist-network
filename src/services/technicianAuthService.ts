@@ -97,19 +97,11 @@ export const technicianAuthService = {
       }
       
       const technicianData = {
-        id: authData.user.id,
+        user_id: authData.user.id,
         name,
         email,
         phone,
         address,
-        region,
-        district,
-        state,
-        locality, // Added locality field
-        service_area_range: serviceAreaRange,
-        experience,
-        specialties,
-        pricing,
         verification_status: 'pending'
       };
       
