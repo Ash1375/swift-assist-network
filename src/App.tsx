@@ -41,6 +41,12 @@ import TechnicianManagement from "./pages/admin/TechnicianManagement";
 import TechnicianDetails from "./pages/admin/TechnicianDetails";
 import TechnicianApplications from "./pages/admin/TechnicianApplications";
 
+import CarServiceRequest from "./components/vehicle-services/CarServiceRequest";
+import BikeServiceRequest from "./components/vehicle-services/BikeServiceRequest";
+import CommercialServiceRequest from "./components/vehicle-services/CommercialServiceRequest";
+import EVServiceRequest from "./components/vehicle-services/EVServiceRequest";
+import VehicleServiceSelector from "./components/VehicleServiceSelector";
+
 // Marketplace pages
 import Marketplace from "./pages/Marketplace";
 import ProductDetail from "./pages/ProductDetail";
@@ -84,7 +90,11 @@ const App = () => (
                         <Route path="register" element={<Register />} />
                         <Route path="subscription" element={<Subscription />} />
                         <Route path="emergency" element={<Emergency />} />
-                        <Route path="request-service/:serviceId" element={<ServiceRequest />} />
+                        <Route path="request-service/:serviceId" element={<VehicleServiceSelector />} />
+                        <Route path="request-service/:serviceId/car" element={<CarServiceRequest />} />
+                        <Route path="request-service/:serviceId/bike" element={<BikeServiceRequest />} />
+                        <Route path="request-service/:serviceId/commercial" element={<CommercialServiceRequest />} />
+                        <Route path="request-service/:serviceId/ev" element={<EVServiceRequest />} />
                         <Route path="request-tracking/:requestId" element={<RequestTracking />} />
                         <Route path="settings" element={<Settings />} />
                         <Route path="marketplace" element={<Marketplace />} />
@@ -103,7 +113,11 @@ const App = () => (
                   <Route path="register" element={<Register />} />
                   <Route path="subscription" element={<Subscription />} />
                   <Route path="emergency" element={<Emergency />} />
-                  <Route path="request-service/:serviceId" element={<ServiceRequest />} />
+                  <Route path="request-service/:serviceId" element={<VehicleServiceSelector />} />
+                  <Route path="request-service/:serviceId/car" element={<CarServiceRequest />} />
+                  <Route path="request-service/:serviceId/bike" element={<BikeServiceRequest />} />
+                  <Route path="request-service/:serviceId/commercial" element={<CommercialServiceRequest />} />
+                  <Route path="request-service/:serviceId/ev" element={<EVServiceRequest />} />
                   <Route path="request-tracking/:requestId" element={<RequestTracking />} />
                   <Route path="settings" element={<Settings />} />
                   <Route path="marketplace" element={<Marketplace />} />

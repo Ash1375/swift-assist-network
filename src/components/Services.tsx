@@ -164,7 +164,7 @@ const Services = () => {
           {services.slice(0, 8).map((service, index) => (
             <Link 
               key={service.id}
-              to={`/service-communication/${service.id}`}
+              to={`/request-service/${service.id}`}
               className="group relative"
             >
               <div className="relative bg-card/60 backdrop-blur-xl border border-border/50 rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-card/80 overflow-hidden">
@@ -230,8 +230,8 @@ const Services = () => {
                     asChild 
                     className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 w-full py-6 rounded-2xl text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300"
                   >
-                    <Link to={`/service-communication/${service.id}`}>
-                      Connect with Services
+                    <Link to={`/request-service/${service.id}`}>
+                      Request This Service
                       <ArrowRight className="ml-2 h-6 w-6" />
                     </Link>
                   </Button>
