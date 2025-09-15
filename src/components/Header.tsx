@@ -39,17 +39,17 @@ const Header = () => {
           : "bg-white border-b border-gray-200"
       }`}
     >
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex h-16 lg:h-20 items-center justify-between px-4">
         <Link to="/" className="flex items-center">
-          <span className="text-xl md:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-700">Towbuddy</span>
+          <span className="text-2xl lg:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-700">Towbuddy</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden lg:flex items-center gap-8">
           <Link 
             to="/" 
-            className={`font-medium transition-colors ${
+            className={`font-medium text-lg transition-colors ${
               isActive('/') 
-                ? "text-primary" 
+                ? "text-primary font-semibold" 
                 : "text-gray-700 hover:text-primary"
             }`}
           >
@@ -57,9 +57,9 @@ const Header = () => {
           </Link>
           <Link 
             to="/services" 
-            className={`font-medium transition-colors ${
+            className={`font-medium text-lg transition-colors ${
               isActive('/services') 
-                ? "text-primary" 
+                ? "text-primary font-semibold" 
                 : "text-gray-700 hover:text-primary"
             }`}
           >
@@ -67,9 +67,9 @@ const Header = () => {
           </Link>
           <Link 
             to="/about" 
-            className={`font-medium transition-colors ${
+            className={`font-medium text-lg transition-colors ${
               isActive('/about') 
-                ? "text-primary" 
+                ? "text-primary font-semibold" 
                 : "text-gray-700 hover:text-primary"
             }`}
           >
@@ -77,9 +77,9 @@ const Header = () => {
           </Link>
           <Link 
             to="/contact" 
-            className={`font-medium transition-colors ${
+            className={`font-medium text-lg transition-colors ${
               isActive('/contact') 
-                ? "text-primary" 
+                ? "text-primary font-semibold" 
                 : "text-gray-700 hover:text-primary"
             }`}
           >
@@ -87,9 +87,9 @@ const Header = () => {
           </Link>
           <Link 
             to="/subscription" 
-            className={`font-medium transition-colors ${
+            className={`font-medium text-lg transition-colors ${
               isActive('/subscription') 
-                ? "text-primary" 
+                ? "text-primary font-semibold" 
                 : "text-gray-700 hover:text-primary"
             }`}
           >
@@ -97,9 +97,9 @@ const Header = () => {
           </Link>
           <Link 
             to="/marketplace" 
-            className={`font-medium transition-colors ${
+            className={`font-medium text-lg transition-colors ${
               isActive('/marketplace') 
-                ? "text-primary" 
+                ? "text-primary font-semibold" 
                 : "text-gray-700 hover:text-primary"
             }`}
           >
@@ -107,34 +107,42 @@ const Header = () => {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-4">
-          <Button className="bg-gradient-to-r from-primary to-blue-700 hover:from-blue-700 hover:to-blue-800 hidden md:flex animate-pulse-blue" asChild>
+        <div className="flex items-center gap-3">
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-primary to-blue-700 hover:from-blue-700 hover:to-blue-800 hidden lg:flex animate-pulse-blue shadow-lg" 
+            asChild
+          >
             <Link to="/request-service/emergency">
-              <PhoneCall className="mr-2 h-4 w-4" />
+              <PhoneCall className="mr-2 h-5 w-5" />
               Emergency Call
             </Link>
           </Button>
           
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <UserMenu />
           </div>
           
-          <button className="md:hidden text-gray-700" onClick={toggleMobileMenu}>
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          <button 
+            className="lg:hidden text-gray-700 p-2 hover:bg-gray-100 rounded-lg transition-colors" 
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
       </div>
       
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg animate-fade-in">
-          <div className="container py-4 flex flex-col gap-4">
+        <div className="lg:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-xl animate-fade-in">
+          <div className="container py-6 px-4 flex flex-col gap-2">
             <Link 
               to="/" 
-              className={`font-medium py-3 text-base transition-colors ${
+              className={`font-medium py-4 px-4 text-lg rounded-lg transition-colors ${
                 isActive('/') 
-                  ? "text-primary" 
-                  : "text-gray-700"
+                  ? "text-primary bg-primary/10 font-semibold" 
+                  : "text-gray-700 hover:bg-gray-50"
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -142,10 +150,10 @@ const Header = () => {
             </Link>
             <Link 
               to="/services" 
-              className={`font-medium py-3 text-base transition-colors ${
+              className={`font-medium py-4 px-4 text-lg rounded-lg transition-colors ${
                 isActive('/services') 
-                  ? "text-primary" 
-                  : "text-gray-700"
+                  ? "text-primary bg-primary/10 font-semibold" 
+                  : "text-gray-700 hover:bg-gray-50"
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -153,10 +161,10 @@ const Header = () => {
             </Link>
             <Link 
               to="/about" 
-              className={`font-medium py-3 text-base transition-colors ${
+              className={`font-medium py-4 px-4 text-lg rounded-lg transition-colors ${
                 isActive('/about') 
-                  ? "text-primary" 
-                  : "text-gray-700"
+                  ? "text-primary bg-primary/10 font-semibold" 
+                  : "text-gray-700 hover:bg-gray-50"
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -164,10 +172,10 @@ const Header = () => {
             </Link>
             <Link 
               to="/contact" 
-              className={`font-medium py-3 text-base transition-colors ${
+              className={`font-medium py-4 px-4 text-lg rounded-lg transition-colors ${
                 isActive('/contact') 
-                  ? "text-primary" 
-                  : "text-gray-700"
+                  ? "text-primary bg-primary/10 font-semibold" 
+                  : "text-gray-700 hover:bg-gray-50"
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -175,10 +183,10 @@ const Header = () => {
             </Link>
             <Link 
               to="/subscription" 
-              className={`font-medium py-3 text-base transition-colors ${
+              className={`font-medium py-4 px-4 text-lg rounded-lg transition-colors ${
                 isActive('/subscription') 
-                  ? "text-primary" 
-                  : "text-gray-700"
+                  ? "text-primary bg-primary/10 font-semibold" 
+                  : "text-gray-700 hover:bg-gray-50"
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -186,26 +194,30 @@ const Header = () => {
             </Link>
             <Link 
               to="/marketplace" 
-              className={`font-medium py-3 text-base transition-colors ${
+              className={`font-medium py-4 px-4 text-lg rounded-lg transition-colors ${
                 isActive('/marketplace') 
-                  ? "text-primary" 
-                  : "text-gray-700"
+                  ? "text-primary bg-primary/10 font-semibold" 
+                  : "text-gray-700 hover:bg-gray-50"
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               Marketplace
             </Link>
             
-            <div className="py-2">
+            <div className="py-4 px-4">
               <UserMenu />
             </div>
             
-            <Button className="bg-gradient-to-r from-primary to-blue-700 hover:from-blue-700 hover:to-blue-800 w-full mt-4 py-3 text-base" asChild>
+            <Button 
+              size="xl" 
+              className="bg-gradient-to-r from-primary to-blue-700 hover:from-blue-700 hover:to-blue-800 w-full mt-4 shadow-lg" 
+              asChild
+            >
               <Link 
                 to="/request-service/emergency"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <PhoneCall className="mr-2 h-4 w-4" />
+                <PhoneCall className="mr-3 h-6 w-6" />
                 Emergency Call
               </Link>
             </Button>

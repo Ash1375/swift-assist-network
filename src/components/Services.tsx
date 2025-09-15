@@ -137,7 +137,7 @@ const Services = () => {
   };
 
   return (
-    <section className="py-16 sm:py-20 bg-gradient-to-b from-background to-accent/20 relative overflow-hidden" id="services">
+    <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-background to-accent/20 relative overflow-hidden" id="services">
       {/* Elegant background elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
       <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full blur-3xl opacity-60"></div>
@@ -145,36 +145,36 @@ const Services = () => {
       
       <div className="container relative z-10 px-4">
         {/* Header Section */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-3xl mb-6 shadow-xl">
-            <ArrowRight className="h-8 w-8 text-white" />
+        <div className="text-center mb-12 md:mb-16">
+          <div className="inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-primary to-accent rounded-3xl mb-6 shadow-xl">
+            <ArrowRight className="h-6 w-6 md:h-8 md:w-8 text-white" />
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 tracking-tight">
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               Our Services
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Professional roadside assistance available 24/7
           </p>
         </div>
 
-        {/* Services Grid - More Elegant Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+        {/* Services Grid - Mobile Optimized */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16">
           {services.slice(0, 8).map((service, index) => (
             <Link 
               key={service.id}
               to={`/request-service/${service.id}`}
               className="group relative"
             >
-              <div className="relative bg-card/60 backdrop-blur-xl border border-border/50 rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-card/80 overflow-hidden">
+              <div className="relative bg-card/60 backdrop-blur-xl border border-border/50 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-card/80 overflow-hidden">
                 {/* Subtle gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl md:rounded-3xl"></div>
                 
                 {/* Badge for featured services */}
                 {service.badge && index < 4 && (
-                  <div className="absolute -top-3 -right-3 z-10">
-                    <div className="bg-gradient-to-r from-primary to-accent px-3 py-1 rounded-full shadow-lg">
+                  <div className="absolute -top-2 -right-2 md:-top-3 md:-right-3 z-10">
+                    <div className="bg-gradient-to-r from-primary to-accent px-2 py-1 md:px-3 md:py-1 rounded-full shadow-lg">
                       <span className="text-xs font-bold text-white">
                         {service.badgeText}
                       </span>
@@ -183,13 +183,13 @@ const Services = () => {
                 )}
                 
                 <div className="relative z-10 flex flex-col items-center text-center">
-                  <div className="relative mb-4">
-                    <div className={`p-4 rounded-2xl mb-1 bg-gradient-to-br from-primary/20 to-accent/20 group-hover:scale-110 transition-all duration-500 shadow-lg ${service.color}`}>
-                      <service.icon className="h-8 w-8 text-white drop-shadow-sm" />
+                  <div className="relative mb-3 md:mb-4">
+                    <div className={`p-3 md:p-4 rounded-xl md:rounded-2xl mb-1 bg-gradient-to-br from-primary/20 to-accent/20 group-hover:scale-110 transition-all duration-500 shadow-lg ${service.color}`}>
+                      <service.icon className="h-6 w-6 md:h-8 md:w-8 text-white drop-shadow-sm" />
                     </div>
                   </div>
                   
-                  <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
+                  <h3 className="text-xs md:text-sm font-bold text-foreground group-hover:text-primary transition-colors duration-300 leading-tight">
                     {service.name}
                   </h3>
                 </div>
@@ -241,9 +241,9 @@ const Services = () => {
           </div>
         )}
 
-        {/* Emergency CTA - More Elegant */}
+        {/* Emergency CTA - Mobile Optimized */}
         <div className="text-center">
-          <div className="relative bg-gradient-to-r from-primary via-accent to-primary rounded-3xl p-8 shadow-2xl overflow-hidden">
+          <div className="relative bg-gradient-to-r from-primary via-accent to-primary rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-2xl overflow-hidden">
             {/* Animated background elements */}
             <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-accent/90"></div>
             <div className="absolute top-0 left-0 w-full h-full opacity-20">
@@ -252,15 +252,15 @@ const Services = () => {
             </div>
             
             <div className="relative z-10">
-              <h3 className="text-2xl font-bold text-white mb-3">
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
                 Need Emergency Help?
               </h3>
-              <p className="text-primary-foreground/80 mb-6 text-lg">
+              <p className="text-primary-foreground/80 mb-6 text-base md:text-lg">
                 24/7 support available - We're just one call away
               </p>
               <Button 
-                size="lg" 
-                className="bg-white/95 text-primary hover:bg-white hover:scale-105 font-bold px-8 py-4 rounded-2xl shadow-xl text-lg backdrop-blur-sm transition-all duration-300"
+                size="xl" 
+                className="bg-white/95 text-primary hover:bg-white hover:scale-105 font-bold rounded-2xl shadow-xl backdrop-blur-sm transition-all duration-300 w-full sm:w-auto"
                 asChild
               >
                 <Link to="/emergency">
