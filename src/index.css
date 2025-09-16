@@ -279,28 +279,16 @@
 }
 
 /* Mobile-first responsive utilities */
-@screen max-sm {
-  .container {
-    @apply px-4;
-  }
-  
-  .mobile-only {
-    @apply block;
-  }
-  
-  .desktop-only {
-    @apply hidden;
-  }
+.container {
+  @apply px-4 sm:px-6 lg:px-8;
 }
 
-@screen sm {
-  .mobile-only {
-    @apply hidden;
-  }
-  
-  .desktop-only {
-    @apply block;
-  }
+.mobile-only {
+  @apply block sm:hidden;
+}
+
+.desktop-only {
+  @apply hidden sm:block;
 }
 
 /* Original styles preserved */
