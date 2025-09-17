@@ -184,7 +184,7 @@ export type Database = {
           service_type: string
           status?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string
           vehicle_info?: Json | null
         }
         Update: {
@@ -203,36 +203,59 @@ export type Database = {
       }
       service_requests: {
         Row: {
+          completed_at: string | null
           created_at: string
+          details: string | null
           id: string
           location_info: Json | null
+          personal_info: Json | null
           service_type: string
           status: string | null
+          technician_id: string | null
           updated_at: string
+          urgency: string | null
           user_id: string
           vehicle_info: Json | null
         }
         Insert: {
+          completed_at?: string | null
           created_at?: string
+          details?: string | null
           id?: string
           location_info?: Json | null
+          personal_info?: Json | null
           service_type: string
           status?: string | null
+          technician_id?: string | null
           updated_at?: string
-          user_id: string
-          vehicle_info?: Json | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          location_info?: Json | null
-          service_type?: string
-          status?: string | null
-          updated_at?: string
+          urgency?: string | null
           user_id?: string
           vehicle_info?: Json | null
         }
-        Relationships: []
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          location_info?: Json | null
+          personal_info?: Json | null
+          service_type?: string
+          status?: string | null
+          technician_id?: string | null
+          updated_at?: string
+          urgency?: string | null
+          user_id?: string
+          vehicle_info?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_requests_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "technicians"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       technicians: {
         Row: {

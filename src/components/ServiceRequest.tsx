@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Check, MapPin, Car, User, Wrench, CreditCard } from "lucide-react";
+import LiveProgressTracker from "./service-request/LiveProgressTracker";
 import { ServiceRequestFormData, ServiceType } from "./service-request/types";
 import PersonalInfoStep from "./service-request/PersonalInfoStep";
 import VehicleInfoStep from "./service-request/VehicleInfoStep";
@@ -343,7 +344,7 @@ const ServiceRequest = () => {
         </CardHeader>
         
         <CardContent className="p-6">
-          {renderProgress()}
+          <LiveProgressTracker currentStep={step} totalSteps={6} />
           
           <form onSubmit={handleSubmit}>
             {step === 1 && (

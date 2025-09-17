@@ -1,23 +1,15 @@
-import { PhoneCall, Wrench, Anchor, Battery, MessageCircle } from "lucide-react";
+import { PhoneCall, Wrench, Anchor, Cog, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 
 const MobileQuickActions = () => {
   return (
     <>
-      {/* Chat Button - Positioned nicely for mobile */}
-      <div className="fixed bottom-6 right-4 z-50 flex flex-col gap-3">
-        <button className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full shadow-2xl w-14 h-14 flex items-center justify-center hover:scale-110 transition-all duration-300 animate-pulse">
-          <MessageCircle className="h-6 w-6" />
+      {/* Chat Button - Positioned above bottom nav */}
+      <div className="fixed bottom-20 right-4 z-50">
+        <button className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full shadow-2xl w-12 h-12 flex items-center justify-center hover:scale-110 transition-all duration-300 lg:hidden">
+          <MessageCircle className="h-5 w-5" />
         </button>
-        
-        {/* Emergency Call Button */}
-        <Link 
-          to="/emergency" 
-          className="bg-gradient-to-r from-primary to-accent text-white rounded-full shadow-2xl w-14 h-14 flex items-center justify-center hover:scale-110 transition-all duration-300"
-        >
-          <PhoneCall className="h-6 w-6" />
-        </Link>
       </div>
 
       {/* Bottom Navigation for Mobile */}
@@ -40,11 +32,11 @@ const MobileQuickActions = () => {
           </Link>
           
           <Link
-            to="/request-service/battery"
+            to="/request-service/mechanical"
             className="flex flex-col items-center justify-center py-2 px-3 text-gray-600 hover:text-primary transition-colors rounded-xl hover:bg-gray-50 active:scale-95"
           >
-            <Battery className="h-5 w-5 mb-1" />
-            <span className="text-xs font-medium">Battery</span>
+            <Cog className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">Mechanical</span>
           </Link>
           
           <Link

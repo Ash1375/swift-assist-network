@@ -101,7 +101,6 @@ const CarServiceRequest = () => {
     
     try {
       const serviceData = {
-        user_id: 'temp-user-id', // Replace with actual user ID when auth is implemented
         service_type: `car-${serviceId}`,
         vehicle_info: {
           type: 'car',

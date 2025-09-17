@@ -23,11 +23,7 @@ export const useServiceRequestSubmit = () => {
     setIsSubmitting(true);
     
     try {
-      // For now, use a temporary user ID until authentication is implemented
-      const userId = 'temp-user-id';
-      
       const serviceData = {
-        user_id: userId,
         service_type: data.serviceType,
         vehicle_info: data.vehicleInfo,
         location_info: data.locationInfo,
