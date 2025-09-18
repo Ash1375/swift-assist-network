@@ -102,7 +102,7 @@ export const technicianAuthService = {
         email,
         phone,
         address,
-        verification_status: 'pending'
+        verification_status: 'pending' as const
       };
       
       const { data, error } = await supabase

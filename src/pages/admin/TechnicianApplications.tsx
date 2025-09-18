@@ -44,7 +44,7 @@ const TechnicianApplications = () => {
         let query = supabase.from('technicians').select('*');
         
         if (activeTab !== 'all') {
-          query = query.eq('verification_status', activeTab);
+          query = query.eq('verification_status', activeTab as 'pending' | 'verified' | 'rejected' | 'suspended');
         }
         
         const { data, error } = await query.order('created_at', { ascending: false });

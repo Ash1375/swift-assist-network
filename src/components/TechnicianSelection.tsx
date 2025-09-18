@@ -1,66 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import TechnicianCard from "./technician/TechnicianCard";
 import SortControls from "./technician/SortControls";
 import { Technician } from "./technician/types";
 import defaultAvatar from "@/assets/default-avatar.png";
-
-const mockTechnicians: Technician[] = [
-  {
-    id: "tech-1",
-    name: "Rajesh Kumar",
-    avatar: defaultAvatar,
-    rating: 4.8,
-    price: 599,
-    currency: "₹",
-    distance: "2.3 km",
-    estimatedArrival: "15-20 min",
-    completedJobs: 538,
-    specialties: ["Towing", "Battery", "Flat Tire"],
-    verified: true,
-    badges: ["Premium", "Top Rated"]
-  },
-  {
-    id: "tech-2",
-    name: "Ananya Singh",
-    avatar: defaultAvatar,
-    rating: 4.6,
-    price: 499,
-    currency: "₹",
-    distance: "3.8 km",
-    estimatedArrival: "20-25 min",
-    completedJobs: 287,
-    specialties: ["Mechanical", "Lockout", "Fuel Delivery"],
-    verified: true
-  },
-  {
-    id: "tech-3",
-    name: "Vikram Patel",
-    avatar: defaultAvatar,
-    rating: 4.9,
-    price: 799,
-    currency: "₹",
-    distance: "1.5 km",
-    estimatedArrival: "10-15 min",
-    completedJobs: 712,
-    specialties: ["All Services", "Emergency Response"],
-    verified: true,
-    badges: ["Premium", "Emergency Specialist"]
-  },
-  {
-    id: "tech-4",
-    name: "Priya Desai",
-    avatar: defaultAvatar,
-    rating: 4.5,
-    price: 549,
-    currency: "₹",
-    distance: "4.2 km",
-    estimatedArrival: "25-30 min",
-    completedJobs: 195,
-    specialties: ["Battery", "Flat Tire", "Fuel Delivery"],
-    verified: true
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
+import LoadingAnimation from "./LoadingAnimation";
+import { Alert, AlertDescription } from "./ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface TechnicianSelectionProps {
   serviceType: string;
@@ -70,8 +17,84 @@ interface TechnicianSelectionProps {
 const TechnicianSelection = ({ serviceType, onSelect }: TechnicianSelectionProps) => {
   const [selectedTechnician, setSelectedTechnician] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"price" | "rating" | "arrival">("arrival");
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const sortedTechnicians = [...mockTechnicians].sort((a, b) => {
+  useEffect(() => {
+    fetchTechnicians();
+  }, [serviceType]);
+
+  const fetchTechnicians = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { data, error: fetchError } = await supabase
+        .from('technicians')
+        .select('*')
+        .eq('verification_status', 'verified')
+        .eq('is_available', true);
+
+      if (fetchError) throw fetchError;
+
+      // Transform Supabase data to match Technician interface
+      const transformedTechnicians: Technician[] = data?.map((tech) => {
+        // Get service price from pricing JSON
+        const serviceKey = serviceType.toLowerCase().replace(' ', '-');
+        const basePrice = tech.pricing?.[serviceKey] || tech.pricing?.['towing'] || 500;
+        
+        return {
+          id: tech.id,
+          name: tech.name,
+          avatar: tech.profile_image_url || defaultAvatar,
+          rating: Number(tech.rating) || 0,
+          price: basePrice,
+          currency: "₹",
+          distance: calculateDistance(tech.latitude, tech.longitude),
+          estimatedArrival: calculateETA(tech.latitude, tech.longitude),
+          completedJobs: tech.total_jobs || 0,
+          specialties: tech.specialties || [],
+          verified: tech.verification_status === 'verified',
+          badges: getBadges(tech)
+        };
+      }) || [];
+
+      setTechnicians(transformedTechnicians);
+    } catch (err) {
+      console.error('Error fetching technicians:', err);
+      setError('Failed to load available technicians. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper functions
+  const calculateDistance = (lat?: number, lng?: number): string => {
+    // In a real app, calculate distance using user's location and technician's location
+    // For now, return a random distance between 1-15 km
+    const randomDistance = (Math.random() * 14 + 1).toFixed(1);
+    return `${randomDistance} km`;
+  };
+
+  const calculateETA = (lat?: number, lng?: number): string => {
+    // In a real app, use Google Maps API or similar for accurate ETA
+    // For now, estimate based on distance
+    const distance = parseFloat(calculateDistance(lat, lng));
+    const timeMin = Math.round(distance * 2 + Math.random() * 10);
+    const timeMax = timeMin + 10;
+    return `${timeMin}-${timeMax} min`;
+  };
+
+  const getBadges = (tech: any): string[] => {
+    const badges = [];
+    if (tech.rating >= 4.8) badges.push("Top Rated");
+    if (tech.total_jobs >= 200) badges.push("Premium");
+    if (tech.experience_years >= 10) badges.push("Expert");
+    return badges;
+  };
+
+  const sortedTechnicians = [...technicians].sort((a, b) => {
     if (sortBy === "price") {
       return a.price - b.price;
     } else if (sortBy === "rating") {
@@ -92,6 +115,45 @@ const TechnicianSelection = ({ serviceType, onSelect }: TechnicianSelectionProps
       onSelect(selectedTechnician);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center py-12 space-y-4">
+        <LoadingAnimation />
+        <p className="text-gray-600">Finding available technicians near you...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          {error}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={fetchTechnicians}
+            className="ml-2"
+          >
+            Retry
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (technicians.length === 0) {
+    return (
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          No technicians are currently available in your area. Please try again later or contact support.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="w-full space-y-6 animate-fade-in">
