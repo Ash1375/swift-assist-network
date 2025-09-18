@@ -76,6 +76,93 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          related_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          related_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          related_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          payment_method: string | null
+          service_request_id: string
+          status: string | null
+          technician_id: string | null
+          transaction_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          payment_method?: string | null
+          service_request_id: string
+          status?: string | null
+          technician_id?: string | null
+          transaction_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          payment_method?: string | null
+          service_request_id?: string
+          status?: string | null
+          technician_id?: string | null
+          transaction_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_service_request_id_fkey"
+            columns: ["service_request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "technicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           brand: string
@@ -247,9 +334,46 @@ export type Database = {
           user_id?: string
           vehicle_info?: Json | null
         }
+        Relationships: []
+      }
+      technician_reviews: {
+        Row: {
+          created_at: string | null
+          id: string
+          rating: number
+          review: string | null
+          service_request_id: string
+          technician_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          rating: number
+          review?: string | null
+          service_request_id: string
+          technician_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          rating?: number
+          review?: string | null
+          service_request_id?: string
+          technician_id?: string
+          user_id?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "service_requests_technician_id_fkey"
+            foreignKeyName: "technician_reviews_service_request_id_fkey"
+            columns: ["service_request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technician_reviews_technician_id_fkey"
             columns: ["technician_id"]
             isOneToOne: false
             referencedRelation: "technicians"
@@ -260,36 +384,75 @@ export type Database = {
       technicians: {
         Row: {
           address: string | null
-          created_at: string
+          created_at: string | null
+          documents: Json | null
           email: string
+          experience_years: number | null
           id: string
+          is_available: boolean | null
+          latitude: number | null
+          longitude: number | null
           name: string
-          phone: string | null
-          updated_at: string
-          user_id: string
-          verification_status: string | null
+          phone: string
+          pricing: Json | null
+          profile_image_url: string | null
+          rating: number | null
+          service_area_radius: number | null
+          specialties: string[] | null
+          total_jobs: number | null
+          updated_at: string | null
+          user_id: string | null
+          verification_status:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
         }
         Insert: {
           address?: string | null
-          created_at?: string
+          created_at?: string | null
+          documents?: Json | null
           email: string
+          experience_years?: number | null
           id?: string
+          is_available?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           name: string
-          phone?: string | null
-          updated_at?: string
-          user_id: string
-          verification_status?: string | null
+          phone: string
+          pricing?: Json | null
+          profile_image_url?: string | null
+          rating?: number | null
+          service_area_radius?: number | null
+          specialties?: string[] | null
+          total_jobs?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
         }
         Update: {
           address?: string | null
-          created_at?: string
+          created_at?: string | null
+          documents?: Json | null
           email?: string
+          experience_years?: number | null
           id?: string
+          is_available?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           name?: string
-          phone?: string | null
-          updated_at?: string
-          user_id?: string
-          verification_status?: string | null
+          phone?: string
+          pricing?: Json | null
+          profile_image_url?: string | null
+          rating?: number | null
+          service_area_radius?: number | null
+          specialties?: string[] | null
+          total_jobs?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
         }
         Relationships: []
       }
@@ -301,7 +464,22 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user" | "technician"
+      payment_status:
+        | "pending"
+        | "processing"
+        | "completed"
+        | "failed"
+        | "refunded"
+      service_status:
+        | "pending"
+        | "assigned"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+        | "rejected"
+      urgency_level: "low" | "normal" | "high" | "emergency"
+      verification_status: "pending" | "verified" | "rejected" | "suspended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -428,6 +606,25 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user", "technician"],
+      payment_status: [
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+        "refunded",
+      ],
+      service_status: [
+        "pending",
+        "assigned",
+        "in_progress",
+        "completed",
+        "cancelled",
+        "rejected",
+      ],
+      urgency_level: ["low", "normal", "high", "emergency"],
+      verification_status: ["pending", "verified", "rejected", "suspended"],
+    },
   },
 } as const
