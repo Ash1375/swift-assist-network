@@ -76,57 +76,59 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="container py-8 animate-fade-in">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+    <div className="container py-4 md:py-8 animate-fade-in">
+      <div className="px-4 md:px-0">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">Admin Dashboard</h1>
+      </div>
       
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8 px-4 md:px-0">
         <Card className="hover:shadow-md transition-all border-l-4 border-l-primary">
-          <CardContent className="p-6 flex flex-col">
+          <CardContent className="p-3 md:p-6 flex flex-col">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Total Technicians</p>
-              <Users className="h-5 w-5 text-primary opacity-70" />
+              <p className="text-xs md:text-sm font-medium text-muted-foreground">Total</p>
+              <Users className="h-4 w-4 md:h-5 md:w-5 text-primary opacity-70" />
             </div>
-            <h3 className="text-3xl font-bold mt-2">{stats.totalTechnicians}</h3>
-            <p className="text-sm text-muted-foreground mt-2">Active technicians in the system</p>
+            <h3 className="text-xl md:text-3xl font-bold mt-1 md:mt-2">{stats.totalTechnicians}</h3>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1 md:mt-2">Technicians</p>
           </CardContent>
         </Card>
         
         <Card className="hover:shadow-md transition-all border-l-4 border-l-green-500">
-          <CardContent className="p-6 flex flex-col">
+          <CardContent className="p-3 md:p-6 flex flex-col">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Verified Technicians</p>
-              <UserCheck className="h-5 w-5 text-green-500 opacity-70" />
+              <p className="text-xs md:text-sm font-medium text-muted-foreground">Verified</p>
+              <UserCheck className="h-4 w-4 md:h-5 md:w-5 text-green-500 opacity-70" />
             </div>
-            <h3 className="text-3xl font-bold mt-2">{stats.verifiedTechnicians}</h3>
-            <p className="text-sm text-muted-foreground mt-2">Technicians ready for service</p>
+            <h3 className="text-xl md:text-3xl font-bold mt-1 md:mt-2">{stats.verifiedTechnicians}</h3>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1 md:mt-2">Ready</p>
           </CardContent>
         </Card>
         
         <Card className="hover:shadow-md transition-all border-l-4 border-l-amber-500">
-          <CardContent className="p-6 flex flex-col">
+          <CardContent className="p-3 md:p-6 flex flex-col">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Pending Applications</p>
-              <Clock className="h-5 w-5 text-amber-500 opacity-70" />
+              <p className="text-xs md:text-sm font-medium text-muted-foreground">Pending</p>
+              <Clock className="h-4 w-4 md:h-5 md:w-5 text-amber-500 opacity-70" />
             </div>
-            <h3 className="text-3xl font-bold mt-2">{stats.pendingApplications}</h3>
-            <p className="text-sm text-muted-foreground mt-2">Applications awaiting review</p>
+            <h3 className="text-xl md:text-3xl font-bold mt-1 md:mt-2">{stats.pendingApplications}</h3>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1 md:mt-2">Review</p>
           </CardContent>
         </Card>
         
         <Card className="hover:shadow-md transition-all border-l-4 border-l-red-500">
-          <CardContent className="p-6 flex flex-col">
+          <CardContent className="p-3 md:p-6 flex flex-col">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Rejected Applications</p>
-              <X className="h-5 w-5 text-red-500 opacity-70" />
+              <p className="text-xs md:text-sm font-medium text-muted-foreground">Rejected</p>
+              <X className="h-4 w-4 md:h-5 md:w-5 text-red-500 opacity-70" />
             </div>
-            <h3 className="text-3xl font-bold mt-2">{stats.rejectedApplications}</h3>
-            <p className="text-sm text-muted-foreground mt-2">Applications that didn't meet criteria</p>
+            <h3 className="text-xl md:text-3xl font-bold mt-1 md:mt-2">{stats.rejectedApplications}</h3>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1 md:mt-2">Failed</p>
           </CardContent>
         </Card>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4 md:px-0">
         {/* Recent Applications */}
         <Card className="lg:col-span-2">
           <CardHeader>

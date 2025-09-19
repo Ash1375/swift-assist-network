@@ -12,7 +12,9 @@ const Index = () => {
   return (
     <div className="mobile-compact">
       <Hero />
-      <Services />
+      <div className="mobile-section">
+        <Services />
+      </div>
       <div className="hidden md:block">
         <Map />
       </div>

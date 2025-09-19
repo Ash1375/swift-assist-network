@@ -55,59 +55,68 @@ const TechnicianDashboard = () => {
   ];
 
   return (
-    <div className="container py-12">
+    <div className="container py-6 md:py-12">
       <div className="flex flex-col space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Technician Dashboard</h1>
+        <div className="px-4 md:px-0">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Technician Dashboard</h1>
           <p className="text-muted-foreground">Welcome back, {technician.name}!</p>
         </div>
         
-        <TechnicianStats stats={mockStats} />
+        <div className="px-4 md:px-0">
+          <TechnicianStats stats={mockStats} />
+        </div>
         
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="overview" className="gap-2">
-              <Activity size={16} />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="requests" className="gap-2">
-              <Clock size={16} />
-              Service Requests
-            </TabsTrigger>
-            <TabsTrigger value="map" className="gap-2">
-              <MapPin size={16} />
-              Service Area
-            </TabsTrigger>
-            <TabsTrigger value="customers" className="gap-2">
-              <Users size={16} />
-              Customers
-            </TabsTrigger>
-            <TabsTrigger value="account" className="gap-2">
-              <Settings size={16} />
-              Account
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview">
-            <OverviewTab revenueData={mockRevenueData} reviews={mockReviews} />
-          </TabsContent>
-          
-          <TabsContent value="requests">
-            <ServiceRequestsTab />
-          </TabsContent>
-          
-          <TabsContent value="map">
-            <ServiceAreaTab />
-          </TabsContent>
-          
-          <TabsContent value="customers">
-            <CustomersTab />
-          </TabsContent>
-          
-          <TabsContent value="account">
-            <AccountTab technician={technician} />
-          </TabsContent>
-        </Tabs>
+        <div className="px-4 md:px-0">
+          <Tabs defaultValue="overview" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 gap-1 md:gap-0">
+              <TabsTrigger value="overview" className="gap-1 md:gap-2 text-xs md:text-sm">
+                <Activity size={14} className="md:w-4 md:h-4" />
+                <span className="hidden sm:inline">Overview</span>
+                <span className="sm:hidden">Stats</span>
+              </TabsTrigger>
+              <TabsTrigger value="requests" className="gap-1 md:gap-2 text-xs md:text-sm">
+                <Clock size={14} className="md:w-4 md:h-4" />
+                <span className="hidden sm:inline">Requests</span>
+                <span className="sm:hidden">Jobs</span>
+              </TabsTrigger>
+              <TabsTrigger value="map" className="gap-1 md:gap-2 text-xs md:text-sm">
+                <MapPin size={14} className="md:w-4 md:h-4" />
+                <span className="hidden sm:inline">Service Area</span>
+                <span className="sm:hidden">Area</span>
+              </TabsTrigger>
+              <TabsTrigger value="customers" className="gap-1 md:gap-2 text-xs md:text-sm">
+                <Users size={14} className="md:w-4 md:h-4" />
+                <span className="hidden sm:inline">Customers</span>
+                <span className="sm:hidden">Users</span>
+              </TabsTrigger>
+              <TabsTrigger value="account" className="gap-1 md:gap-2 text-xs md:text-sm">
+                <Settings size={14} className="md:w-4 md:h-4" />
+                <span className="hidden sm:inline">Account</span>
+                <span className="sm:hidden">Settings</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview">
+              <OverviewTab revenueData={mockRevenueData} reviews={mockReviews} />
+            </TabsContent>
+            
+            <TabsContent value="requests">
+              <ServiceRequestsTab />
+            </TabsContent>
+            
+            <TabsContent value="map">
+              <ServiceAreaTab />
+            </TabsContent>
+            
+            <TabsContent value="customers">
+              <CustomersTab />
+            </TabsContent>
+            
+            <TabsContent value="account">
+              <AccountTab technician={technician} />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );

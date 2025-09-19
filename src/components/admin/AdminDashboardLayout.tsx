@@ -49,14 +49,16 @@ const AdminDashboardLayout = () => {
       <aside 
         className={cn(
           "bg-card border-r border-border transition-all duration-300 ease-in-out",
-          isSidebarCollapsed ? "w-16" : "w-64"
+          "fixed md:relative z-40 h-full md:h-auto",
+          isSidebarCollapsed ? "w-16" : "w-64 md:w-64",
+          "md:block"
         )}
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           {!isSidebarCollapsed && (
             <div className="flex items-center gap-2">
               <Shield className="h-6 w-6 text-primary" />
-              <h2 className="text-xl font-bold text-primary">Towbuddy</h2>
+              <h2 className="text-xl font-bold text-primary">Admin</h2>
             </div>
           )}
           {isSidebarCollapsed && <Shield className="h-6 w-6 text-primary mx-auto" />}
@@ -158,11 +160,24 @@ const AdminDashboardLayout = () => {
       </aside>
       
       {/* Main content */}
-      <div className="flex-1 flex flex-col">
+      <div className={cn(
+        "flex-1 flex flex-col transition-all duration-300",
+        !isSidebarCollapsed ? "md:ml-64" : "md:ml-16"
+      )}>
         {/* Top nav */}
-        <header className="border-b border-border bg-card h-16 flex items-center px-6 sticky top-0 z-10">
+        <header className="border-b border-border bg-card h-14 md:h-16 flex items-center px-4 md:px-6 sticky top-0 z-10">
           <div className="flex items-center justify-between w-full">
-            <h1 className="text-lg font-semibold">Admin Dashboard</h1>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleSidebar}
+                className="md:hidden"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              <h1 className="text-lg font-semibold">Admin Dashboard</h1>
+            </div>
             
             <div className="flex items-center space-x-3">
               <DropdownMenu>
@@ -238,10 +253,18 @@ const AdminDashboardLayout = () => {
         </header>
         
         {/* Content area */}
-        <main className="flex-1 overflow-y-auto bg-muted/20">
+        <main className="flex-1 overflow-y-auto bg-muted/20 pb-20 md:pb-0">
           <Outlet />
         </main>
       </div>
+      
+      {/* Mobile overlay */}
+      {!isSidebarCollapsed && (
+        <div 
+          className="fixed inset-0 bg-black/20 z-30 md:hidden" 
+          onClick={() => setIsSidebarCollapsed(true)}
+        />
+      )}
     </div>
   );
 };

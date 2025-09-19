@@ -86,14 +86,14 @@ const Header = () => {
             Contact
           </Link>
           <Link 
-            to="/subscription" 
+            to="/technician/login" 
             className={`font-medium text-lg transition-colors ${
-              isActive('/subscription') 
+              isActive('/technician') 
                 ? "text-primary font-semibold" 
                 : "text-gray-700 hover:text-primary"
             }`}
           >
-            Pricing
+            Technician Portal
           </Link>
           <Link 
             to="/marketplace" 
@@ -182,15 +182,15 @@ const Header = () => {
               Contact
             </Link>
             <Link 
-              to="/subscription" 
+              to="/technician/login" 
               className={`font-medium py-4 px-4 text-lg rounded-lg transition-colors ${
-                isActive('/subscription') 
+                isActive('/technician') 
                   ? "text-primary bg-primary/10 font-semibold" 
                   : "text-gray-700 hover:bg-gray-50"
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              Pricing
+              Technician Portal
             </Link>
             <Link 
               to="/marketplace" 

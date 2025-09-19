@@ -13,12 +13,10 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Subscription from "./pages/Subscription";
 import ServiceRequest from "./components/ServiceRequest";
 import RequestTracking from "./components/RequestTracking";
 import NotFound from "./pages/NotFound";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import AppLayout from "./components/AppLayout";
 import Chatbot from "@/components/Chatbot";
 import LoadingAnimation from "@/components/LoadingAnimation";
 import Emergency from "./pages/Emergency";
@@ -65,53 +63,14 @@ const App = () => (
               <Sonner />
               <LoadingAnimation />
               <Routes>
-                {/* Main app routes */}
-                <Route path="/" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Header />
-                    <main className="flex-grow">
-                      <Index />
-                    </main>
-                    <Footer />
-                    <Chatbot />
-                  </div>
-                } />
-                
-                {/* Standard routes with Header/Footer */}
-                <Route path="/" element={
-                  <div className="flex flex-col min-h-screen">
-                    <Header />
-                    <main className="flex-grow">
-                      <Routes>
-                        <Route path="services" element={<ServicesPage />} />
-                        <Route path="about" element={<About />} />
-                        <Route path="contact" element={<Contact />} />
-                        <Route path="login" element={<Login />} />
-                        <Route path="register" element={<Register />} />
-                        <Route path="subscription" element={<Subscription />} />
-                        <Route path="emergency" element={<Emergency />} />
-                        <Route path="request-service/:serviceId" element={<VehicleServiceSelector />} />
-                        <Route path="request-service/:serviceId/car" element={<CarServiceRequest />} />
-                        <Route path="request-service/:serviceId/bike" element={<BikeServiceRequest />} />
-                        <Route path="request-service/:serviceId/commercial" element={<CommercialServiceRequest />} />
-                        <Route path="request-service/:serviceId/ev" element={<EVServiceRequest />} />
-                        <Route path="request-tracking/:requestId" element={<RequestTracking />} />
-                        <Route path="settings" element={<Settings />} />
-                        <Route path="marketplace" element={<Marketplace />} />
-                        <Route path="marketplace/product/:id" element={<ProductDetail />} />
-                        <Route path="service-communication/:serviceId" element={<ServiceCommunicationPage />} />
-                      </Routes>
-                    </main>
-                    <Footer />
-                    <Chatbot />
-                  </div>
-                }>
+                {/* Main app routes with AppLayout */}
+                <Route path="/" element={<AppLayout />}>
+                  <Route index element={<Index />} />
                   <Route path="services" element={<ServicesPage />} />
                   <Route path="about" element={<About />} />
                   <Route path="contact" element={<Contact />} />
                   <Route path="login" element={<Login />} />
                   <Route path="register" element={<Register />} />
-                  <Route path="subscription" element={<Subscription />} />
                   <Route path="emergency" element={<Emergency />} />
                   <Route path="request-service/:serviceId" element={<VehicleServiceSelector />} />
                   <Route path="request-service/:serviceId/car" element={<CarServiceRequest />} />

@@ -54,6 +54,14 @@
     /* Enhanced animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     
+    /* Mobile app-specific */
+    --mobile-padding: 1rem;
+    --mobile-border-radius: 0.75rem;
+    --app-background: hsl(var(--background));
+    --app-surface: hsl(var(--card));
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(0 84% 60%), hsl(25 95% 53%));
     --gradient-hero: linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(25 95% 53%) 100%);
@@ -766,4 +774,70 @@
 
 .animate-slide-down {
   animation: slideDown 0.3s ease-out;
+}
+
+/* Mobile App Layout Styles */
+.mobile-app-layout {
+  background: var(--app-background);
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.mobile-main {
+  padding: 0;
+  background: var(--app-background);
+}
+
+.mobile-section {
+  padding: var(--mobile-padding);
+  margin-bottom: 0.5rem;
+  background: var(--app-surface);
+  border-radius: var(--mobile-border-radius);
+  margin-left: var(--mobile-padding);
+  margin-right: var(--mobile-padding);
+  border: 1px solid hsl(var(--border));
+}
+
+.mobile-compact {
+  @apply space-y-0;
+}
+
+.mobile-chatbot .fixed {
+  bottom: 5rem;
+}
+
+/* App-like cards */
+.app-card {
+  background: var(--app-surface);
+  border-radius: var(--mobile-border-radius);
+  border: 1px solid hsl(var(--border));
+  padding: 1rem;
+  margin: 0.5rem var(--mobile-padding);
+}
+
+/* Mobile-first button styles */
+.mobile-btn {
+  min-height: 48px;
+  border-radius: var(--mobile-border-radius);
+  font-weight: 600;
+  transition: var(--transition-smooth);
+}
+
+/* Safe area handling */
+.safe-area-pb {
+  padding-bottom: max(1rem, var(--safe-area-inset-bottom));
+}
+
+/* Mobile app header */
+@media (max-width: 768px) {
+  header {
+    background: var(--app-surface) !important;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  
+  .container {
+    padding-left: var(--mobile-padding);
+    padding-right: var(--mobile-padding);
+  }
 }
