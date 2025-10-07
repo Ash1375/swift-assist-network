@@ -140,8 +140,8 @@ const CarServiceRequest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-accent/10 py-8">
-      <div className="container max-w-3xl px-4">
+    <div className="min-h-screen bg-gradient-to-b from-background to-accent/10 py-4 md:py-8 pb-24 md:pb-8">
+      <div className="container max-w-3xl px-3 md:px-4">
         <div className="mb-6">
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -349,13 +349,15 @@ const CarServiceRequest = () => {
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full py-6 text-lg"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Submitting Request..." : "Submit Service Request"}
-              </Button>
+              <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t md:relative md:border-t-0 md:p-0 z-10">
+                <Button 
+                  type="submit" 
+                  className="w-full py-6 text-lg shadow-lg"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting Request..." : "Submit Service Request"}
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>

@@ -41,9 +41,13 @@ const Login = () => {
     setError(null);
     
     try {
-      await login(data.email, data.password);
-      toast.success("Login successful!");
-      navigate("/");
+      const result = await login(data.email, data.password);
+      if (result.user) {
+        toast.success("Login successful!");
+        setTimeout(() => {
+          navigate("/");
+        }, 500);
+      }
     } catch (error: any) {
       console.error(error);
       setError(error.message || "Invalid email or password");

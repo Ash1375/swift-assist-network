@@ -69,21 +69,21 @@ const VehicleServiceSelector = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-accent/10 py-8">
-      <div className="container max-w-4xl px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">
+    <div className="min-h-screen bg-gradient-to-b from-background to-accent/10 py-4 md:py-8 pb-20 md:pb-8">
+      <div className="container max-w-4xl px-3 md:px-4">
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
             Select Your Vehicle Type
           </h1>
-          <p className="text-xl text-muted-foreground mb-2">
+          <p className="text-lg md:text-xl text-muted-foreground mb-2">
             For <span className="text-primary font-semibold">{service.name}</span>
           </p>
-          <p className="text-muted-foreground">
+          <p className="text-sm md:text-base text-muted-foreground">
             {service.description}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           {vehicleCategories.map((category) => (
             <Card 
               key={category.id}
@@ -128,12 +128,12 @@ const VehicleServiceSelector = () => {
           ))}
         </div>
 
-        <div className="text-center">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t md:relative md:border-t-0 md:p-0 md:text-center z-10">
           <Button 
             onClick={handleContinue}
             disabled={!selectedVehicle}
             size="lg"
-            className="px-8 py-4 text-lg"
+            className="w-full md:w-auto px-8 py-6 md:py-4 text-lg shadow-lg"
           >
             Continue with {selectedVehicle ? vehicleCategories.find(v => v.id === selectedVehicle)?.name : 'Vehicle'}
             <ArrowRight className="ml-2 h-5 w-5" />

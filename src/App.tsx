@@ -21,6 +21,8 @@ import Chatbot from "@/components/Chatbot";
 import LoadingAnimation from "@/components/LoadingAnimation";
 import Emergency from "./pages/Emergency";
 import Settings from "./pages/Settings";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
 
 // Technician pages
 import TechnicianLayout from "./components/technician/TechnicianLayout";
@@ -52,6 +54,27 @@ import ServiceCommunicationPage from "./pages/ServiceCommunicationPage";
 
 const queryClient = new QueryClient();
 
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, loading } = useAuth();
+  const location = window.location.pathname;
+  
+  // Allow access to auth pages and technician/admin routes
+  const isAuthPage = location === '/login' || location === '/register';
+  const isTechnicianRoute = location.startsWith('/technician');
+  const isAdminRoute = location.startsWith('/admin');
+  
+  if (loading) {
+    return <LoadingAnimation />;
+  }
+  
+  if (!isAuthenticated && !isAuthPage && !isTechnicianRoute && !isAdminRoute) {
+    window.location.href = '/login';
+    return null;
+  }
+  
+  return <>{children}</>;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
@@ -65,23 +88,23 @@ const App = () => (
               <Routes>
                 {/* Main app routes with AppLayout */}
                 <Route path="/" element={<AppLayout />}>
-                  <Route index element={<Index />} />
-                  <Route path="services" element={<ServicesPage />} />
-                  <Route path="about" element={<About />} />
-                  <Route path="contact" element={<Contact />} />
+                  <Route index element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                  <Route path="services" element={<ProtectedRoute><ServicesPage /></ProtectedRoute>} />
+                  <Route path="about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+                  <Route path="contact" element={<ProtectedRoute><Contact /></ProtectedRoute>} />
                   <Route path="login" element={<Login />} />
                   <Route path="register" element={<Register />} />
-                  <Route path="emergency" element={<Emergency />} />
-                  <Route path="request-service/:serviceId" element={<VehicleServiceSelector />} />
-                  <Route path="request-service/:serviceId/car" element={<CarServiceRequest />} />
-                  <Route path="request-service/:serviceId/bike" element={<BikeServiceRequest />} />
-                  <Route path="request-service/:serviceId/commercial" element={<CommercialServiceRequest />} />
-                  <Route path="request-service/:serviceId/ev" element={<EVServiceRequest />} />
-                  <Route path="request-tracking/:requestId" element={<RequestTracking />} />
-                  <Route path="settings" element={<Settings />} />
-                  <Route path="marketplace" element={<Marketplace />} />
-                  <Route path="marketplace/product/:id" element={<ProductDetail />} />
-                  <Route path="service-communication/:serviceId" element={<ServiceCommunicationPage />} />
+                  <Route path="emergency" element={<ProtectedRoute><Emergency /></ProtectedRoute>} />
+                  <Route path="request-service/:serviceId" element={<ProtectedRoute><VehicleServiceSelector /></ProtectedRoute>} />
+                  <Route path="request-service/:serviceId/car" element={<ProtectedRoute><CarServiceRequest /></ProtectedRoute>} />
+                  <Route path="request-service/:serviceId/bike" element={<ProtectedRoute><BikeServiceRequest /></ProtectedRoute>} />
+                  <Route path="request-service/:serviceId/commercial" element={<ProtectedRoute><CommercialServiceRequest /></ProtectedRoute>} />
+                  <Route path="request-service/:serviceId/ev" element={<ProtectedRoute><EVServiceRequest /></ProtectedRoute>} />
+                  <Route path="request-tracking/:requestId" element={<ProtectedRoute><RequestTracking /></ProtectedRoute>} />
+                  <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                  <Route path="marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
+                  <Route path="marketplace/product/:id" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
+                  <Route path="service-communication/:serviceId" element={<ProtectedRoute><ServiceCommunicationPage /></ProtectedRoute>} />
                 </Route>
                 
                 {/* Technician portal routes */}

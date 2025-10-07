@@ -46,9 +46,13 @@ const Register = () => {
     setError(null);
     
     try {
-      await register(data.name, data.email, data.password);
-      toast.success("Registration successful!");
-      navigate("/");
+      const result = await register(data.name, data.email, data.password);
+      if (result.user) {
+        toast.success("Registration successful!");
+        setTimeout(() => {
+          navigate("/");
+        }, 500);
+      }
     } catch (error: any) {
       console.error(error);
       setError(error.message || "Registration failed. Email may already be in use.");
