@@ -56,18 +56,12 @@ const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
-  const location = window.location.pathname;
-  
-  // Allow access to auth pages and technician/admin routes
-  const isAuthPage = location === '/login' || location === '/register';
-  const isTechnicianRoute = location.startsWith('/technician');
-  const isAdminRoute = location.startsWith('/admin');
   
   if (loading) {
     return <LoadingAnimation />;
   }
   
-  if (!isAuthenticated && !isAuthPage && !isTechnicianRoute && !isAdminRoute) {
+  if (!isAuthenticated) {
     window.location.href = '/login';
     return null;
   }
@@ -86,14 +80,16 @@ const App = () => (
               <Sonner />
               <LoadingAnimation />
               <Routes>
+                {/* Auth routes - separate from app layout */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                
                 {/* Main app routes with AppLayout */}
                 <Route path="/" element={<AppLayout />}>
                   <Route index element={<ProtectedRoute><Index /></ProtectedRoute>} />
                   <Route path="services" element={<ProtectedRoute><ServicesPage /></ProtectedRoute>} />
                   <Route path="about" element={<ProtectedRoute><About /></ProtectedRoute>} />
                   <Route path="contact" element={<ProtectedRoute><Contact /></ProtectedRoute>} />
-                  <Route path="login" element={<Login />} />
-                  <Route path="register" element={<Register />} />
                   <Route path="emergency" element={<ProtectedRoute><Emergency /></ProtectedRoute>} />
                   <Route path="request-service/:serviceId" element={<ProtectedRoute><VehicleServiceSelector /></ProtectedRoute>} />
                   <Route path="request-service/:serviceId/car" element={<ProtectedRoute><CarServiceRequest /></ProtectedRoute>} />

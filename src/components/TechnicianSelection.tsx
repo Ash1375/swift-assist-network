@@ -7,23 +7,34 @@ import defaultAvatar from "@/assets/default-avatar.png";
 import { supabase } from "@/integrations/supabase/client";
 import LoadingAnimation from "./LoadingAnimation";
 import { Alert, AlertDescription } from "./ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Sparkles, Loader2 } from "lucide-react";
+import { Card } from "./ui/card";
 
 interface TechnicianSelectionProps {
   serviceType: string;
   onSelect: (technicianId: string) => void;
+  vehicleType?: string;
+  location?: string;
 }
 
-const TechnicianSelection = ({ serviceType, onSelect }: TechnicianSelectionProps) => {
+const TechnicianSelection = ({ serviceType, onSelect, vehicleType, location }: TechnicianSelectionProps) => {
   const [selectedTechnician, setSelectedTechnician] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"price" | "rating" | "arrival">("arrival");
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [aiRecommendation, setAiRecommendation] = useState<string>("");
+  const [loadingAI, setLoadingAI] = useState(false);
 
   useEffect(() => {
     fetchTechnicians();
   }, [serviceType]);
+
+  useEffect(() => {
+    if (technicians.length > 0 && !aiRecommendation) {
+      fetchAIRecommendation();
+    }
+  }, [technicians]);
 
   const fetchTechnicians = async () => {
     try {
@@ -66,6 +77,37 @@ const TechnicianSelection = ({ serviceType, onSelect }: TechnicianSelectionProps
       setError('Failed to load available technicians. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAIRecommendation = async () => {
+    if (!vehicleType || !location) return;
+    
+    setLoadingAI(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('match-technician', {
+        body: {
+          serviceType,
+          vehicleType,
+          location,
+          technicians: technicians.map(t => ({
+            name: t.name,
+            rating: t.rating,
+            completedJobs: t.completedJobs,
+            distance: t.distance,
+            estimatedArrival: t.estimatedArrival,
+            price: t.price,
+            specialties: t.specialties
+          }))
+        }
+      });
+
+      if (error) throw error;
+      setAiRecommendation(data.recommendation);
+    } catch (err) {
+      console.error('Error getting AI recommendation:', err);
+    } finally {
+      setLoadingAI(false);
     }
   };
 
@@ -162,6 +204,21 @@ const TechnicianSelection = ({ serviceType, onSelect }: TechnicianSelectionProps
         <p className="text-gray-600 text-center sm:text-left">
           Select a technician for your {serviceType} service
         </p>
+        
+        {aiRecommendation && (
+          <Card className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <div className="flex items-start gap-3">
+              <Sparkles className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+              <div>
+                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                  AI-Powered Recommendations
+                  {loadingAI && <Loader2 className="h-4 w-4 animate-spin" />}
+                </h4>
+                <p className="text-sm text-muted-foreground whitespace-pre-line">{aiRecommendation}</p>
+              </div>
+            </div>
+          </Card>
+        )}
         
         <SortControls sortBy={sortBy} onSortChange={setSortBy} />
       </div>
