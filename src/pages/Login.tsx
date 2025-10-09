@@ -62,19 +62,27 @@ const Login = () => {
     setError(null);
     
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${window.location.origin}/`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Google OAuth error:", error);
+        throw error;
+      }
       
+      console.log("Google OAuth initiated:", data);
       toast.success("Redirecting to Google...");
     } catch (error: any) {
-      console.error(error);
-      setError(error.message || "Google login failed");
+      console.error("Google login error:", error);
+      setError(error.message || "Google login failed. Please try again.");
       toast.error("Google login failed");
       setIsLoading(false);
     }
