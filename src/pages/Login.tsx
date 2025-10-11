@@ -44,14 +44,21 @@ const Login = () => {
       const result = await login(data.email, data.password);
       if (result.user) {
         toast.success("Login successful!");
+        // Small delay to allow auth state to update
         setTimeout(() => {
           navigate("/");
-        }, 500);
+        }, 100);
       }
     } catch (error: any) {
-      console.error(error);
-      setError(error.message || "Invalid email or password");
-      toast.error("Login failed");
+      console.error("Login error:", error);
+      
+      if (error.message?.includes("Email not confirmed") || error.message?.includes("email_not_confirmed")) {
+        setError("Please confirm your email before logging in. Check your inbox for the confirmation link.");
+        toast.error("Email not confirmed");
+      } else {
+        setError(error.message || "Invalid email or password");
+        toast.error("Login failed");
+      }
     } finally {
       setIsLoading(false);
     }

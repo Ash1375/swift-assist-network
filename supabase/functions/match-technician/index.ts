@@ -46,6 +46,8 @@ ${technicianSummary}
 
 Recommend the top 3 technicians with brief reasoning for each.`;
 
+    console.log('Calling Lovable AI Gateway with Gemini...');
+    
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -58,12 +60,13 @@ Recommend the top 3 technicians with brief reasoning for each.`;
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.7,
-        max_tokens: 500,
       }),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Lovable AI error:', response.status, errorText);
+      
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
@@ -72,7 +75,7 @@ Recommend the top 3 technicians with brief reasoning for each.`;
       }
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: "AI service requires payment. Please contact support." }),
+          JSON.stringify({ error: "AI credits depleted. Please add credits to your workspace." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -82,18 +85,32 @@ Recommend the top 3 technicians with brief reasoning for each.`;
     const data = await response.json();
     const recommendation = data.choices[0]?.message?.content || "No recommendation available";
 
-    return new Response(
-      JSON.stringify({ recommendation }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-  } catch (error) {
-    console.error("Error:", error);
+    console.log('AI recommendation generated successfully');
+
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : "Unknown error",
+        recommendation,
+        serviceType,
+        vehicleType,
+        location 
+      }),
+      { 
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      }
+    );
+
+  } catch (error) {
+    console.error('Error in match-technician function:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'An unexpected error occurred',
         recommendation: "Unable to generate AI recommendations at this time."
       }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { 
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
     );
   }
 });

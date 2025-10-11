@@ -49,14 +49,27 @@ const Register = () => {
     
     try {
       const result = await register(data.name, data.email, data.password);
-      if (result.user) {
-        toast.success("Account created successfully!");
-        setTimeout(() => {
-          navigate("/");
-        }, 500);
+      
+      // Check if user was created but might need email confirmation
+      if (result.user?.identities && result.user.identities.length === 0) {
+        setError("An account with this email already exists. Please login instead.");
+        toast.error("Email already registered");
+      } else if (result.user) {
+        // Check if email confirmation is required
+        if (result.user.email_confirmed_at) {
+          toast.success("Account created successfully!");
+          setTimeout(() => {
+            navigate("/");
+          }, 100);
+        } else {
+          toast.success("Registration successful! Please check your email to confirm your account.");
+          setTimeout(() => {
+            navigate("/login");
+          }, 2000);
+        }
       }
     } catch (error: any) {
-      console.error(error);
+      console.error("Registration error:", error);
       let errorMessage = "Registration failed. Please try again.";
       
       if (error.message?.includes("already registered") || error.message?.includes("already been registered")) {

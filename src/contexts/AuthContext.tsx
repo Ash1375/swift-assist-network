@@ -51,14 +51,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           if (event === 'SIGNED_IN' && newSession) {
             try {
-              // Use a type assertion to bypass type checking for the profiles table
+              // Query by user_id since profiles table uses that column
               const { data: profile, error } = await supabase
                 .from('profiles' as any)
                 .select('*')
-                .eq('id', newSession.user.id)
-                .single();
+                .eq('user_id', newSession.user.id)
+                .maybeSingle();
               
-              if (error) throw error;
+              if (error && error.code !== 'PGRST116') {
+                console.error("Error fetching user profile:", error);
+              }
               
               if (profile) {
                 setUser({
@@ -68,16 +70,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   subscription: (profile as any).subscription_tier || 'free',
                 });
               } else {
-                // Fallback if profile not found
+                // Create profile if it doesn't exist
+                const { error: insertError } = await supabase
+                  .from('profiles' as any)
+                  .insert({
+                    user_id: newSession.user.id,
+                    full_name: newSession.user.user_metadata?.full_name || newSession.user.email?.split('@')[0] || 'User',
+                    email: newSession.user.email,
+                    subscription_tier: 'free'
+                  });
+                
+                if (insertError) {
+                  console.error("Error creating profile:", insertError);
+                }
+                
                 setUser({
                   id: newSession.user.id,
-                  name: newSession.user.email?.split('@')[0] || 'User',
+                  name: newSession.user.user_metadata?.full_name || newSession.user.email?.split('@')[0] || 'User',
                   email: newSession.user.email || '',
                   subscription: 'free',
                 });
               }
             } catch (error) {
-              console.error("Error fetching user profile:", error);
+              console.error("Error in auth state change:", error);
+              // Set user anyway with basic info
+              setUser({
+                id: newSession.user.id,
+                name: newSession.user.email?.split('@')[0] || 'User',
+                email: newSession.user.email || '',
+                subscription: 'free',
+              });
             }
           } else if (event === 'SIGNED_OUT') {
             setUser(null);
@@ -91,14 +113,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (currentSession?.user) {
         try {
-          // Use a type assertion to bypass type checking for the profiles table
+          // Query by user_id since profiles table uses that column
           const { data: profile, error } = await supabase
             .from('profiles' as any)
             .select('*')
-            .eq('id', currentSession.user.id)
-            .single();
+            .eq('user_id', currentSession.user.id)
+            .maybeSingle();
           
-          if (error) throw error;
+          if (error && error.code !== 'PGRST116') {
+            console.error("Error fetching user profile:", error);
+          }
           
           if (profile) {
             setUser({
@@ -108,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               subscription: (profile as any).subscription_tier || 'free',
             });
           } else {
-            // Fallback if profile not found
+            // Set user with basic info, profile will be created on next sign in
             setUser({
               id: currentSession.user.id,
               name: currentSession.user.email?.split('@')[0] || 'User',
@@ -118,6 +142,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } catch (error) {
           console.error("Error fetching user profile:", error);
+          // Set user anyway with basic info
+          setUser({
+            id: currentSession.user.id,
+            name: currentSession.user.email?.split('@')[0] || 'User',
+            email: currentSession.user.email || '',
+            subscription: 'free',
+          });
         }
       }
       
@@ -187,7 +218,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           full_name: data.name,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
+        .eq('user_id', user.id);
         
       if (error) throw error;
       
@@ -211,7 +242,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           subscription_tier: subscription,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
+        .eq('user_id', user.id);
         
       if (error) throw error;
       
