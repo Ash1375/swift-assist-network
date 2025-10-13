@@ -86,11 +86,11 @@ const App = () => (
                 
                 {/* Main app routes with AppLayout */}
                 <Route path="/" element={<AppLayout />}>
-                  <Route index element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                  <Route path="services" element={<ProtectedRoute><ServicesPage /></ProtectedRoute>} />
-                  <Route path="about" element={<ProtectedRoute><About /></ProtectedRoute>} />
-                  <Route path="contact" element={<ProtectedRoute><Contact /></ProtectedRoute>} />
-                  <Route path="emergency" element={<ProtectedRoute><Emergency /></ProtectedRoute>} />
+                  <Route index element={<Index />} />
+                  <Route path="services" element={<ServicesPage />} />
+                  <Route path="about" element={<About />} />
+                  <Route path="contact" element={<Contact />} />
+                  <Route path="emergency" element={<Emergency />} />
                   <Route path="request-service/:serviceId" element={<ProtectedRoute><VehicleServiceSelector /></ProtectedRoute>} />
                   <Route path="request-service/:serviceId/car" element={<ProtectedRoute><CarServiceRequest /></ProtectedRoute>} />
                   <Route path="request-service/:serviceId/bike" element={<ProtectedRoute><BikeServiceRequest /></ProtectedRoute>} />
@@ -98,8 +98,8 @@ const App = () => (
                   <Route path="request-service/:serviceId/ev" element={<ProtectedRoute><EVServiceRequest /></ProtectedRoute>} />
                   <Route path="request-tracking/:requestId" element={<ProtectedRoute><RequestTracking /></ProtectedRoute>} />
                   <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                  <Route path="marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
-                  <Route path="marketplace/product/:id" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
+                  <Route path="marketplace" element={<Marketplace />} />
+                  <Route path="marketplace/product/:id" element={<ProductDetail />} />
                   <Route path="service-communication/:serviceId" element={<ProtectedRoute><ServiceCommunicationPage /></ProtectedRoute>} />
                 </Route>
                 
