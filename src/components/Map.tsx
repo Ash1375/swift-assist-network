@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +16,8 @@ import {
   Star,
   MessageCircle,
   Calendar,
-  Shield
+  Shield,
+  Locate
 } from "lucide-react";
 
 interface ServiceStation {
@@ -119,6 +121,34 @@ const Map = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredStations, setFilteredStations] = useState<ServiceStation[]>(mockServiceStations);
   const [selectedStation, setSelectedStation] = useState<ServiceStation | null>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [apiKey, setApiKey] = useState('');
+
+  // Google Maps configuration
+  const mapContainerStyle = {
+    width: '100%',
+    height: '100%',
+  };
+
+  const mapOptions = {
+    disableDefaultUI: false,
+    zoomControl: true,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+    styles: [
+      {
+        featureType: "all",
+        elementType: "geometry",
+        stylers: [{ saturation: -20 }]
+      },
+      {
+        featureType: "poi",
+        elementType: "labels",
+        stylers: [{ visibility: "off" }]
+      }
+    ]
+  };
 
   useEffect(() => {
     // Get user location
@@ -206,11 +236,34 @@ const Map = () => {
     }
   };
 
+  const centerMapOnUser = () => {
+    if (map && userLocation) {
+      map.panTo(userLocation);
+      map.setZoom(15);
+    }
+  };
+
+  const getMarkerIcon = (type: string) => {
+    const colors = {
+      fuel: '#3B82F6',
+      'ev-charging': '#10B981',
+      garage: '#F97316'
+    };
+    return {
+      path: google.maps.SymbolPath.CIRCLE,
+      fillColor: colors[type as keyof typeof colors] || '#6B7280',
+      fillOpacity: 1,
+      strokeColor: '#FFFFFF',
+      strokeWeight: 3,
+      scale: 10,
+    };
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto p-3 sm:p-4 space-y-4 sm:space-y-6">
-      {/* Header */}
+      {/* Header with modern gradient */}
       <div className="text-center space-y-2 sm:space-y-3 mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 animate-gradient">
           Nearby Services
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base md:text-lg px-4">
@@ -218,24 +271,54 @@ const Map = () => {
         </p>
       </div>
 
-      {/* Search and Filters */}
-      <Card className="shadow-lg border-0 bg-card/60 backdrop-blur-sm">
+      {/* API Key Input (temporary - remove after adding to Supabase Secrets) */}
+      {!apiKey && (
+        <Card className="shadow-xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Shield className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-2">Google Maps API Key Required</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Enter your Google Maps API key to enable the interactive map. For production, add it to Supabase Edge Function Secrets.
+                  </p>
+                  <Input
+                    placeholder="Enter your Google Maps API Key"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="font-mono"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Get your API key at: <a href="https://console.cloud.google.com/google/maps-apis" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google Cloud Console</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Search and Filters with glassmorphism */}
+      <Card className="shadow-2xl border-0 bg-gradient-to-br from-white/80 to-white/60 dark:from-card/80 dark:to-card/60 backdrop-blur-xl">
         <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+            <div className="flex-1 relative group">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground group-hover:text-primary transition-colors" />
               <Input
                 placeholder="Search for stations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 sm:pl-12 h-10 sm:h-12 text-sm sm:text-base border-2 border-border/50 focus:border-primary rounded-xl"
+                className="pl-10 sm:pl-12 h-10 sm:h-12 text-sm sm:text-base border-2 border-border/50 focus:border-primary rounded-xl bg-white/50 backdrop-blur-sm transition-all hover:bg-white/80"
               />
             </div>
             <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3">
               <Button
                 variant={selectedFilter === 'all' ? 'default' : 'outline'}
                 onClick={() => setSelectedFilter('all')}
-                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-sm text-xs sm:text-sm"
+                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-md text-xs sm:text-sm transition-all hover:scale-105 hover:shadow-lg"
               >
                 <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
                 All
@@ -243,7 +326,8 @@ const Map = () => {
               <Button
                 variant={selectedFilter === 'fuel' ? 'default' : 'outline'}
                 onClick={() => setSelectedFilter('fuel')}
-                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-sm text-xs sm:text-sm"
+                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-md text-xs sm:text-sm transition-all hover:scale-105 hover:shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                style={selectedFilter === 'fuel' ? {} : { background: 'transparent' }}
               >
                 <Fuel className="h-3 w-3 sm:h-4 sm:w-4" />
                 Fuel
@@ -251,7 +335,8 @@ const Map = () => {
               <Button
                 variant={selectedFilter === 'ev-charging' ? 'default' : 'outline'}
                 onClick={() => setSelectedFilter('ev-charging')}
-                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-sm text-xs sm:text-sm"
+                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-md text-xs sm:text-sm transition-all hover:scale-105 hover:shadow-lg bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+                style={selectedFilter === 'ev-charging' ? {} : { background: 'transparent' }}
               >
                 <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
                 EV
@@ -259,7 +344,8 @@ const Map = () => {
               <Button
                 variant={selectedFilter === 'garage' ? 'default' : 'outline'}
                 onClick={() => setSelectedFilter('garage')}
-                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-sm text-xs sm:text-sm"
+                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-md text-xs sm:text-sm transition-all hover:scale-105 hover:shadow-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+                style={selectedFilter === 'garage' ? {} : { background: 'transparent' }}
               >
                 <Wrench className="h-3 w-3 sm:h-4 sm:w-4" />
                 Service
@@ -270,103 +356,129 @@ const Map = () => {
       </Card>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
-        {/* Map View */}
-        <Card className="shadow-xl border-0 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm">
-          <CardHeader className="pb-3 sm:pb-4">
+        {/* Google Maps View */}
+        <Card className="shadow-2xl border-0 bg-gradient-to-br from-white/90 to-white/70 dark:from-card/90 dark:to-card/70 backdrop-blur-xl overflow-hidden">
+          <CardHeader className="pb-3 sm:pb-4 bg-gradient-to-r from-primary/5 to-transparent">
             <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
-              <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
+              <div className="p-1.5 sm:p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 backdrop-blur-sm">
                 <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               Interactive Map
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="h-[300px] sm:h-[400px] lg:h-[450px] rounded-xl bg-gradient-to-br from-blue-50 via-emerald-50 to-orange-50 relative overflow-hidden shadow-inner border">
-              {/* Enhanced Map Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-100/30 via-emerald-100/30 to-orange-100/30" />
-              
-              {/* User Location */}
-              {userLocation && (
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-                  <div className="relative">
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full border-2 sm:border-3 border-white shadow-lg" />
-                    <div className="absolute -top-1 sm:-top-2 -left-1 sm:-left-2 w-6 h-6 sm:w-9 sm:h-9 bg-blue-600/20 rounded-full animate-ping" />
+          <CardContent className="p-0">
+            <div className="h-[300px] sm:h-[400px] lg:h-[450px] relative overflow-hidden">
+              {apiKey ? (
+                <LoadScript googleMapsApiKey={apiKey}>
+                  <GoogleMap
+                    mapContainerStyle={mapContainerStyle}
+                    center={userLocation || { lat: 12.9716, lng: 77.5946 }}
+                    zoom={13}
+                    options={mapOptions}
+                    onLoad={(mapInstance) => setMap(mapInstance)}
+                  >
+                    {/* User Location Marker */}
+                    {userLocation && (
+                      <Marker
+                        position={userLocation}
+                        icon={{
+                          path: google.maps.SymbolPath.CIRCLE,
+                          fillColor: '#3B82F6',
+                          fillOpacity: 1,
+                          strokeColor: '#FFFFFF',
+                          strokeWeight: 3,
+                          scale: 8,
+                        }}
+                      />
+                    )}
+
+                    {/* Service Station Markers */}
+                    {filteredStations.map((station) => (
+                      <Marker
+                        key={station.id}
+                        position={{ lat: station.latitude, lng: station.longitude }}
+                        icon={getMarkerIcon(station.type)}
+                        onClick={() => setSelectedStation(station)}
+                      />
+                    ))}
+
+                    {/* Info Window for Selected Station */}
+                    {selectedStation && (
+                      <InfoWindow
+                        position={{ lat: selectedStation.latitude, lng: selectedStation.longitude }}
+                        onCloseClick={() => setSelectedStation(null)}
+                      >
+                        <div className="p-2 max-w-xs">
+                          <h3 className="font-semibold text-sm mb-1">{selectedStation.name}</h3>
+                          <p className="text-xs text-gray-600 mb-2">{selectedStation.address}</p>
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {selectedStation.distance} km
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              {selectedStation.rating}
+                            </span>
+                          </div>
+                        </div>
+                      </InfoWindow>
+                    )}
+                  </GoogleMap>
+                </LoadScript>
+              ) : (
+                <div className="h-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-pink-950/20">
+                  <div className="text-center p-6">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                      <MapPin className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-2">Map Ready to Load</h3>
+                    <p className="text-sm text-muted-foreground max-w-md">
+                      Enter your Google Maps API key above to view the interactive map
+                    </p>
                   </div>
-                  <span className="absolute top-6 sm:top-8 left-1/2 transform -translate-x-1/2 text-xs font-semibold bg-white/90 backdrop-blur-sm px-2 sm:px-3 py-1 rounded-full shadow-lg border">
-                    You are here
-                  </span>
                 </div>
               )}
 
-              {/* Enhanced Service Stations on Map */}
-              {filteredStations.slice(0, 6).map((station, index) => (
-                <div
-                  key={station.id}
-                  className={`absolute cursor-pointer transform transition-all duration-300 hover:scale-125 hover:z-20 ${
-                    index === 0 ? 'top-[20%] left-[30%]' :
-                    index === 1 ? 'top-[60%] right-[25%]' :
-                    index === 2 ? 'bottom-[20%] left-[20%]' :
-                    index === 3 ? 'top-[30%] right-[40%]' :
-                    index === 4 ? 'bottom-[40%] right-[30%]' :
-                    'top-[70%] left-[40%]'
-                  }`}
-                  onClick={() => setSelectedStation(station)}
-                >
-                  <div className={`w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r ${getStationGradient(station.type)} rounded-full flex items-center justify-center text-white shadow-lg border-2 sm:border-3 border-white hover:shadow-xl transition-shadow`}>
-                    <div className="text-xs sm:text-sm">
-                      {getStationIcon(station.type)}
-                    </div>
-                  </div>
-                  {selectedStation?.id === station.id && (
-                    <div className="absolute top-10 sm:top-12 left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-sm p-2 sm:p-3 rounded-xl shadow-xl border min-w-[180px] sm:min-w-[220px] animate-scale-in">
-                      <p className="font-semibold text-xs sm:text-sm text-foreground">{station.name}</p>
-                      <p className="text-xs text-muted-foreground">{station.distance} km away</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                        <span className="text-xs font-medium">{station.rating}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-
               {/* Enhanced Current Location Button */}
-              <Button
-                size="sm"
-                className="absolute top-2 sm:top-4 right-2 sm:right-4 shadow-lg rounded-xl bg-white/90 backdrop-blur-sm border text-foreground hover:bg-white h-8 w-8 sm:h-auto sm:w-auto p-2"
-                onClick={() => {
-                  console.log('Centering on user location');
-                }}
-              >
-                <Navigation className="h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>
+              {apiKey && (
+                <Button
+                  size="sm"
+                  className="absolute top-2 sm:top-4 right-2 sm:right-4 shadow-2xl rounded-xl bg-white/95 dark:bg-card/95 backdrop-blur-md border-2 border-primary/20 text-foreground hover:bg-white hover:scale-110 h-10 w-10 sm:h-12 sm:w-12 p-0 transition-all"
+                  onClick={centerMapOnUser}
+                >
+                  <Locate className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Enhanced Station List */}
-        <Card className="shadow-xl border-0 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm">
-          <CardHeader className="pb-3 sm:pb-4">
+        {/* Enhanced Station List with modern design */}
+        <Card className="shadow-2xl border-0 bg-gradient-to-br from-white/90 to-white/70 dark:from-card/90 dark:to-card/70 backdrop-blur-xl overflow-hidden">
+          <CardHeader className="pb-3 sm:pb-4 bg-gradient-to-r from-primary/5 to-transparent">
             <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
-              <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
-                <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              <div className="p-1.5 sm:p-2 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/10 backdrop-blur-sm">
+                <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
               </div>
-              Verified Vendors ({filteredStations.length})
+              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                Verified Vendors ({filteredStations.length})
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="max-h-[300px] sm:max-h-[400px] lg:max-h-[450px] overflow-y-auto">
+            <div className="max-h-[300px] sm:max-h-[400px] lg:max-h-[450px] overflow-y-auto custom-scrollbar">
               {filteredStations.map((station) => (
                 <div
                   key={station.id}
-                  className={`p-3 sm:p-5 border-b last:border-b-0 cursor-pointer transition-all duration-200 hover:bg-gradient-to-r hover:from-primary/5 hover:to-transparent ${
-                    selectedStation?.id === station.id ? 'bg-gradient-to-r from-primary/10 to-transparent border-l-4 border-l-primary' : ''
+                  className={`p-3 sm:p-5 border-b last:border-b-0 cursor-pointer transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent hover:scale-[1.02] ${
+                    selectedStation?.id === station.id ? 'bg-gradient-to-r from-primary/15 to-transparent border-l-4 border-l-primary shadow-lg' : ''
                   }`}
                   onClick={() => setSelectedStation(station)}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r ${getStationGradient(station.type)} rounded-xl flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${getStationGradient(station.type)} rounded-2xl flex items-center justify-center text-white shadow-xl flex-shrink-0 hover:scale-110 transition-transform`}>
                         <div className="text-sm sm:text-base">
                           {getStationIcon(station.type)}
                         </div>
@@ -407,7 +519,7 @@ const Map = () => {
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="h-8 sm:h-9 px-2 sm:px-4 rounded-xl shadow-sm text-xs"
+                        className="h-8 sm:h-9 px-2 sm:px-4 rounded-xl shadow-md text-xs hover:shadow-lg hover:scale-105 transition-all bg-white/50 backdrop-blur-sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleConnectVendor(station);
@@ -418,7 +530,7 @@ const Map = () => {
                       </Button>
                       <Button 
                         size="sm" 
-                        className="h-8 sm:h-9 px-2 sm:px-4 rounded-xl shadow-sm text-xs"
+                        className="h-8 sm:h-9 px-2 sm:px-4 rounded-xl shadow-md text-xs bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 hover:shadow-lg hover:scale-105 transition-all"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleBookService(station);
