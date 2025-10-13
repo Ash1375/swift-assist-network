@@ -122,7 +122,7 @@ const Map = () => {
   const [filteredStations, setFilteredStations] = useState<ServiceStation[]>(mockServiceStations);
   const [selectedStation, setSelectedStation] = useState<ServiceStation | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [apiKey, setApiKey] = useState('');
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
   // Google Maps configuration
   const mapContainerStyle = {
@@ -271,35 +271,6 @@ const Map = () => {
         </p>
       </div>
 
-      {/* API Key Input (temporary - remove after adding to Supabase Secrets) */}
-      {!apiKey && (
-        <Card className="shadow-xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 backdrop-blur-sm">
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Shield className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">Google Maps API Key Required</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Enter your Google Maps API key to enable the interactive map. For production, add it to Supabase Edge Function Secrets.
-                  </p>
-                  <Input
-                    placeholder="Enter your Google Maps API Key"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    className="font-mono"
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Get your API key at: <a href="https://console.cloud.google.com/google/maps-apis" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google Cloud Console</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Search and Filters with glassmorphism */}
       <Card className="shadow-2xl border-0 bg-gradient-to-br from-white/80 to-white/60 dark:from-card/80 dark:to-card/60 backdrop-blur-xl">
