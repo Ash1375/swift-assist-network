@@ -1,4 +1,4 @@
-import { PhoneCall, Wrench, Anchor, Cog, MessageCircle } from "lucide-react";
+import { PhoneCall, Wrench, Anchor, Cog, MessageCircle, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 
@@ -14,37 +14,45 @@ const MobileQuickActions = () => {
 
       {/* Bottom Navigation for Mobile - App Style */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-lg border-t border-border lg:hidden">
-        <div className="flex items-center justify-around py-2 px-2 safe-area-pb">
+        <div className="grid grid-cols-5 gap-1 py-2 px-2 safe-area-pb">
+          <Link
+            to="/map"
+            className="flex flex-col items-center justify-center py-2 px-2 text-muted-foreground hover:text-primary transition-colors rounded-xl hover:bg-accent active:scale-95"
+          >
+            <MapPin className="h-5 w-5 mb-1" />
+            <span className="text-[10px] font-medium">Map</span>
+          </Link>
+
           <Link
             to="/request-service/towing"
-            className="flex flex-col items-center justify-center py-3 px-3 text-muted-foreground hover:text-primary transition-colors rounded-xl hover:bg-accent active:scale-95 min-w-0 flex-1"
+            className="flex flex-col items-center justify-center py-2 px-2 text-muted-foreground hover:text-primary transition-colors rounded-xl hover:bg-accent active:scale-95"
           >
-            <Anchor className="h-6 w-6 mb-1" />
-            <span className="text-xs font-medium">Towing</span>
+            <Anchor className="h-5 w-5 mb-1" />
+            <span className="text-[10px] font-medium">Towing</span>
           </Link>
           
           <Link
             to="/request-service/flat-tire"
-            className="flex flex-col items-center justify-center py-3 px-3 text-muted-foreground hover:text-primary transition-colors rounded-xl hover:bg-accent active:scale-95 min-w-0 flex-1"
+            className="flex flex-col items-center justify-center py-2 px-2 text-muted-foreground hover:text-primary transition-colors rounded-xl hover:bg-accent active:scale-95"
           >
-            <Wrench className="h-6 w-6 mb-1" />
-            <span className="text-xs font-medium">Tire Fix</span>
+            <Wrench className="h-5 w-5 mb-1" />
+            <span className="text-[10px] font-medium">Tire</span>
           </Link>
           
           <Link
             to="/request-service/mechanical"
-            className="flex flex-col items-center justify-center py-3 px-3 text-muted-foreground hover:text-primary transition-colors rounded-xl hover:bg-accent active:scale-95 min-w-0 flex-1"
+            className="flex flex-col items-center justify-center py-2 px-2 text-muted-foreground hover:text-primary transition-colors rounded-xl hover:bg-accent active:scale-95"
           >
-            <Cog className="h-6 w-6 mb-1" />
-            <span className="text-xs font-medium">Mechanical</span>
+            <Cog className="h-5 w-5 mb-1" />
+            <span className="text-[10px] font-medium">Repair</span>
           </Link>
           
           <Link
             to="/services"
-            className="flex flex-col items-center justify-center py-3 px-3 text-muted-foreground hover:text-primary transition-colors rounded-xl hover:bg-accent active:scale-95 min-w-0 flex-1"
+            className="flex flex-col items-center justify-center py-2 px-2 text-muted-foreground hover:text-primary transition-colors rounded-xl hover:bg-accent active:scale-95"
           >
-            <Wrench className="h-6 w-6 mb-1" />
-            <span className="text-xs font-medium">Services</span>
+            <Wrench className="h-5 w-5 mb-1" />
+            <span className="text-[10px] font-medium">More</span>
           </Link>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { PhoneCall, Menu, X, User, Settings } from "lucide-react";
+import { PhoneCall, Menu, X, User, Settings, MapPin } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
@@ -46,6 +46,12 @@ const MobileAppHeader = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link to="/map" className="flex items-center">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Interactive Map
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/services" className="flex items-center">
                   Services

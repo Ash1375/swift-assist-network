@@ -51,6 +51,7 @@ import VehicleServiceSelector from "./components/VehicleServiceSelector";
 import Marketplace from "./pages/Marketplace";
 import ProductDetail from "./pages/ProductDetail";
 import ServiceCommunicationPage from "./pages/ServiceCommunicationPage";
+import MapPage from "./pages/MapPage";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +102,7 @@ const App = () => (
                   <Route path="marketplace" element={<Marketplace />} />
                   <Route path="marketplace/product/:id" element={<ProductDetail />} />
                   <Route path="service-communication/:serviceId" element={<ProtectedRoute><ServiceCommunicationPage /></ProtectedRoute>} />
+                  <Route path="map" element={<MapPage />} />
                 </Route>
                 
                 {/* Technician portal routes */}

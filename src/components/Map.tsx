@@ -379,14 +379,14 @@ const Map = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-3 sm:p-4 space-y-4 sm:space-y-6">
-      {/* Header with modern gradient */}
-      <div className="text-center space-y-2 sm:space-y-3 mb-6 sm:mb-8 relative">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 animate-gradient">
+    <div className="w-full max-w-7xl mx-auto p-2 sm:p-3 md:p-4 space-y-3 sm:space-y-4 md:space-y-6 pb-24 lg:pb-4">
+      {/* Compact Header with modern gradient */}
+      <div className="text-center space-y-1 sm:space-y-2 mb-3 sm:mb-6 md:mb-8 relative">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 animate-gradient">
           Nearby Services
         </h1>
-        <p className="text-muted-foreground text-sm sm:text-base md:text-lg px-4">
-          Connect with verified vendors through our secure platform
+        <p className="text-muted-foreground text-xs sm:text-sm md:text-base lg:text-lg px-4">
+          Real-time service locations
         </p>
         {userLocation && (
           <Button
@@ -394,9 +394,9 @@ const Map = () => {
             variant="outline"
             onClick={() => fetchNearbyPlaces(userLocation)}
             disabled={isLoadingPlaces}
-            className="absolute right-4 top-1/2 -translate-y-1/2 gap-2 rounded-xl shadow-md hover:shadow-lg transition-all"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 gap-1 sm:gap-2 rounded-xl shadow-md hover:shadow-lg transition-all h-8 px-2 sm:h-auto sm:px-4"
           >
-            <RefreshCw className={`h-4 w-4 ${isLoadingPlaces ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 ${isLoadingPlaces ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
         )}
@@ -404,60 +404,60 @@ const Map = () => {
 
 
       {/* Search and Filters with glassmorphism */}
-      <Card className="shadow-2xl border-0 bg-gradient-to-br from-white/80 to-white/60 dark:from-card/80 dark:to-card/60 backdrop-blur-xl">
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex flex-col gap-4">
+      <Card className="shadow-xl border-0 bg-gradient-to-br from-white/80 to-white/60 dark:from-card/80 dark:to-card/60 backdrop-blur-xl">
+        <CardContent className="p-3 sm:p-4 md:p-6">
+          <div className="flex flex-col gap-3 sm:gap-4">
             <div className="flex-1 relative group">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
               <Input
-                placeholder="Search for stations..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 sm:pl-12 h-10 sm:h-12 text-sm sm:text-base border-2 border-border/50 focus:border-primary rounded-xl bg-white/50 backdrop-blur-sm transition-all hover:bg-white/80"
+                className="pl-10 h-10 text-sm border-2 border-border/50 focus:border-primary rounded-xl bg-white/50 backdrop-blur-sm transition-all hover:bg-white/80"
               />
             </div>
-            <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3">
+            <div className="grid grid-cols-4 gap-2">
               <Button
                 variant={selectedFilter === 'all' ? 'default' : 'outline'}
                 onClick={() => setSelectedFilter('all')}
-                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-md text-xs sm:text-sm transition-all hover:scale-105 hover:shadow-lg"
+                className="gap-1 h-10 px-2 rounded-xl shadow-md text-xs transition-all hover:scale-105 hover:shadow-lg"
               >
-                <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
-                All
+                <Filter className="h-3 w-3" />
+                <span className="hidden sm:inline">All</span>
               </Button>
               <Button
                 variant={selectedFilter === 'fuel' ? 'default' : 'outline'}
                 onClick={() => setSelectedFilter('fuel')}
-                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-md text-xs sm:text-sm transition-all hover:scale-105 hover:shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                className="gap-1 h-10 px-2 rounded-xl shadow-md text-xs transition-all hover:scale-105 hover:shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
                 style={selectedFilter === 'fuel' ? {} : { background: 'transparent' }}
               >
-                <Fuel className="h-3 w-3 sm:h-4 sm:w-4" />
-                Fuel
+                <Fuel className="h-3 w-3" />
+                <span className="hidden sm:inline">Fuel</span>
               </Button>
               <Button
                 variant={selectedFilter === 'ev-charging' ? 'default' : 'outline'}
                 onClick={() => setSelectedFilter('ev-charging')}
-                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-md text-xs sm:text-sm transition-all hover:scale-105 hover:shadow-lg bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
+                className="gap-1 h-10 px-2 rounded-xl shadow-md text-xs transition-all hover:scale-105 hover:shadow-lg bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
                 style={selectedFilter === 'ev-charging' ? {} : { background: 'transparent' }}
               >
-                <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
-                EV
+                <Zap className="h-3 w-3" />
+                <span className="hidden sm:inline">EV</span>
               </Button>
               <Button
                 variant={selectedFilter === 'garage' ? 'default' : 'outline'}
                 onClick={() => setSelectedFilter('garage')}
-                className="gap-1 sm:gap-2 h-10 sm:h-12 px-3 sm:px-6 rounded-xl shadow-md text-xs sm:text-sm transition-all hover:scale-105 hover:shadow-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+                className="gap-1 h-10 px-2 rounded-xl shadow-md text-xs transition-all hover:scale-105 hover:shadow-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
                 style={selectedFilter === 'garage' ? {} : { background: 'transparent' }}
               >
-                <Wrench className="h-3 w-3 sm:h-4 sm:w-4" />
-                Service
+                <Wrench className="h-3 w-3" />
+                <span className="hidden sm:inline">Garage</span>
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
         {/* Google Maps View */}
         <Card className="shadow-2xl border-0 bg-gradient-to-br from-white/90 to-white/70 dark:from-card/90 dark:to-card/70 backdrop-blur-xl overflow-hidden">
           <CardHeader className="pb-3 sm:pb-4 bg-gradient-to-r from-primary/5 to-transparent">
@@ -469,7 +469,7 @@ const Map = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="h-[300px] sm:h-[400px] lg:h-[450px] relative overflow-hidden">
+            <div className="h-[250px] sm:h-[350px] md:h-[400px] lg:h-[450px] relative overflow-hidden">
               {apiKey && isLoaded ? (
                 <GoogleMap
                   mapContainerStyle={mapContainerStyle}
@@ -560,7 +560,7 @@ const Map = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="max-h-[300px] sm:max-h-[400px] lg:max-h-[450px] overflow-y-auto custom-scrollbar">
+            <div className="max-h-[250px] sm:max-h-[350px] md:max-h-[400px] lg:max-h-[450px] overflow-y-auto custom-scrollbar">
               {isLoadingPlaces && filteredStations.length === 0 ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center">
                   <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
