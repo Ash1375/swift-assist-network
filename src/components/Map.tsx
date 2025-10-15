@@ -243,7 +243,9 @@ const Map = () => {
     }
   };
 
-  const getMarkerIcon = (type: string) => {
+  const getMarkerIcon = (type: string): google.maps.Symbol | undefined => {
+    if (typeof google === 'undefined') return undefined;
+    
     const colors = {
       fuel: '#3B82F6',
       'ev-charging': '#10B981',
@@ -349,7 +351,7 @@ const Map = () => {
                     onLoad={(mapInstance) => setMap(mapInstance)}
                   >
                     {/* User Location Marker */}
-                    {userLocation && (
+                    {userLocation && typeof google !== 'undefined' && (
                       <Marker
                         position={userLocation}
                         icon={{
