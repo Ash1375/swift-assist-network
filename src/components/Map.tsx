@@ -17,7 +17,8 @@ import {
   MessageCircle,
   Calendar,
   Shield,
-  Locate
+  Locate,
+  RefreshCw
 } from "lucide-react";
 
 interface ServiceStation {
@@ -119,11 +120,17 @@ const Map = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'fuel' | 'ev-charging' | 'garage'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredStations, setFilteredStations] = useState<ServiceStation[]>(mockServiceStations);
+  const [allStations, setAllStations] = useState<ServiceStation[]>([]);
+  const [filteredStations, setFilteredStations] = useState<ServiceStation[]>([]);
   const [selectedStation, setSelectedStation] = useState<ServiceStation | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [isLoadingPlaces, setIsLoadingPlaces] = useState(false);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-  const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: apiKey });
+  const { isLoaded } = useJsApiLoader({ 
+    id: 'google-map-script', 
+    googleMapsApiKey: apiKey,
+    libraries: ['places', 'geometry']
+  });
 
   // Google Maps configuration
   const mapContainerStyle = {
@@ -151,6 +158,69 @@ const Map = () => {
     ]
   };
 
+  // Fetch nearby places using Google Places API
+  const fetchNearbyPlaces = async (location: { lat: number; lng: number }) => {
+    if (!isLoaded || !window.google) return;
+    
+    setIsLoadingPlaces(true);
+    const service = new google.maps.places.PlacesService(document.createElement('div'));
+    const allResults: ServiceStation[] = [];
+
+    // Define search types
+    const searchTypes = [
+      { type: 'gas_station', category: 'fuel' as const },
+      { type: 'electric_vehicle_charging_station', category: 'ev-charging' as const },
+      { type: 'car_repair', category: 'garage' as const }
+    ];
+
+    // Fetch each type
+    const promises = searchTypes.map(({ type, category }) => 
+      new Promise<void>((resolve) => {
+        const request = {
+          location: new google.maps.LatLng(location.lat, location.lng),
+          radius: 5000, // 5km radius
+          type: type
+        };
+
+        service.nearbySearch(request, (results, status) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+            results.forEach((place, index) => {
+              if (place.geometry?.location && place.place_id) {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                  new google.maps.LatLng(location.lat, location.lng),
+                  place.geometry.location
+                ) / 1000; // Convert to km
+
+                const station: ServiceStation = {
+                  id: place.place_id,
+                  name: place.name || 'Unknown',
+                  type: category,
+                  address: place.vicinity || 'Address not available',
+                  distance: parseFloat(distance.toFixed(1)),
+                  rating: place.rating || 0,
+                  isOpen: place.opening_hours?.isOpen?.() ?? true,
+                  phone: place.formatted_phone_number || 'N/A',
+                  latitude: place.geometry.location.lat(),
+                  longitude: place.geometry.location.lng(),
+                  amenities: place.types?.slice(0, 3) || []
+                };
+                allResults.push(station);
+              }
+            });
+          }
+          resolve();
+        });
+      })
+    );
+
+    await Promise.all(promises);
+    
+    // Sort by distance
+    allResults.sort((a, b) => a.distance - b.distance);
+    setAllStations(allResults);
+    setIsLoadingPlaces(false);
+  };
+
   useEffect(() => {
     // Get user location
     if (navigator.geolocation) {
@@ -171,8 +241,16 @@ const Map = () => {
     }
   }, []);
 
+  // Fetch places when location and map are ready
   useEffect(() => {
-    let filtered = mockServiceStations;
+    if (userLocation && isLoaded) {
+      fetchNearbyPlaces(userLocation);
+    }
+  }, [userLocation, isLoaded]);
+
+  // Filter stations based on selected filter and search query
+  useEffect(() => {
+    let filtered = allStations;
 
     if (selectedFilter !== 'all') {
       filtered = filtered.filter(station => station.type === selectedFilter);
@@ -186,7 +264,7 @@ const Map = () => {
     }
 
     setFilteredStations(filtered);
-  }, [selectedFilter, searchQuery]);
+  }, [selectedFilter, searchQuery, allStations]);
 
   const getStationIcon = (type: string) => {
     switch (type) {
@@ -269,13 +347,25 @@ const Map = () => {
   return (
     <div className="w-full max-w-7xl mx-auto p-3 sm:p-4 space-y-4 sm:space-y-6">
       {/* Header with modern gradient */}
-      <div className="text-center space-y-2 sm:space-y-3 mb-6 sm:mb-8">
+      <div className="text-center space-y-2 sm:space-y-3 mb-6 sm:mb-8 relative">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 animate-gradient">
           Nearby Services
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base md:text-lg px-4">
           Connect with verified vendors through our secure platform
         </p>
+        {userLocation && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => fetchNearbyPlaces(userLocation)}
+            disabled={isLoadingPlaces}
+            className="absolute right-4 top-1/2 -translate-y-1/2 gap-2 rounded-xl shadow-md hover:shadow-lg transition-all"
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoadingPlaces ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh</span>
+          </Button>
+        )}
       </div>
 
 
@@ -437,14 +527,25 @@ const Map = () => {
           </CardHeader>
           <CardContent className="p-0">
             <div className="max-h-[300px] sm:max-h-[400px] lg:max-h-[450px] overflow-y-auto custom-scrollbar">
-              {filteredStations.map((station) => (
-                <div
-                  key={station.id}
-                  className={`p-3 sm:p-5 border-b last:border-b-0 cursor-pointer transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent hover:scale-[1.02] ${
-                    selectedStation?.id === station.id ? 'bg-gradient-to-r from-primary/15 to-transparent border-l-4 border-l-primary shadow-lg' : ''
-                  }`}
-                  onClick={() => setSelectedStation(station)}
-                >
+              {isLoadingPlaces && filteredStations.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-8 text-center">
+                  <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                  <p className="text-muted-foreground">Loading nearby services...</p>
+                </div>
+              ) : filteredStations.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-8 text-center">
+                  <MapPin className="h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No services found nearby</p>
+                </div>
+              ) : (
+                filteredStations.map((station) => (
+                  <div
+                    key={station.id}
+                    className={`p-3 sm:p-5 border-b last:border-b-0 cursor-pointer transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/10 hover:to-transparent hover:scale-[1.02] ${
+                      selectedStation?.id === station.id ? 'bg-gradient-to-r from-primary/15 to-transparent border-l-4 border-l-primary shadow-lg' : ''
+                    }`}
+                    onClick={() => setSelectedStation(station)}
+                  >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
                       <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${getStationGradient(station.type)} rounded-2xl flex items-center justify-center text-white shadow-xl flex-shrink-0 hover:scale-110 transition-transform`}>
@@ -511,7 +612,8 @@ const Map = () => {
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+              )}
             </div>
           </CardContent>
         </Card>
