@@ -117,8 +117,8 @@ const mockServiceStations: ServiceStation[] = [
 ];
 
 // Google Maps configuration constants (must stay constant across renders)
-const GOOGLE_MAPS_LIBRARIES: ("places" | "geometry")[] = ["places", "geometry"];
-const GOOGLE_MAPS_LOADER_ID = "maps-lib-places-geometry";
+const GOOGLE_MAPS_LIBRARIES: ("maps")[] = ["maps"]; // match existing loader to avoid conflicts
+const GOOGLE_MAPS_LOADER_ID = "google-map-script"; // use the original id
 
 const Map = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -164,65 +164,95 @@ const Map = () => {
 
   // Fetch nearby places using Google Places API
   const fetchNearbyPlaces = async (location: { lat: number; lng: number }) => {
-    if (!isLoaded || !window.google) return;
-    
+    if (!isLoaded || !(window as any).google) return;
+
     setIsLoadingPlaces(true);
-    const service = new google.maps.places.PlacesService(document.createElement('div'));
-    const allResults: ServiceStation[] = [];
+    try {
+      // Dynamically import required libraries without reinitializing the loader
+      const gmaps: any = (window as any).google?.maps;
+      if (gmaps?.importLibrary) {
+        await gmaps.importLibrary('places');
+        await gmaps.importLibrary('geometry');
+      }
 
-    // Define search types
-    const searchTypes = [
-      { type: 'gas_station', category: 'fuel' as const },
-      { type: 'electric_vehicle_charging_station', category: 'ev-charging' as const },
-      { type: 'car_repair', category: 'garage' as const }
-    ];
-
-    // Fetch each type
-    const promises = searchTypes.map(({ type, category }) => 
-      new Promise<void>((resolve) => {
-        const request = {
-          location: new google.maps.LatLng(location.lat, location.lng),
-          radius: 5000, // 5km radius
-          type: type
-        };
-
-        service.nearbySearch(request, (results, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            results.forEach((place, index) => {
-              if (place.geometry?.location && place.place_id) {
-                const distance = google.maps.geometry.spherical.computeDistanceBetween(
-                  new google.maps.LatLng(location.lat, location.lng),
-                  place.geometry.location
-                ) / 1000; // Convert to km
-
-                const station: ServiceStation = {
-                  id: place.place_id,
-                  name: place.name || 'Unknown',
-                  type: category,
-                  address: place.vicinity || 'Address not available',
-                  distance: parseFloat(distance.toFixed(1)),
-                  rating: place.rating || 0,
-                  isOpen: place.opening_hours?.isOpen?.() ?? true,
-                  phone: place.formatted_phone_number || 'N/A',
-                  latitude: place.geometry.location.lat(),
-                  longitude: place.geometry.location.lng(),
-                  amenities: place.types?.slice(0, 3) || []
-                };
-                allResults.push(station);
-              }
-            });
+      // Helper to compute distance in KM with fallback
+      const computeKm = (a: any, b: any) => {
+        try {
+          if ((google as any).maps?.geometry?.spherical?.computeDistanceBetween) {
+            return (google as any).maps.geometry.spherical.computeDistanceBetween(a, b) / 1000;
           }
-          resolve();
-        });
-      })
-    );
+        } catch {}
+        // Haversine fallback
+        const toRad = (v: number) => (v * Math.PI) / 180;
+        const dLat = toRad(b.lat() - a.lat());
+        const dLng = toRad(b.lng() - a.lng());
+        const lat1 = toRad(a.lat());
+        const lat2 = toRad(b.lat());
+        const R = 6371; // km
+        const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+        return 2 * R * Math.asin(Math.sqrt(h));
+      };
 
-    await Promise.all(promises);
-    
-    // Sort by distance
-    allResults.sort((a, b) => a.distance - b.distance);
-    setAllStations(allResults);
-    setIsLoadingPlaces(false);
+      const service = new (google as any).maps.places.PlacesService(document.createElement('div'));
+      const allResults: ServiceStation[] = [];
+
+      // Define search types
+      const searchTypes = [
+        { type: 'gas_station', category: 'fuel' as const },
+        { type: 'electric_vehicle_charging_station', category: 'ev-charging' as const },
+        { type: 'car_repair', category: 'garage' as const }
+      ];
+
+      // Fetch each type
+      const promises = searchTypes.map(({ type, category }) =>
+        new Promise<void>((resolve) => {
+          const request: any = {
+            location: new google.maps.LatLng(location.lat, location.lng),
+            radius: 5000, // 5km radius
+            type
+          };
+
+          service.nearbySearch(request, (results: any[], status: any) => {
+            if (status === (google as any).maps.places.PlacesServiceStatus.OK && results) {
+              results.forEach((place: any) => {
+                if (place.geometry?.location && place.place_id) {
+                  const distance = computeKm(
+                    new google.maps.LatLng(location.lat, location.lng),
+                    place.geometry.location
+                  );
+
+                  const station: ServiceStation = {
+                    id: place.place_id,
+                    name: place.name || 'Unknown',
+                    type: category,
+                    address: place.vicinity || 'Address not available',
+                    distance: parseFloat(distance.toFixed(1)),
+                    rating: place.rating || 0,
+                    isOpen: place.opening_hours?.open_now ?? true,
+                    phone: 'N/A',
+                    latitude: place.geometry.location.lat(),
+                    longitude: place.geometry.location.lng(),
+                    amenities: (place.types || []).slice(0, 3)
+                  };
+                  allResults.push(station);
+                }
+              });
+            }
+            resolve();
+          });
+        })
+      );
+
+      await Promise.all(promises);
+
+      // Sort by distance
+      allResults.sort((a, b) => a.distance - b.distance);
+      setAllStations(allResults);
+    } catch (err) {
+      console.error('Failed to fetch nearby places', err);
+    } finally {
+      setIsLoadingPlaces(false);
+    }
   };
 
   useEffect(() => {
