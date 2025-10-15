@@ -116,6 +116,9 @@ const mockServiceStations: ServiceStation[] = [
   }
 ];
 
+// Google Maps libraries configuration (must be defined outside component)
+const GOOGLE_MAPS_LIBRARIES: ("places" | "geometry")[] = ['places', 'geometry'];
+
 const Map = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'fuel' | 'ev-charging' | 'garage'>('all');
@@ -129,7 +132,7 @@ const Map = () => {
   const { isLoaded } = useJsApiLoader({ 
     id: 'google-map-script', 
     googleMapsApiKey: apiKey,
-    libraries: ['places', 'geometry']
+    libraries: GOOGLE_MAPS_LIBRARIES
   });
 
   // Google Maps configuration
