@@ -116,8 +116,9 @@ const mockServiceStations: ServiceStation[] = [
   }
 ];
 
-// Google Maps libraries configuration (must be defined outside component)
-const GOOGLE_MAPS_LIBRARIES: ("places" | "geometry")[] = ['places', 'geometry'];
+// Google Maps configuration constants (must stay constant across renders)
+const GOOGLE_MAPS_LIBRARIES: ("places" | "geometry")[] = ["places", "geometry"];
+const GOOGLE_MAPS_LOADER_ID = "maps-lib-places-geometry";
 
 const Map = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -130,7 +131,7 @@ const Map = () => {
   const [isLoadingPlaces, setIsLoadingPlaces] = useState(false);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
   const { isLoaded } = useJsApiLoader({ 
-    id: 'google-map-script', 
+    id: GOOGLE_MAPS_LOADER_ID, 
     googleMapsApiKey: apiKey,
     libraries: GOOGLE_MAPS_LIBRARIES
   });
