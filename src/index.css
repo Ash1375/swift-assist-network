@@ -68,6 +68,8 @@
     
     /* Shadows */
     --shadow-elegant: 0 10px 30px -10px hsl(0 84% 60% / 0.2);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
   }
 
   .dark {
@@ -911,5 +913,52 @@
   .container {
     padding-left: var(--mobile-padding);
     padding-right: var(--mobile-padding);
+  }
+}
+
+/* Mobile-optimized utilities */
+@layer utilities {
+  .active\:scale-98:active {
+    transform: scale(0.98);
+  }
+  
+  .active\:scale-95:active {
+    transform: scale(0.95);
+  }
+  
+  /* App-like mobile styles */
+  .mobile-compact {
+    @apply bg-background min-h-screen;
+  }
+  
+  .mobile-section {
+    @apply bg-white lg:bg-transparent;
+  }
+  
+  /* Smooth tap animations */
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Bottom sheet style */
+  .bottom-sheet-enter {
+    animation: slideUpFade 0.3s ease-out;
+  }
+  
+  @keyframes slideUpFade {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Card press effect */
+  .card-press:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
 }

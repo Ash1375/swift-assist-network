@@ -3,11 +3,12 @@ import { useState } from "react";
 import { 
   Car, Bike, Truck, Wrench, Battery, Key, 
   Fuel, LifeBuoy, Anchor, MapPin, ArrowRight, Zap, PhoneCall,
-  Truck as TowTruck, Gauge, Settings, Unlock, Droplets, ShieldCheck, BatteryCharging
+  Truck as TowTruck, Gauge, Settings, Unlock, Droplets, ShieldCheck, BatteryCharging, ChevronRight
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const services = [
   {
@@ -131,88 +132,146 @@ const vehicleTypes = [
 
 const Services = () => {
   const [selectedService, setSelectedService] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   const handleSelectService = (serviceId: string) => {
     setSelectedService(serviceId === selectedService ? null : serviceId);
   };
 
   return (
-    <section className="py-16 bg-gradient-to-b from-background to-gray-50/50" id="services">
-      <div className="container px-4">
+    <section className={cn(
+      "bg-gradient-to-b from-background to-gray-50/50",
+      isMobile ? "py-6 pb-24" : "py-16"
+    )} id="services">
+      <div className={cn("container", isMobile ? "px-3" : "px-4")}>
         {/* Modern Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-3xl mb-6 shadow-lg">
-            <ArrowRight className="h-8 w-8 text-white" />
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            Our Professional Services
+        <div className={cn("mb-6", isMobile ? "text-left px-1" : "text-center mb-12")}>
+          {!isMobile && (
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-3xl mb-6 shadow-lg">
+              <ArrowRight className="h-8 w-8 text-white" />
+            </div>
+          )}
+          <h2 className={cn(
+            "font-bold text-gray-800",
+            isMobile ? "text-xl mb-2" : "text-3xl md:text-4xl mb-4"
+          )}>
+            {isMobile ? "Quick Services" : "Our Professional Services"}
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Comprehensive roadside assistance available 24/7 across all locations
+          <p className={cn(
+            "text-gray-600",
+            isMobile ? "text-sm" : "text-lg max-w-2xl mx-auto"
+          )}>
+            {isMobile ? "Available 24/7 near you" : "Comprehensive roadside assistance available 24/7 across all locations"}
           </p>
         </div>
 
-        {/* Modern Services Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        {/* App-Style Services Grid for Mobile, Modern Grid for Desktop */}
+        <div className={cn(
+          isMobile 
+            ? "flex flex-col gap-3" 
+            : "grid grid-cols-2 md:grid-cols-4 gap-4 mb-12"
+        )}>
           {services.slice(0, 8).map((service, index) => (
             <Link 
               key={service.id}
               to={`/request-service/${service.id}`}
-              className="group relative animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className={cn(
+                "group relative animate-fade-in",
+                isMobile && "active:scale-98 transition-transform"
+              )}
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-primary/20 transition-all duration-300 hover:-translate-y-1">
-                {/* Popular Badge */}
-                {index < 3 && (
-                  <div className="absolute -top-2 -right-2 bg-gradient-to-r from-primary to-accent px-2 py-1 rounded-full shadow-lg">
-                    <span className="text-xs font-bold text-white">
-                      Popular
-                    </span>
+              {isMobile ? (
+                // Swiggy/Zomato style card for mobile
+                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 active:shadow-lg transition-all duration-200">
+                  <div className="flex items-center gap-4">
+                    {/* Icon with gradient background */}
+                    <div className={cn(
+                      "flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center",
+                      service.color
+                    )}>
+                      <service.icon className="h-7 w-7 text-white" />
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold text-gray-800 text-base leading-tight">
+                          {service.name}
+                        </h3>
+                        {/* Popular Badge */}
+                        {index < 3 && (
+                          <span className="inline-flex items-center bg-gradient-to-r from-red-500 to-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            Popular
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 line-clamp-1">
+                        {service.description}
+                      </p>
+                    </div>
+                    
+                    {/* Arrow */}
+                    <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
                   </div>
-                )}
-                
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-primary/10 group-hover:to-accent/10 transition-all duration-300 mb-4">
-                    <service.icon className="h-8 w-8 text-gray-600 group-hover:text-primary transition-colors duration-300" />
-                  </div>
-                  <h3 className="font-bold text-gray-800 group-hover:text-primary transition-colors duration-300 text-sm leading-tight">
-                    {service.name}
-                  </h3>
                 </div>
-              </div>
+              ) : (
+                // Original desktop card
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-primary/20 transition-all duration-300 hover:-translate-y-1">
+                  {/* Popular Badge */}
+                  {index < 3 && (
+                    <div className="absolute -top-2 -right-2 bg-gradient-to-r from-primary to-accent px-2 py-1 rounded-full shadow-lg">
+                      <span className="text-xs font-bold text-white">
+                        Popular
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-primary/10 group-hover:to-accent/10 transition-all duration-300 mb-4">
+                      <service.icon className="h-8 w-8 text-gray-600 group-hover:text-primary transition-colors duration-300" />
+                    </div>
+                    <h3 className="font-bold text-gray-800 group-hover:text-primary transition-colors duration-300 text-sm leading-tight">
+                      {service.name}
+                    </h3>
+                  </div>
+                </div>
+              )}
             </Link>
           ))}
         </div>
 
         {/* Emergency CTA */}
-        <div className="text-center">
-          <div className="bg-gradient-to-r from-primary to-accent text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden max-w-2xl mx-auto">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-4 left-4 w-20 h-20 bg-white/20 rounded-full blur-xl"></div>
-              <div className="absolute bottom-4 right-4 w-16 h-16 bg-white/20 rounded-full blur-xl"></div>
-            </div>
-            
-            <div className="relative z-10">
-              <h3 className="text-2xl font-bold mb-2">
-                Need Immediate Help?
-              </h3>
-              <p className="text-white/90 mb-6 text-lg">
-                Our emergency response team is ready 24/7
-              </p>
-              <Button 
-                size="lg" 
-                className="bg-white text-primary hover:bg-white/90 font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 px-8"
-                asChild
-              >
-                <Link to="/emergency">
-                  <PhoneCall className="mr-2 h-5 w-5" />
-                  Call Emergency Line
-                </Link>
-              </Button>
+        {!isMobile && (
+          <div className="text-center mt-12">
+            <div className="bg-gradient-to-r from-primary to-accent text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden max-w-2xl mx-auto">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-4 left-4 w-20 h-20 bg-white/20 rounded-full blur-xl"></div>
+                <div className="absolute bottom-4 right-4 w-16 h-16 bg-white/20 rounded-full blur-xl"></div>
+              </div>
+              
+              <div className="relative z-10">
+                <h3 className="text-2xl font-bold mb-2">
+                  Need Immediate Help?
+                </h3>
+                <p className="text-white/90 mb-6 text-lg">
+                  Our emergency response team is ready 24/7
+                </p>
+                <Button 
+                  size="lg" 
+                  className="bg-white text-primary hover:bg-white/90 font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 px-8"
+                  asChild
+                >
+                  <Link to="/emergency">
+                    <PhoneCall className="mr-2 h-5 w-5" />
+                    Call Emergency Line
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
