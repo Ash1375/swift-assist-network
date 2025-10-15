@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -123,6 +123,7 @@ const Map = () => {
   const [selectedStation, setSelectedStation] = useState<ServiceStation | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+  const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: apiKey });
 
   // Google Maps configuration
   const mapContainerStyle = {
@@ -243,22 +244,26 @@ const Map = () => {
     }
   };
 
-  const getMarkerIcon = (type: string): google.maps.Symbol | undefined => {
-    if (typeof google === 'undefined') return undefined;
-    
+  const getUserMarkerIconUrl = () => {
+    const svg = `
+      <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'>
+        <circle cx='12' cy='12' r='8' fill='#3B82F6' stroke='white' stroke-width='3'/>
+      </svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  };
+
+  const getMarkerIconUrl = (type: string) => {
     const colors = {
       fuel: '#3B82F6',
       'ev-charging': '#10B981',
       garage: '#F97316'
-    };
-    return {
-      path: google.maps.SymbolPath.CIRCLE,
-      fillColor: colors[type as keyof typeof colors] || '#6B7280',
-      fillOpacity: 1,
-      strokeColor: '#FFFFFF',
-      strokeWeight: 3,
-      scale: 10,
-    };
+    } as const;
+    const color = colors[type as keyof typeof colors] || '#6B7280';
+    const svg = `
+      <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28'>
+        <circle cx='14' cy='14' r='9' fill='${color}' stroke='white' stroke-width='3'/>
+      </svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
   };
 
   return (
@@ -341,64 +346,55 @@ const Map = () => {
           </CardHeader>
           <CardContent className="p-0">
             <div className="h-[300px] sm:h-[400px] lg:h-[450px] relative overflow-hidden">
-              {apiKey ? (
-                <LoadScript googleMapsApiKey={apiKey}>
-                  <GoogleMap
-                    mapContainerStyle={mapContainerStyle}
-                    center={userLocation || { lat: 12.9716, lng: 77.5946 }}
-                    zoom={13}
-                    options={mapOptions}
-                    onLoad={(mapInstance) => setMap(mapInstance)}
-                  >
-                    {/* User Location Marker */}
-                    {userLocation && typeof google !== 'undefined' && (
-                      <Marker
-                        position={userLocation}
-                        icon={{
-                          path: google.maps.SymbolPath.CIRCLE,
-                          fillColor: '#3B82F6',
-                          fillOpacity: 1,
-                          strokeColor: '#FFFFFF',
-                          strokeWeight: 3,
-                          scale: 8,
-                        }}
-                      />
-                    )}
+              {apiKey && isLoaded ? (
+                <GoogleMap
+                  mapContainerStyle={mapContainerStyle}
+                  center={userLocation || { lat: 12.9716, lng: 77.5946 }}
+                  zoom={13}
+                  options={mapOptions}
+                  onLoad={(mapInstance) => setMap(mapInstance)}
+                >
+                  {/* User Location Marker */}
+                  {userLocation && (
+                    <Marker
+                      position={userLocation}
+                      icon={getUserMarkerIconUrl()}
+                    />
+                  )}
 
-                    {/* Service Station Markers */}
-                    {filteredStations.map((station) => (
-                      <Marker
-                        key={station.id}
-                        position={{ lat: station.latitude, lng: station.longitude }}
-                        icon={getMarkerIcon(station.type)}
-                        onClick={() => setSelectedStation(station)}
-                      />
-                    ))}
+                  {/* Service Station Markers */}
+                  {filteredStations.map((station) => (
+                    <Marker
+                      key={station.id}
+                      position={{ lat: station.latitude, lng: station.longitude }}
+                      icon={getMarkerIconUrl(station.type)}
+                      onClick={() => setSelectedStation(station)}
+                    />
+                  ))}
 
-                    {/* Info Window for Selected Station */}
-                    {selectedStation && (
-                      <InfoWindow
-                        position={{ lat: selectedStation.latitude, lng: selectedStation.longitude }}
-                        onCloseClick={() => setSelectedStation(null)}
-                      >
-                        <div className="p-2 max-w-xs">
-                          <h3 className="font-semibold text-sm mb-1">{selectedStation.name}</h3>
-                          <p className="text-xs text-gray-600 mb-2">{selectedStation.address}</p>
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {selectedStation.distance} km
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                              {selectedStation.rating}
-                            </span>
-                          </div>
+                  {/* Info Window for Selected Station */}
+                  {selectedStation && (
+                    <InfoWindow
+                      position={{ lat: selectedStation.latitude, lng: selectedStation.longitude }}
+                      onCloseClick={() => setSelectedStation(null)}
+                    >
+                      <div className="p-2 max-w-xs">
+                        <h3 className="font-semibold text-sm mb-1">{selectedStation.name}</h3>
+                        <p className="text-xs text-gray-600 mb-2">{selectedStation.address}</p>
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            {selectedStation.distance} km
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                            {selectedStation.rating}
+                          </span>
                         </div>
-                      </InfoWindow>
-                    )}
-                  </GoogleMap>
-                </LoadScript>
+                      </div>
+                    </InfoWindow>
+                  )}
+                </GoogleMap>
               ) : (
                 <div className="h-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-pink-950/20">
                   <div className="text-center p-6">
