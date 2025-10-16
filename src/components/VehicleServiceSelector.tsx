@@ -67,7 +67,15 @@ const VehicleServiceSelector = () => {
 
   const handleContinue = () => {
     if (selectedVehicle && serviceId) {
-      navigate(`/request-service/${serviceId}/${selectedVehicle}`);
+      // Check if user is authenticated - if not, redirect to login with return URL
+      const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+      if (!isAuthenticated) {
+        // Store the intended destination
+        sessionStorage.setItem('returnUrl', `/request-service/${serviceId}/${selectedVehicle}`);
+        navigate('/login');
+      } else {
+        navigate(`/request-service/${serviceId}/${selectedVehicle}`);
+      }
     }
   };
 

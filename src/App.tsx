@@ -92,7 +92,7 @@ const App = () => (
                   <Route path="about" element={<About />} />
                   <Route path="contact" element={<Contact />} />
                   <Route path="emergency" element={<Emergency />} />
-                  <Route path="request-service/:serviceId" element={<ProtectedRoute><VehicleServiceSelector /></ProtectedRoute>} />
+                  <Route path="request-service/:serviceId" element={<VehicleServiceSelector />} />
                   <Route path="request-service/:serviceId/car" element={<ProtectedRoute><CarServiceRequest /></ProtectedRoute>} />
                   <Route path="request-service/:serviceId/bike" element={<ProtectedRoute><BikeServiceRequest /></ProtectedRoute>} />
                   <Route path="request-service/:serviceId/commercial" element={<ProtectedRoute><CommercialServiceRequest /></ProtectedRoute>} />
