@@ -2,6 +2,7 @@
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { Card } from "../ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ServiceRequestFormData, VehicleType } from "./types";
 import { Car, Bike, Truck, ChevronDown } from "lucide-react";
@@ -85,56 +86,57 @@ const VehicleInfoStep = ({
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-2">Vehicle Information</h2>
-        <p className="text-gray-600">Tell us about your vehicle for personalized assistance</p>
+    <div className="space-y-6 animate-in fade-in-50 duration-500">
+      <div className="mb-6">
+        <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2">Vehicle Information</h3>
+        <p className="text-sm text-muted-foreground">Tell us about your vehicle for personalized service</p>
       </div>
       
       <div className="space-y-6">
         <div className="space-y-4">
-          <Label className="text-lg font-semibold text-gray-800">Vehicle Type</Label>
-          <div className="grid grid-cols-3 gap-4">
+          <Label className="text-base font-semibold text-foreground">Vehicle Type</Label>
+          <div className="grid grid-cols-3 gap-3">
             {vehicleTypes.map((type) => (
-              <div
+              <button
                 key={type.id}
-                className={`group relative flex flex-col items-center gap-4 p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 hover-scale
+                type="button"
+                className={`group relative flex flex-col items-center gap-3 p-4 md:p-6 rounded-2xl border-2 transition-all duration-300 active:scale-95
                   ${formData.vehicleType === type.id 
-                    ? 'border-red-400 bg-gradient-to-br from-red-50 to-red-100 shadow-lg scale-105' 
-                    : 'border-gray-200 bg-white hover:border-red-200 hover:bg-red-50/50 hover:shadow-md'}`}
+                    ? 'border-primary bg-primary/10 shadow-lg' 
+                    : 'border-border bg-card hover:border-primary/50 hover:bg-accent/50'}`}
                 onClick={() => handleVehicleTypeChange(type.id)}
               >
-                <div className={`p-4 rounded-xl transition-all duration-300 ${formData.vehicleType === type.id ? 'bg-gradient-to-br from-red-500 to-red-600 shadow-lg' : 'bg-gray-100 group-hover:bg-red-100'}`}>
-                  <type.icon className={`h-8 w-8 transition-colors duration-300 ${formData.vehicleType === type.id ? 'text-white' : 'text-gray-600 group-hover:text-red-600'}`} />
+                <div className={`p-3 md:p-4 rounded-xl transition-all duration-300 ${formData.vehicleType === type.id ? 'bg-primary text-primary-foreground' : 'bg-accent'}`}>
+                  <type.icon className={`h-6 w-6 md:h-8 md:w-8 transition-colors duration-300 ${formData.vehicleType === type.id ? 'text-primary-foreground' : 'text-foreground'}`} />
                 </div>
-                <span className={`text-sm font-semibold text-center transition-colors duration-300 ${formData.vehicleType === type.id ? 'text-red-700' : 'text-gray-700 group-hover:text-red-600'}`}>
+                <span className={`text-xs md:text-sm font-semibold text-center transition-colors duration-300 ${formData.vehicleType === type.id ? 'text-primary' : 'text-foreground'}`}>
                   {type.name}
                 </span>
                 
                 {formData.vehicleType === type.id && (
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-primary-foreground rounded-full"></div>
                   </div>
                 )}
-              </div>
+              </button>
             ))}
           </div>
         </div>
       
         {formData.vehicleType && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-6 animate-in fade-in-50 duration-500">
             <div className="space-y-4">
-              <Label className="text-lg font-semibold text-gray-800">Vehicle Subtype</Label>
-              <div className="flex flex-wrap gap-3">
+              <Label className="text-base font-semibold text-foreground">Vehicle Subtype</Label>
+              <div className="flex flex-wrap gap-2">
                 {vehicleTypes.find(t => t.id === formData.vehicleType)?.subtypes.map((subtype) => (
                   <Button
                     key={subtype}
                     type="button"
                     variant={formData.vehicleSubtype === subtype ? "default" : "outline"}
-                    className={`px-4 py-2 rounded-xl border-2 transition-all duration-300 ${
+                    className={`px-3 md:px-4 py-2 rounded-xl border-2 transition-all duration-300 active:scale-95 ${
                       formData.vehicleSubtype === subtype 
-                        ? "bg-gradient-to-r from-red-600 to-red-700 border-red-600 text-white shadow-lg hover:shadow-xl" 
-                        : "border-gray-200 hover:border-red-300 hover:bg-red-50"
+                        ? "shadow-md" 
+                        : "hover:border-primary/50"
                     }`}
                     onClick={() => onVehicleSubtypeSelect(subtype)}
                   >
@@ -145,57 +147,61 @@ const VehicleInfoStep = ({
             </div>
             
             {formData.vehicleSubtype && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
-                <div className="space-y-3">
-                  <Label className="text-lg font-semibold text-gray-800">Vehicle Brand</Label>
-                  <Select onValueChange={handleBrandChange} value={selectedBrand}>
-                    <SelectTrigger className="h-14 rounded-xl border-2 border-gray-200 hover:border-red-300 focus:border-red-400 bg-white shadow-sm">
-                      <SelectValue placeholder="Select your vehicle brand" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl border-2 border-gray-200 shadow-xl bg-white/95 backdrop-blur-sm max-h-[300px]">
-                      {availableBrands.map((brand) => (
-                        <SelectItem 
-                          key={brand.id} 
-                          value={brand.id}
-                          className="py-3 px-4 hover:bg-red-50 focus:bg-red-50 rounded-lg margin-1"
-                        >
-                          <div className="flex items-center gap-3">
-                            <img 
-                              src={brand.logo} 
-                              alt={brand.name}
-                              className="w-8 h-8 object-contain rounded"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                            <span className="font-medium">{brand.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {selectedBrand && (
-                  <div className="space-y-3 animate-fade-in">
-                    <Label className="text-lg font-semibold text-gray-800">Vehicle Model</Label>
-                    <Select onValueChange={handleModelChange} value={formData.vehicleModel}>
-                      <SelectTrigger className="h-14 rounded-xl border-2 border-gray-200 hover:border-red-300 focus:border-red-400 bg-white shadow-sm">
-                        <SelectValue placeholder="Select your vehicle model" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in-50 duration-500">
+                <Card className="p-4 border-border/50 bg-accent/20">
+                  <div className="space-y-3">
+                    <Label className="text-base font-semibold">Vehicle Brand</Label>
+                    <Select onValueChange={handleBrandChange} value={selectedBrand}>
+                      <SelectTrigger className="h-12 rounded-xl border-2 hover:border-primary/50 focus:border-primary bg-background">
+                        <SelectValue placeholder="Select brand" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border-2 border-gray-200 shadow-xl bg-white/95 backdrop-blur-sm max-h-[300px]">
-                        {availableModels.map((model) => (
+                      <SelectContent className="rounded-xl border-2 shadow-xl max-h-[250px]">
+                        {availableBrands.map((brand) => (
                           <SelectItem 
-                            key={model} 
-                            value={model}
-                            className="py-3 px-4 hover:bg-red-50 focus:bg-red-50 rounded-lg margin-1"
+                            key={brand.id} 
+                            value={brand.id}
+                            className="py-3 px-4 hover:bg-accent rounded-lg"
                           >
-                            <span className="font-medium">{model}</span>
+                            <div className="flex items-center gap-3">
+                              <img 
+                                src={brand.logo} 
+                                alt={brand.name}
+                                className="w-6 h-6 object-contain"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                              <span className="font-medium">{brand.name}</span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
+                </Card>
+                
+                {selectedBrand && (
+                  <Card className="p-4 border-border/50 bg-accent/20 animate-in fade-in-50 duration-500">
+                    <div className="space-y-3">
+                      <Label className="text-base font-semibold">Vehicle Model</Label>
+                      <Select onValueChange={handleModelChange} value={formData.vehicleModel}>
+                        <SelectTrigger className="h-12 rounded-xl border-2 hover:border-primary/50 focus:border-primary bg-background">
+                          <SelectValue placeholder="Select model" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-2 shadow-xl max-h-[250px]">
+                          {availableModels.map((model) => (
+                            <SelectItem 
+                              key={model} 
+                              value={model}
+                              className="py-3 px-4 hover:bg-accent rounded-lg"
+                            >
+                              <span className="font-medium">{model}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </Card>
                 )}
               </div>
             )}

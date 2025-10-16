@@ -320,30 +320,34 @@ const ServiceRequest = () => {
   };
 
   return (
-    <div className="container max-w-3xl py-12">
-      <Card className="border border-gray-200 overflow-hidden shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-red-600 to-red-700 text-white">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/20 rounded-full">
-              {serviceId && services[serviceId]?.name === "Towing Service" && 
-                <MapPin className="h-6 w-6" />}
-              {serviceId && services[serviceId]?.name === "Flat Tire Repair" && 
-                <Car className="h-6 w-6" />}
-              {serviceId && services[serviceId]?.name === "Battery Jumpstart" && 
-                <Car className="h-6 w-6" />}
-              {serviceId && services[serviceId]?.name !== "Towing Service" && 
-               services[serviceId]?.name !== "Flat Tire Repair" && 
-               services[serviceId]?.name !== "Battery Jumpstart" && 
-                <Car className="h-6 w-6" />}
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 pb-24 md:pb-0">
+      <div className="container max-w-3xl py-4 md:py-12 px-4">
+        <Card className="border-none md:border overflow-hidden shadow-xl md:shadow-2xl bg-white/95 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground p-6 md:p-8">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+                {serviceId && services[serviceId]?.name === "Towing Service" && 
+                  <MapPin className="h-7 w-7" />}
+                {serviceId && services[serviceId]?.name === "Flat Tire Repair" && 
+                  <Car className="h-7 w-7" />}
+                {serviceId && services[serviceId]?.name === "Battery Jumpstart" && 
+                  <Car className="h-7 w-7" />}
+                {serviceId && services[serviceId]?.name !== "Towing Service" && 
+                 services[serviceId]?.name !== "Flat Tire Repair" && 
+                 services[serviceId]?.name !== "Battery Jumpstart" && 
+                  <Car className="h-7 w-7" />}
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-xl md:text-2xl font-bold leading-tight">{service.name}</CardTitle>
+                <CardDescription className="text-primary-foreground/90 mt-2 text-sm md:text-base leading-snug">{service.description}</CardDescription>
+                <div className="mt-3 inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5">
+                  <span className="text-xs md:text-sm font-semibold">{service.estimatedPrice}</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <CardTitle className="text-2xl font-bold">{service.name}</CardTitle>
-              <CardDescription className="text-white/80 mt-1">{service.description}</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="p-6">
+          </CardHeader>
+          
+          <CardContent className="p-4 md:p-6">
           <LiveProgressTracker currentStep={step} totalSteps={6} />
           
           <form onSubmit={handleSubmit}>
@@ -396,18 +400,39 @@ const ServiceRequest = () => {
               />
             )}
 
-            <div className="mt-8 flex justify-between">
+            {/* Mobile Fixed Bottom Navigation */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-lg border-t md:hidden z-50">
+              <div className="flex gap-3 max-w-3xl mx-auto">
+                {step > 1 && step !== 4 && step !== 5 && (
+                  <Button type="button" variant="outline" onClick={prevStep} className="flex-1 h-12 font-semibold">
+                    Back
+                  </Button>
+                )}
+                {step < 4 ? (
+                  <Button type="button" className="flex-1 h-12 font-semibold" onClick={nextStep}>
+                    Next
+                  </Button>
+                ) : step === 6 ? (
+                  <Button type="submit" className="flex-1 h-12 font-semibold">
+                    Confirm & Submit
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex mt-8 justify-between">
               {step > 1 && step !== 4 && step !== 5 && (
-                <Button type="button" variant="outline" onClick={prevStep}>
+                <Button type="button" variant="outline" onClick={prevStep} className="px-8">
                   Back
                 </Button>
               )}
               {step < 4 ? (
-                <Button type="button" className="bg-red-600 hover:bg-red-700 ml-auto" onClick={nextStep}>
+                <Button type="button" className="ml-auto px-8" onClick={nextStep}>
                   Next
                 </Button>
               ) : step === 6 ? (
-                <Button type="submit" className="bg-red-600 hover:bg-red-700 ml-auto">
+                <Button type="submit" className="ml-auto px-8">
                   Confirm and Submit
                 </Button>
               ) : null}
@@ -415,6 +440,7 @@ const ServiceRequest = () => {
           </form>
         </CardContent>
       </Card>
+    </div>
     </div>
   );
 };

@@ -198,24 +198,49 @@ const Map = () => {
 
       // Define search types
       const searchTypes = [
-        { type: 'gas_station', category: 'fuel' as const },
-        { type: 'electric_vehicle_charging_station', category: 'ev-charging' as const },
-        { type: 'car_repair', category: 'garage' as const }
+        { type: 'gas_station', category: 'fuel' as const, keywords: [] },
+        { type: 'electric_vehicle_charging_station', category: 'ev-charging' as const, keywords: ['Tata Power', 'MG', 'Zion', 'Ather', 'ChargeZone', 'Fortum', 'Statiq', 'EV charging', 'electric vehicle charger'] },
+        { type: 'car_repair', category: 'garage' as const, keywords: [] }
       ];
 
       // Fetch each type
-      const promises = searchTypes.map(({ type, category }) =>
+      const promises = searchTypes.map(({ type, category, keywords }) =>
         new Promise<void>((resolve) => {
           const request: any = {
             location: new google.maps.LatLng(location.lat, location.lng),
             radius: 5000, // 5km radius
-            type
+            type,
+            keyword: category === 'ev-charging' ? 'EV charging station electric vehicle' : undefined
           };
 
           service.nearbySearch(request, (results: any[], status: any) => {
             if (status === (google as any).maps.places.PlacesServiceStatus.OK && results) {
               results.forEach((place: any) => {
                 if (place.geometry?.location && place.place_id) {
+                  // Filter for EV charging stations more strictly
+                  if (category === 'ev-charging') {
+                    const placeName = place.name?.toLowerCase() || '';
+                    const placeTypes = place.types || [];
+                    
+                    // Check if it's likely an EV charging station
+                    const isEVStation = 
+                      placeTypes.includes('electric_vehicle_charging_station') ||
+                      keywords.some(kw => placeName.includes(kw.toLowerCase())) ||
+                      placeName.includes('ev') ||
+                      placeName.includes('charger') ||
+                      placeName.includes('charging');
+                    
+                    // Exclude electrical shops
+                    const isElectricalShop = 
+                      placeName.includes('electrical') && !placeName.includes('vehicle') ||
+                      placeTypes.includes('electronics_store') ||
+                      placeTypes.includes('electrician');
+                    
+                    if (!isEVStation || isElectricalShop) {
+                      return; // Skip this place
+                    }
+                  }
+
                   const distance = computeKm(
                     new google.maps.LatLng(location.lat, location.lng),
                     place.geometry.location
