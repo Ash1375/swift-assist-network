@@ -44,10 +44,19 @@ const Login = () => {
       const result = await login(data.email, data.password);
       if (result.user) {
         toast.success("Login successful!");
-        // Small delay to allow auth state to update
-        setTimeout(() => {
-          navigate("/");
-        }, 100);
+        
+        // Check for return URL from sessionStorage
+        const returnUrl = sessionStorage.getItem('returnUrl');
+        if (returnUrl) {
+          sessionStorage.removeItem('returnUrl');
+          setTimeout(() => {
+            navigate(returnUrl);
+          }, 100);
+        } else {
+          setTimeout(() => {
+            navigate("/");
+          }, 100);
+        }
       }
     } catch (error: any) {
       console.error("Login error:", error);

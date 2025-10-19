@@ -50,6 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setSession(newSession);
           
           if (event === 'SIGNED_IN' && newSession) {
+            localStorage.setItem('isAuthenticated', 'true');
             try {
               // Query by user_id since profiles table uses that column
               const { data: profile, error } = await supabase
@@ -103,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           } else if (event === 'SIGNED_OUT') {
             setUser(null);
+            localStorage.removeItem('isAuthenticated');
           }
         }
       );
@@ -112,6 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(currentSession);
       
       if (currentSession?.user) {
+        localStorage.setItem('isAuthenticated', 'true');
         try {
           // Query by user_id since profiles table uses that column
           const { data: profile, error } = await supabase
