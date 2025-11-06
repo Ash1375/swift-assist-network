@@ -23,18 +23,27 @@ export const useServiceRequestSubmit = () => {
     setIsSubmitting(true);
     
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please login to submit a service request");
+        navigate('/login');
+        return;
+      }
+
       const serviceData = {
+        user_id: user.id,
         service_type: data.serviceType,
-        vehicle_info: data.vehicleInfo,
-        location_info: data.locationInfo,
-        personal_info: data.personalInfo || {
-          name: data.name,
-          phone: data.phone,
-          email: data.email
-        },
-        details: data.details,
-        urgency: data.urgency,
-        status: 'pending'
+        vehicle_type: data.vehicleInfo?.type || 'unknown',
+        vehicle_model: data.vehicleInfo?.model || data.vehicleInfo?.brand || 'Unknown Model',
+        address: data.locationInfo?.address || data.personalInfo?.address || 'Not specified',
+        description: data.details || '',
+        contact_name: data.personalInfo?.name || data.name,
+        contact_phone: data.personalInfo?.phone || data.phone,
+        contact_email: data.personalInfo?.email || data.email,
+        status: 'pending',
+        payment_status: 'pending'
       };
 
       const { data: result, error } = await supabase

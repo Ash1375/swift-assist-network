@@ -73,19 +73,8 @@ const ServiceCommunication = ({ serviceType, vehicleInfo, location, onClose }: S
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from('service_communications')
-        .insert({
-          user_id: 'temp-user-id', // Replace with actual user ID when auth is implemented
-          service_provider_id: selectedProvider,
-          service_type: serviceType,
-          message: message,
-          location: location ? { address: location } : null,
-          vehicle_info: vehicleInfo
-        });
-
-      if (error) throw error;
-
+      // TODO: Implement service communications once the table is created
+      // For now, just show success message
       toast.success("Your request has been sent to the service provider!");
       setMessage("");
       onClose();

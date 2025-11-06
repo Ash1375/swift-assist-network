@@ -8,6 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 interface Category {
   id: string;
@@ -38,35 +39,16 @@ const Marketplace = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCategories();
-    fetchProducts();
+    // Marketplace feature disabled - tables not yet created
+    toast.info("Marketplace coming soon!");
   }, []);
 
   const fetchCategories = async () => {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name');
-    
-    if (data && !error) {
-      setCategories(data);
-    }
+    // Disabled - table not created yet
   };
 
   const fetchProducts = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('products')
-      .select(`
-        *,
-        category:categories(name)
-      `)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
-    
-    if (data && !error) {
-      setProducts(data as Product[]);
-    }
+    // Disabled - table not created yet
     setLoading(false);
   };
 

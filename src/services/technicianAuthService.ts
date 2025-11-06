@@ -102,6 +102,14 @@ export const technicianAuthService = {
         email,
         phone,
         address,
+        region,
+        district,
+        state,
+        locality: locality || '',
+        service_area_range: serviceAreaRange,
+        experience,
+        specialties,
+        pricing,
         verification_status: 'pending' as const
       };
       

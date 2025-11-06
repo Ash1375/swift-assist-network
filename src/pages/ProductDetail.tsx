@@ -35,63 +35,18 @@ const ProductDetail = () => {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      fetchProduct();
-    }
+    // Product detail feature disabled - tables not yet created
+    toast.info("Product details coming soon!");
   }, [id]);
 
   const fetchProduct = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('products')
-      .select(`
-        *,
-        category:categories(name, description)
-      `)
-      .eq('id', id)
-      .single();
-    
-    if (data && !error) {
-      setProduct(data as Product);
-      setQuantity(data.min_order_quantity || 1);
-    }
+    // Disabled - table not created yet
     setLoading(false);
   };
 
   const addToCart = async () => {
-    setIsAddingToCart(true);
-    
-    // Check if user is authenticated
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      toast.error("Please login to add items to cart");
-      setIsAddingToCart(false);
-      return;
-    }
-
-    if (!product) return;
-
-    try {
-      const { error } = await supabase
-        .from('cart')
-        .upsert({
-          user_id: user.id,
-          product_id: product.id,
-          quantity: quantity,
-          price_type: priceType
-        }, {
-          onConflict: 'user_id,product_id'
-        });
-
-      if (error) throw error;
-
-      toast.success("Product added to cart successfully!");
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      toast.error("Failed to add product to cart");
-    }
-    
+    // Disabled - table not created yet
+    toast.info("Cart feature coming soon!");
     setIsAddingToCart(false);
   };
 

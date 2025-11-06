@@ -94,24 +94,30 @@ const CarServiceRequest = () => {
     setIsSubmitting(true);
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please login to submit a service request");
+        navigate('/login');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('service_requests')
         .insert({
+          user_id: user.id,
           service_type: `car-${serviceId}`,
-          vehicle_info: {
-            type: 'car',
-            subtype: formData.vehicleSubtype,
-            model: formData.vehicleModel,
-          },
-          location_info: {
-            address: formData.location,
-          },
-          personal_info: {
-            name: formData.name,
-            phone: formData.phone,
-          },
+          vehicle_type: 'car',
+          vehicle_model: `${formData.vehicleSubtype} - ${formData.vehicleModel}`,
+          address: formData.location,
+          description: formData.details || '',
+          contact_name: formData.name,
+          contact_phone: formData.phone,
+          contact_email: '',
           technician_id: technicianId,
           status: 'pending',
+          payment_status: 'pending'
         })
         .select()
         .single();

@@ -109,41 +109,39 @@ const EVServiceRequest = () => {
     setIsSubmitting(true);
     
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please login to submit a service request");
+        navigate('/login');
+        return;
+      }
+
       const serviceData = {
-        user_id: 'temp-user-id',
+        user_id: user.id,
         service_type: `ev-${serviceId}`,
-        vehicle_info: {
-          type: 'ev',
-          subtype: formData.vehicleSubtype,
-          brand: formData.vehicleBrand,
-          model: formData.vehicleModel,
-          year: formData.vehicleYear,
-          batteryCapacity: formData.batteryCapacity,
-          chargingType: formData.chargingType,
-          currentBatteryLevel: formData.currentBatteryLevel
-        },
-        location_info: {
-          address: formData.location,
-          landmark: formData.landmark
-        },
-        personal_info: {
-          name: formData.name,
-          phone: formData.phone,
-          email: formData.email
-        },
-        details: formData.details,
-        urgency: formData.urgency,
-        status: 'pending'
+        vehicle_type: 'ev',
+        vehicle_model: `${formData.vehicleBrand} ${formData.vehicleModel} ${formData.vehicleYear}`.trim(),
+        address: `${formData.location}${formData.landmark ? ' - ' + formData.landmark : ''}`,
+        description: `${formData.details || ''}\nSubtype: ${formData.vehicleSubtype}\nBattery: ${formData.batteryCapacity}\nCharging: ${formData.chargingType}\nCurrent Level: ${formData.currentBatteryLevel}\nUrgency: ${formData.urgency}`,
+        contact_name: formData.name,
+        contact_phone: formData.phone,
+        contact_email: formData.email || '',
+        status: 'pending',
+        payment_status: 'pending'
       };
 
-      const { error } = await supabase
+      const { data: result, error } = await supabase
         .from('service_requests')
-        .insert(serviceData);
+        .insert(serviceData)
+        .select()
+        .single();
 
       if (error) throw error;
 
       toast.success("Service request submitted successfully!");
-      navigate(`/request-tracking/temp-request-id`);
+      navigate(`/request-tracking/${result.id}`);
     } catch (error) {
       console.error('Error submitting request:', error);
       toast.error("Failed to submit request. Please try again.");
