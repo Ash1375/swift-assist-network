@@ -10,141 +10,49 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "12.2.12 (cd3cf9e)"
   }
   public: {
     Tables: {
-      cart: {
-        Row: {
-          created_at: string
-          id: string
-          price_type: string
-          product_id: string | null
-          quantity: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          price_type: string
-          product_id?: string | null
-          quantity?: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          price_type?: string
-          product_id?: string | null
-          quantity?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cart_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      categories: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      notifications: {
-        Row: {
-          created_at: string | null
-          id: string
-          is_read: boolean | null
-          message: string
-          related_id: string | null
-          title: string
-          type: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          message: string
-          related_id?: string | null
-          title: string
-          type: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          message?: string
-          related_id?: string | null
-          title?: string
-          type?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       payments: {
         Row: {
           amount: number
-          created_at: string | null
+          created_at: string
+          currency: string | null
           id: string
+          paid_at: string | null
           payment_method: string | null
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
           service_request_id: string
           status: string | null
-          technician_id: string | null
-          transaction_id: string | null
-          updated_at: string | null
-          user_id: string | null
+          updated_at: string
         }
         Insert: {
           amount: number
-          created_at?: string | null
+          created_at?: string
+          currency?: string | null
           id?: string
+          paid_at?: string | null
           payment_method?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
           service_request_id: string
           status?: string | null
-          technician_id?: string | null
-          transaction_id?: string | null
-          updated_at?: string | null
-          user_id?: string | null
+          updated_at?: string
         }
         Update: {
           amount?: number
-          created_at?: string | null
+          created_at?: string
+          currency?: string | null
           id?: string
+          paid_at?: string | null
           payment_method?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
           service_request_id?: string
           status?: string | null
-          technician_id?: string | null
-          transaction_id?: string | null
-          updated_at?: string | null
-          user_id?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -154,305 +62,210 @@ export type Database = {
             referencedRelation: "service_requests"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "payments_technician_id_fkey"
-            columns: ["technician_id"]
-            isOneToOne: false
-            referencedRelation: "technicians"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      products: {
-        Row: {
-          brand: string
-          category_id: string | null
-          created_at: string
-          description: string | null
-          id: string
-          images: string[] | null
-          is_active: boolean | null
-          min_order_quantity: number | null
-          name: string
-          retail_price: number
-          stock_quantity: number
-          updated_at: string
-          vehicle_compatibility: string[] | null
-          wholesale_price: number
-        }
-        Insert: {
-          brand: string
-          category_id?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          images?: string[] | null
-          is_active?: boolean | null
-          min_order_quantity?: number | null
-          name: string
-          retail_price: number
-          stock_quantity?: number
-          updated_at?: string
-          vehicle_compatibility?: string[] | null
-          wholesale_price: number
-        }
-        Update: {
-          brand?: string
-          category_id?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          images?: string[] | null
-          is_active?: boolean | null
-          min_order_quantity?: number | null
-          name?: string
-          retail_price?: number
-          stock_quantity?: number
-          updated_at?: string
-          vehicle_compatibility?: string[] | null
-          wholesale_price?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "products_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
         ]
       }
       profiles: {
         Row: {
-          created_at: string
+          created_at: string | null
           full_name: string | null
           id: string
+          phone: string | null
           subscription_tier: string | null
-          updated_at: string
-          user_id: string
+          updated_at: string | null
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           full_name?: string | null
-          id?: string
-          subscription_tier?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          full_name?: string | null
-          id?: string
-          subscription_tier?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      service_communications: {
-        Row: {
-          created_at: string
           id: string
-          location: Json | null
-          message: string
-          service_provider_id: string | null
-          service_type: string
-          status: string | null
-          updated_at: string
-          user_id: string
-          vehicle_info: Json | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          location?: Json | null
-          message: string
-          service_provider_id?: string | null
-          service_type: string
-          status?: string | null
-          updated_at?: string
-          user_id?: string
-          vehicle_info?: Json | null
+          phone?: string | null
+          subscription_tier?: string | null
+          updated_at?: string | null
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
+          full_name?: string | null
           id?: string
-          location?: Json | null
-          message?: string
-          service_provider_id?: string | null
-          service_type?: string
-          status?: string | null
-          updated_at?: string
-          user_id?: string
-          vehicle_info?: Json | null
+          phone?: string | null
+          subscription_tier?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
       service_requests: {
         Row: {
+          address: string
           completed_at: string | null
-          created_at: string
-          details: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          estimated_cost: number | null
           id: string
-          location_info: Json | null
-          personal_info: Json | null
+          location_lat: number | null
+          location_lng: number | null
+          payment_method: string | null
+          payment_status: string | null
+          payment_timing: string | null
           service_type: string
           status: string | null
           technician_id: string | null
-          updated_at: string
-          urgency: string | null
+          total_amount: number | null
+          updated_at: string | null
           user_id: string
-          vehicle_info: Json | null
+          vehicle_model: string | null
+          vehicle_type: string
         }
         Insert: {
+          address: string
           completed_at?: string | null
-          created_at?: string
-          details?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          estimated_cost?: number | null
           id?: string
-          location_info?: Json | null
-          personal_info?: Json | null
+          location_lat?: number | null
+          location_lng?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          payment_timing?: string | null
           service_type: string
           status?: string | null
           technician_id?: string | null
-          updated_at?: string
-          urgency?: string | null
-          user_id?: string
-          vehicle_info?: Json | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id: string
+          vehicle_model?: string | null
+          vehicle_type: string
         }
         Update: {
+          address?: string
           completed_at?: string | null
-          created_at?: string
-          details?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          estimated_cost?: number | null
           id?: string
-          location_info?: Json | null
-          personal_info?: Json | null
+          location_lat?: number | null
+          location_lng?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          payment_timing?: string | null
           service_type?: string
           status?: string | null
           technician_id?: string | null
-          updated_at?: string
-          urgency?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
           user_id?: string
-          vehicle_info?: Json | null
-        }
-        Relationships: []
-      }
-      technician_reviews: {
-        Row: {
-          created_at: string | null
-          id: string
-          rating: number
-          review: string | null
-          service_request_id: string
-          technician_id: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          rating: number
-          review?: string | null
-          service_request_id: string
-          technician_id: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          rating?: number
-          review?: string | null
-          service_request_id?: string
-          technician_id?: string
-          user_id?: string | null
+          vehicle_model?: string | null
+          vehicle_type?: string
         }
         Relationships: [
           {
-            foreignKeyName: "technician_reviews_service_request_id_fkey"
-            columns: ["service_request_id"]
-            isOneToOne: false
-            referencedRelation: "service_requests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "technician_reviews_technician_id_fkey"
+            foreignKeyName: "service_requests_technician_id_fkey"
             columns: ["technician_id"]
             isOneToOne: false
             referencedRelation: "technicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_timeline: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          service_request_id: string
+          status: string
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          service_request_id: string
+          status: string
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          service_request_id?: string
+          status?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_timeline_service_request_id_fkey"
+            columns: ["service_request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
             referencedColumns: ["id"]
           },
         ]
       }
       technicians: {
         Row: {
-          address: string | null
+          address: string
           created_at: string | null
-          documents: Json | null
+          district: string
           email: string
-          experience_years: number | null
+          experience: number
           id: string
-          is_available: boolean | null
-          latitude: number | null
-          longitude: number | null
+          locality: string | null
           name: string
           phone: string
           pricing: Json | null
-          profile_image_url: string | null
-          rating: number | null
-          service_area_radius: number | null
+          region: string
+          service_area_range: number
           specialties: string[] | null
-          total_jobs: number | null
+          state: string
           updated_at: string | null
-          user_id: string | null
-          verification_status:
-            | Database["public"]["Enums"]["verification_status"]
-            | null
+          verification_status: string | null
         }
         Insert: {
-          address?: string | null
+          address: string
           created_at?: string | null
-          documents?: Json | null
+          district: string
           email: string
-          experience_years?: number | null
+          experience?: number
           id?: string
-          is_available?: boolean | null
-          latitude?: number | null
-          longitude?: number | null
+          locality?: string | null
           name: string
           phone: string
           pricing?: Json | null
-          profile_image_url?: string | null
-          rating?: number | null
-          service_area_radius?: number | null
+          region: string
+          service_area_range?: number
           specialties?: string[] | null
-          total_jobs?: number | null
+          state: string
           updated_at?: string | null
-          user_id?: string | null
-          verification_status?:
-            | Database["public"]["Enums"]["verification_status"]
-            | null
+          verification_status?: string | null
         }
         Update: {
-          address?: string | null
+          address?: string
           created_at?: string | null
-          documents?: Json | null
+          district?: string
           email?: string
-          experience_years?: number | null
+          experience?: number
           id?: string
-          is_available?: boolean | null
-          latitude?: number | null
-          longitude?: number | null
+          locality?: string | null
           name?: string
           phone?: string
           pricing?: Json | null
-          profile_image_url?: string | null
-          rating?: number | null
-          service_area_radius?: number | null
+          region?: string
+          service_area_range?: number
           specialties?: string[] | null
-          total_jobs?: number | null
+          state?: string
           updated_at?: string | null
-          user_id?: string | null
-          verification_status?:
-            | Database["public"]["Enums"]["verification_status"]
-            | null
+          verification_status?: string | null
         }
         Relationships: []
       }
@@ -464,22 +277,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user" | "technician"
-      payment_status:
-        | "pending"
-        | "processing"
-        | "completed"
-        | "failed"
-        | "refunded"
-      service_status:
-        | "pending"
-        | "assigned"
-        | "in_progress"
-        | "completed"
-        | "cancelled"
-        | "rejected"
-      urgency_level: "low" | "normal" | "high" | "emergency"
-      verification_status: "pending" | "verified" | "rejected" | "suspended"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -606,25 +404,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "moderator", "user", "technician"],
-      payment_status: [
-        "pending",
-        "processing",
-        "completed",
-        "failed",
-        "refunded",
-      ],
-      service_status: [
-        "pending",
-        "assigned",
-        "in_progress",
-        "completed",
-        "cancelled",
-        "rejected",
-      ],
-      urgency_level: ["low", "normal", "high", "emergency"],
-      verification_status: ["pending", "verified", "rejected", "suspended"],
-    },
+    Enums: {},
   },
 } as const
