@@ -48,28 +48,59 @@ const TechnicianSelection = ({ serviceType, onSelect, vehicleType, location }: T
 
       if (fetchError) throw fetchError;
 
-      // Transform Supabase data to match Technician interface
-      const transformedTechnicians: Technician[] = data?.map((tech) => {
-        // Get service price from pricing JSON
-        const serviceKey = serviceType.toLowerCase().replace(' ', '-');
-        const pricing = tech.pricing as any;
-        const basePrice = pricing?.[serviceKey] || pricing?.['towing'] || 500;
-        
-        return {
-          id: tech.id,
-          name: tech.name,
-          avatar: defaultAvatar,
-          rating: 4.5 + Math.random() * 0.5, // Random rating between 4.5-5.0
-          price: basePrice,
-          currency: "₹",
-          distance: calculateDistance(),
-          estimatedArrival: calculateETA(),
-          completedJobs: tech.experience * 50, // Estimate based on experience
-          specialties: tech.specialties || [],
-          verified: tech.verification_status === 'verified',
-          badges: getBadges(tech)
-        };
-      }) || [];
+      let transformedTechnicians: Technician[] = [];
+
+      // If we have data from database, use it
+      if (data && data.length > 0) {
+        transformedTechnicians = data.map((tech) => {
+          const serviceKey = serviceType.toLowerCase().replace(' ', '-');
+          const pricing = tech.pricing as any;
+          const basePrice = pricing?.[serviceKey] || pricing?.['towing'] || 500;
+          
+          return {
+            id: tech.id,
+            name: tech.name,
+            avatar: defaultAvatar,
+            rating: 4.5 + Math.random() * 0.5,
+            price: basePrice,
+            currency: "₹",
+            distance: calculateDistance(),
+            estimatedArrival: calculateETA(),
+            completedJobs: tech.experience * 50,
+            specialties: tech.specialties || [],
+            verified: tech.verification_status === 'verified',
+            badges: getBadges(tech)
+          };
+        });
+      } else {
+        // Use mock data for demo purposes
+        const { demoTechnicians } = await import('@/mocks/technicians');
+        transformedTechnicians = demoTechnicians.map((tech, index) => {
+          const serviceKey = serviceType.toLowerCase().replace(' ', '-');
+          const pricing = tech.pricing as any;
+          const basePrice = pricing?.[serviceKey] || pricing?.['towing'] || 500;
+          
+          // Calculate realistic distances based on locality
+          const distances = [2.3, 4.7, 6.1, 8.5];
+          const distance = distances[index] || (Math.random() * 10 + 1).toFixed(1);
+          const timeMin = Math.round(parseFloat(distance.toString()) * 3 + 5);
+          
+          return {
+            id: tech.id,
+            name: tech.name,
+            avatar: defaultAvatar,
+            rating: 4.6 + Math.random() * 0.4,
+            price: basePrice,
+            currency: "₹",
+            distance: `${distance} km`,
+            estimatedArrival: `${timeMin}-${timeMin + 10} min`,
+            completedJobs: tech.experience * 50,
+            specialties: tech.specialties || [],
+            verified: tech.verification_status === 'verified',
+            badges: getBadges(tech)
+          };
+        });
+      }
 
       setTechnicians(transformedTechnicians);
     } catch (err) {
@@ -186,16 +217,7 @@ const TechnicianSelection = ({ serviceType, onSelect, vehicleType, location }: T
     );
   }
 
-  if (technicians.length === 0) {
-    return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          No technicians are currently available in your area. Please try again later or contact support.
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  // Remove the "no technicians" alert since we now have fallback mock data
 
   return (
     <div className="w-full space-y-6 animate-fade-in">
