@@ -1,6 +1,5 @@
 import { Technician } from "@/types/technician";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/sonner";
 
 export const technicianAuthService = {
   fetchTechnicianProfile: async (email: string) => {

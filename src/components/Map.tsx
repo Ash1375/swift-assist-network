@@ -550,10 +550,19 @@ const Map = () => {
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
                       <MapPin className="h-8 w-8 text-primary" />
                     </div>
-                    <h3 className="text-lg font-medium mb-2">Map Ready to Load</h3>
+                    <h3 className="text-lg font-medium mb-2">
+                      {!apiKey ? 'Map Configuration Required' : 'Loading Map...'}
+                    </h3>
                     <p className="text-sm text-muted-foreground max-w-md">
-                      Enter your Google Maps API key above to view the interactive map
+                      {!apiKey 
+                        ? 'Google Maps API key is required. Please configure it in the environment settings.' 
+                        : 'Please wait while the map loads...'}
                     </p>
+                    {!apiKey && (
+                      <p className="text-xs text-amber-600 mt-2">
+                        Note: Google Maps requires billing to be enabled on your API key.
+                      </p>
+                    )}
                   </div>
                 </div>
               )}

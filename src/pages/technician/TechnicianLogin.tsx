@@ -119,12 +119,6 @@ const TechnicianLogin = () => {
                       </span>
                     )}
                   </Button>
-                  
-                  <div className="text-center mt-4">
-                    <p className="text-sm text-muted-foreground">
-                      Demo Account: tech@example.com / password123
-                    </p>
-                  </div>
                 </form>
               </Form>
 
