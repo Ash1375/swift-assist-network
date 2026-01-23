@@ -1,8 +1,8 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
+import { Session, User } from "@supabase/supabase-js";
 
 interface AdminUser {
   id: string;
@@ -34,39 +34,118 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check for existing admin session
-    const storedAdmin = localStorage.getItem("towbuddy_admin");
-    if (storedAdmin) {
-      setAdminUser(JSON.parse(storedAdmin));
+  // Check if user has admin role using server-side validation
+  const verifyAdminRole = async (userId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .rpc('has_role', { _user_id: userId, _role: 'admin' });
+      
+      if (error) {
+        console.error("Error checking admin role:", error);
+        return false;
+      }
+      
+      return data === true;
+    } catch (error) {
+      console.error("Error verifying admin role:", error);
+      return false;
     }
+  };
+
+  // Fetch user profile data
+  const fetchUserProfile = async (user: User): Promise<AdminUser | null> => {
+    const isAdmin = await verifyAdminRole(user.id);
     
-    // For a real application, here we would validate the admin token
-    // with Supabase or another backend service
-    
-    setIsLoading(false);
+    if (!isAdmin) {
+      return null;
+    }
+
+    // Get user profile for display name
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('user_id', user.id)
+      .single();
+
+    return {
+      id: user.id,
+      email: user.email || '',
+      name: profile?.full_name || user.email?.split('@')[0] || 'Admin',
+      role: 'admin'
+    };
+  };
+
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          // Use setTimeout to avoid potential deadlocks with Supabase auth
+          setTimeout(async () => {
+            const adminData = await fetchUserProfile(session.user);
+            setAdminUser(adminData);
+            setIsLoading(false);
+          }, 0);
+        } else {
+          setAdminUser(null);
+          setIsLoading(false);
+        }
+      }
+    );
+
+    // Then check for existing session
+    const initializeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const adminData = await fetchUserProfile(session.user);
+        setAdminUser(adminData);
+      }
+      setIsLoading(false);
+    };
+
+    initializeAuth();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const loginAdmin = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // For demo purposes, we're using a hardcoded admin
-      // In a real app, this would validate against Supabase Auth
-      if (email === "admin@towbuddy.com" && password === "adminpassword") {
-        const adminData = {
-          id: "admin-1",
-          email: "admin@towbuddy.com",
-          name: "Admin User",
-          role: "admin"
-        };
-        
-        setAdminUser(adminData);
-        localStorage.setItem("towbuddy_admin", JSON.stringify(adminData));
-        toast.success("Admin login successful");
-        navigate("/admin/dashboard");
-      } else {
-        throw new Error("Invalid admin credentials");
+      // Use Supabase Auth for login
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        throw new Error(authError.message);
       }
+
+      if (!authData.user) {
+        throw new Error("Login failed");
+      }
+
+      // Verify admin role server-side
+      const isAdmin = await verifyAdminRole(authData.user.id);
+      
+      if (!isAdmin) {
+        // Sign out if not an admin
+        await supabase.auth.signOut();
+        throw new Error("Access denied: Admin privileges required");
+      }
+
+      const adminData = await fetchUserProfile(authData.user);
+      
+      if (!adminData) {
+        await supabase.auth.signOut();
+        throw new Error("Access denied: Admin privileges required");
+      }
+
+      setAdminUser(adminData);
+      toast.success("Admin login successful");
+      navigate("/admin/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Admin login failed");
       throw error;
@@ -76,16 +155,20 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const logoutAdmin = async () => {
+    await supabase.auth.signOut();
     setAdminUser(null);
-    localStorage.removeItem("towbuddy_admin");
     toast.success("Admin logged out");
     navigate("/");
   };
 
-  const checkAdminAccess = async () => {
-    // This function would verify the admin's token/session
-    // For now we just check if we have an admin user in state
-    return !!adminUser;
+  const checkAdminAccess = async (): Promise<boolean> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.user) {
+      return false;
+    }
+
+    return verifyAdminRole(session.user.id);
   };
 
   return (
@@ -107,19 +190,30 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 export const useAdminAuth = () => useContext(AdminAuthContext);
 
 export const AdminProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAdminAuthenticated, isLoading } = useAdminAuth();
+  const { isAdminAuthenticated, isLoading, checkAdminAccess } = useAdminAuth();
   const navigate = useNavigate();
+  const [verified, setVerified] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (!isLoading && !isAdminAuthenticated) {
-      toast.error("Admin access required");
-      navigate("/admin/login");
-    }
-  }, [isAdminAuthenticated, isLoading, navigate]);
+    const verify = async () => {
+      if (!isLoading) {
+        // Always verify admin status server-side
+        const hasAccess = await checkAdminAccess();
+        setVerified(hasAccess);
+        
+        if (!hasAccess) {
+          toast.error("Admin access required");
+          navigate("/admin/login");
+        }
+      }
+    };
+    
+    verify();
+  }, [isLoading, isAdminAuthenticated, navigate, checkAdminAccess]);
 
-  if (isLoading) {
+  if (isLoading || verified === null) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  return isAdminAuthenticated ? <>{children}</> : null;
+  return verified ? <>{children}</> : null;
 };

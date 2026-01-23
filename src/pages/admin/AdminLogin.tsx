@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Shield, UserCheck, Lock } from "lucide-react";
@@ -48,7 +47,7 @@ const AdminLogin = () => {
             </div>
             <CardTitle className="text-2xl font-bold text-center">Admin Login</CardTitle>
             <CardDescription className="text-center">
-              Enter your credentials to access the admin dashboard
+              Enter your admin credentials to access the dashboard
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -95,17 +94,17 @@ const AdminLogin = () => {
               </div>
             </form>
           </CardContent>
-          <CardFooter>
-            <p className="px-8 text-center text-sm text-muted-foreground">
+          <CardFooter className="flex flex-col gap-2">
+            <p className="text-center text-sm text-muted-foreground">
+              Admin access is restricted to authorized personnel only.
+            </p>
+            <p className="text-center text-sm text-muted-foreground">
               <a href="/" className="underline hover:text-primary">
                 Return to home page
               </a>
             </p>
           </CardFooter>
         </Card>
-        <div className="mt-4 text-center text-sm text-muted-foreground">
-          <p>Demo credentials: admin@towbuddy.com / adminpassword</p>
-        </div>
       </div>
     </div>
   );
