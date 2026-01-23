@@ -6,10 +6,10 @@ const LoadingAnimation = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Hide loading animation after content has loaded
+    // Hide loading animation quickly after initial load
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, []);
