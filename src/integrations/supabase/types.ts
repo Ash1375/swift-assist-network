@@ -14,7 +14,185 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      service_requests: {
+        Row: {
+          address: string | null
+          completed_at: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          payment_status: string | null
+          service_type: string
+          status: string | null
+          technician_id: string | null
+          updated_at: string
+          user_id: string
+          vehicle_model: string | null
+          vehicle_type: string | null
+        }
+        Insert: {
+          address?: string | null
+          completed_at?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          payment_status?: string | null
+          service_type: string
+          status?: string | null
+          technician_id?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_model?: string | null
+          vehicle_type?: string | null
+        }
+        Update: {
+          address?: string | null
+          completed_at?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          payment_status?: string | null
+          service_type?: string
+          status?: string | null
+          technician_id?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_model?: string | null
+          vehicle_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_requests_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "technicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technicians: {
+        Row: {
+          address: string | null
+          avatar_url: string | null
+          completed_jobs: number | null
+          created_at: string
+          district: string | null
+          email: string
+          experience: number | null
+          id: string
+          locality: string | null
+          name: string
+          password: string
+          phone: string
+          pricing: Json | null
+          rating: number | null
+          region: string | null
+          resume_url: string | null
+          service_area_range: number | null
+          specialties: string[] | null
+          state: string | null
+          updated_at: string
+          verification_status: string | null
+        }
+        Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          completed_jobs?: number | null
+          created_at?: string
+          district?: string | null
+          email: string
+          experience?: number | null
+          id?: string
+          locality?: string | null
+          name: string
+          password: string
+          phone: string
+          pricing?: Json | null
+          rating?: number | null
+          region?: string | null
+          resume_url?: string | null
+          service_area_range?: number | null
+          specialties?: string[] | null
+          state?: string | null
+          updated_at?: string
+          verification_status?: string | null
+        }
+        Update: {
+          address?: string | null
+          avatar_url?: string | null
+          completed_jobs?: number | null
+          created_at?: string
+          district?: string | null
+          email?: string
+          experience?: number | null
+          id?: string
+          locality?: string | null
+          name?: string
+          password?: string
+          phone?: string
+          pricing?: Json | null
+          rating?: number | null
+          region?: string | null
+          resume_url?: string | null
+          service_area_range?: number | null
+          specialties?: string[] | null
+          state?: string | null
+          updated_at?: string
+          verification_status?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
