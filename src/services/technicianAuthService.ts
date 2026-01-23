@@ -1,4 +1,3 @@
-
 import { Technician } from "@/types/technician";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
@@ -39,6 +38,7 @@ export const technicianAuthService = {
   
   login: async (email: string, password: string) => {
     try {
+      // Use Supabase Auth for login - passwords are managed by Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -46,6 +46,7 @@ export const technicianAuthService = {
       
       if (authError) throw authError;
       
+      // Fetch technician profile from technicians table
       const { data: technicianData, error: techFetchError } = await supabase
         .from('technicians')
         .select('*')
@@ -72,13 +73,14 @@ export const technicianAuthService = {
     region: string,
     district: string,
     state: string,
-    locality: string, // Added locality parameter
+    locality: string,
     serviceAreaRange: number,
     experience: number,
     specialties: string[],
     pricing: Record<string, number>
   ) => {
     try {
+      // Register with Supabase Auth - password is stored securely by Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -96,6 +98,7 @@ export const technicianAuthService = {
         throw new Error("Failed to create user account");
       }
       
+      // Create technician record WITHOUT password (password is managed by Supabase Auth)
       const technicianData = {
         user_id: authData.user.id,
         name,
@@ -154,7 +157,7 @@ const mapTechnicianData = (data: any): Technician => {
     region: data.region,
     district: data.district,
     state: data.state,
-    locality: data.locality, // Added locality field
+    locality: data.locality,
     serviceAreaRange: data.service_area_range,
     experience: data.experience,
     specialties: data.specialties || [],
