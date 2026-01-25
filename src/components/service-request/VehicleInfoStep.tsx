@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { ServiceRequestFormData, VehicleType } from "./types";
 import { Car, Bike, Truck, ChevronDown } from "lucide-react";
 import { getCarBrands, getBikeBrands, getCommercialBrands, getBrandModels, VehicleBrand } from "../../data/indianVehicles";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const vehicleTypes: VehicleType[] = [
   { 
@@ -50,6 +50,19 @@ const VehicleInfoStep = ({
   const [selectedBrand, setSelectedBrand] = useState<string>("");
   const [availableBrands, setAvailableBrands] = useState<VehicleBrand[]>([]);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
+
+  // Load brands when component mounts if vehicleType is already set
+  useEffect(() => {
+    if (formData.vehicleType && availableBrands.length === 0) {
+      if (formData.vehicleType === "car") {
+        setAvailableBrands(getCarBrands());
+      } else if (formData.vehicleType === "bike") {
+        setAvailableBrands(getBikeBrands());
+      } else if (formData.vehicleType === "commercial") {
+        setAvailableBrands(getCommercialBrands());
+      }
+    }
+  }, [formData.vehicleType, availableBrands.length]);
 
   const handleVehicleTypeChange = (type: string) => {
     onVehicleTypeSelect(type);
