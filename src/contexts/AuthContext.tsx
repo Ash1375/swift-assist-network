@@ -46,62 +46,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const setupAuth = async () => {
       // Set up auth state listener FIRST
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, newSession) => {
+        (event, newSession) => {
           setSession(newSession);
           
           if (event === 'SIGNED_IN' && newSession) {
             localStorage.setItem('isAuthenticated', 'true');
-            try {
-              // Query by user_id since profiles table uses that column
-              const { data: profile, error } = await supabase
-                .from('profiles' as any)
-                .select('*')
-                .eq('user_id', newSession.user.id)
-                .maybeSingle();
-              
-              if (error && error.code !== 'PGRST116') {
-                console.error("Error fetching user profile:", error);
-              }
-              
-              if (profile) {
-                setUser({
-                  id: newSession.user.id,
-                  name: (profile as any).full_name || newSession.user.email?.split('@')[0] || 'User',
-                  email: newSession.user.email || '',
-                  subscription: (profile as any).subscription_tier || 'free',
-                });
-              } else {
-                // Create profile if it doesn't exist
-                const { error: insertError } = await supabase
+            
+            // Use setTimeout to avoid blocking the auth state change callback
+            setTimeout(async () => {
+              try {
+                // Query by user_id since profiles table uses that column
+                const { data: profile, error } = await supabase
                   .from('profiles' as any)
-                  .insert({
-                    user_id: newSession.user.id,
-                    full_name: newSession.user.user_metadata?.full_name || newSession.user.email?.split('@')[0] || 'User',
-                    email: newSession.user.email,
-                    subscription_tier: 'free'
-                  });
+                  .select('*')
+                  .eq('user_id', newSession.user.id)
+                  .maybeSingle();
                 
-                if (insertError) {
-                  console.error("Error creating profile:", insertError);
+                if (error && error.code !== 'PGRST116') {
+                  console.error("Error fetching user profile:", error);
                 }
                 
+                if (profile) {
+                  setUser({
+                    id: newSession.user.id,
+                    name: (profile as any).full_name || newSession.user.email?.split('@')[0] || 'User',
+                    email: newSession.user.email || '',
+                    subscription: (profile as any).subscription_tier || 'free',
+                  });
+                } else {
+                  // Create profile if it doesn't exist
+                  const { error: insertError } = await supabase
+                    .from('profiles' as any)
+                    .insert({
+                      user_id: newSession.user.id,
+                      full_name: newSession.user.user_metadata?.full_name || newSession.user.email?.split('@')[0] || 'User',
+                      email: newSession.user.email,
+                      subscription_tier: 'free'
+                    });
+                  
+                  if (insertError) {
+                    console.error("Error creating profile:", insertError);
+                  }
+                  
+                  setUser({
+                    id: newSession.user.id,
+                    name: newSession.user.user_metadata?.full_name || newSession.user.email?.split('@')[0] || 'User',
+                    email: newSession.user.email || '',
+                    subscription: 'free',
+                  });
+                }
+              } catch (error) {
+                console.error("Error in auth state change:", error);
+                // Set user anyway with basic info
                 setUser({
                   id: newSession.user.id,
-                  name: newSession.user.user_metadata?.full_name || newSession.user.email?.split('@')[0] || 'User',
+                  name: newSession.user.email?.split('@')[0] || 'User',
                   email: newSession.user.email || '',
                   subscription: 'free',
                 });
               }
-            } catch (error) {
-              console.error("Error in auth state change:", error);
-              // Set user anyway with basic info
-              setUser({
-                id: newSession.user.id,
-                name: newSession.user.email?.split('@')[0] || 'User',
-                email: newSession.user.email || '',
-                subscription: 'free',
-              });
-            }
+            }, 0);
           } else if (event === 'SIGNED_OUT') {
             setUser(null);
             localStorage.removeItem('isAuthenticated');

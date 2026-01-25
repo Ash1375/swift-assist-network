@@ -62,22 +62,22 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-6 text-white">Services</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/services/towing" className="text-gray-300 hover:text-red-500 transition-colors">Towing Services</Link>
+                <Link to="/request-service/towing" className="text-gray-300 hover:text-red-500 transition-colors">Towing Services</Link>
               </li>
               <li>
-                <Link to="/services/flat-tire" className="text-gray-300 hover:text-red-500 transition-colors">Flat Tire Repair</Link>
+                <Link to="/request-service/flat-tire" className="text-gray-300 hover:text-red-500 transition-colors">Flat Tire Repair</Link>
               </li>
               <li>
-                <Link to="/services/battery" className="text-gray-300 hover:text-red-500 transition-colors">Battery Jumpstart</Link>
+                <Link to="/request-service/battery" className="text-gray-300 hover:text-red-500 transition-colors">Battery Jumpstart</Link>
               </li>
               <li>
-                <Link to="/services/mechanical" className="text-gray-300 hover:text-red-500 transition-colors">Mechanical Repairs</Link>
+                <Link to="/request-service/mechanical" className="text-gray-300 hover:text-red-500 transition-colors">Mechanical Repairs</Link>
               </li>
               <li>
-                <Link to="/services/fuel" className="text-gray-300 hover:text-red-500 transition-colors">Fuel Delivery</Link>
+                <Link to="/request-service/fuel" className="text-gray-300 hover:text-red-500 transition-colors">Fuel Delivery</Link>
               </li>
               <li>
-                <Link to="/services/lockout" className="text-gray-300 hover:text-red-500 transition-colors">Lockout Assistance</Link>
+                <Link to="/request-service/lockout" className="text-gray-300 hover:text-red-500 transition-colors">Lockout Assistance</Link>
               </li>
             </ul>
           </div>
