@@ -59,14 +59,16 @@ const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
+  const location = window.location.pathname;
   
   if (loading) {
     return <LoadingAnimation />;
   }
   
   if (!isAuthenticated) {
-    window.location.href = '/login';
-    return null;
+    // Store the current path to redirect back after login
+    sessionStorage.setItem('returnUrl', location);
+    return <Navigate to="/login" replace />;
   }
   
   return <>{children}</>;
