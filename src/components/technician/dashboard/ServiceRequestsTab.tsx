@@ -1,83 +1,37 @@
-import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, Phone, CheckCircle, RefreshCw } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Clock, MapPin, Phone, CheckCircle, RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { useTechnicianAuth } from "@/contexts/TechnicianAuthContext";
-import { toast } from "@/components/ui/sonner";
-
-interface ServiceRequest {
-  id: string;
-  service_type: string;
-  vehicle_type: string;
-  vehicle_model: string;
-  address: string;
-  description: string;
-  contact_name: string;
-  contact_phone: string;
-  status: string;
-  created_at: string;
-}
+import { useRealtimeTechnicianRequests } from "@/hooks/useRealtimeTechnicianRequests";
+import { useMemo } from "react";
 
 const ServiceRequestsTab = () => {
   const { technician } = useTechnicianAuth();
-  const [requests, setRequests] = useState<ServiceRequest[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchRequests = async () => {
-    if (!technician) return;
-    
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('service_requests')
-        .select('*')
-        .eq('technician_id', technician.id)
-        .in('status', ['pending', 'assigned', 'en-route', 'in-progress'])
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setRequests(data || []);
-    } catch (error) {
-      console.error('Error fetching requests:', error);
-      toast.error('Failed to load service requests');
-    } finally {
-      setIsLoading(false);
+  
+  // Real-time subscription options
+  const realtimeOptions = useMemo(() => ({
+    onNewRequest: (request: any) => {
+      console.log('New request notification:', request);
+    },
+    onRequestUpdated: (request: any) => {
+      console.log('Request updated:', request);
     }
+  }), []);
+
+  const { 
+    requests, 
+    isLoading, 
+    isConnected,
+    refresh,
+    updateRequestStatus 
+  } = useRealtimeTechnicianRequests(technician?.id, realtimeOptions);
+
+  const handleStatusUpdate = async (requestId: string, newStatus: string) => {
+    await updateRequestStatus(requestId, newStatus);
   };
 
-  useEffect(() => {
-    fetchRequests();
-  }, [technician]);
-
-  const updateRequestStatus = async (requestId: string, newStatus: string) => {
-    try {
-      const updates: any = {
-        status: newStatus,
-        updated_at: new Date().toISOString()
-      };
-      
-      if (newStatus === 'completed') {
-        updates.completed_at = new Date().toISOString();
-      }
-
-      const { error } = await supabase
-        .from('service_requests')
-        .update(updates)
-        .eq('id', requestId);
-
-      if (error) throw error;
-      
-      toast.success(`Request ${newStatus === 'completed' ? 'completed' : 'updated'} successfully`);
-      fetchRequests();
-    } catch (error) {
-      console.error('Error updating request:', error);
-      toast.error('Failed to update request');
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | null) => {
     switch (status) {
       case 'pending':
         return <Badge variant="secondary">Pending</Badge>;
@@ -90,7 +44,7 @@ const ServiceRequestsTab = () => {
       case 'completed':
         return <Badge className="bg-green-500">Completed</Badge>;
       default:
-        return <Badge>{status}</Badge>;
+        return <Badge>{status || 'Unknown'}</Badge>;
     }
   };
 
@@ -110,12 +64,30 @@ const ServiceRequestsTab = () => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Service Requests</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Service Requests</CardTitle>
+            <Badge 
+              variant="outline" 
+              className={`text-xs ${isConnected ? 'border-green-500 text-green-600' : 'border-yellow-500 text-yellow-600'}`}
+            >
+              {isConnected ? (
+                <>
+                  <Wifi className="h-3 w-3 mr-1" />
+                  Live
+                </>
+              ) : (
+                <>
+                  <WifiOff className="h-3 w-3 mr-1" />
+                  Connecting
+                </>
+              )}
+            </Badge>
+          </div>
           <CardDescription>
-            View and respond to customer service requests
+            View and respond to customer service requests in real-time
           </CardDescription>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchRequests}>
+        <Button variant="outline" size="sm" onClick={refresh}>
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh
         </Button>
@@ -164,7 +136,7 @@ const ServiceRequestsTab = () => {
                   {request.status === 'assigned' && (
                     <Button
                       size="sm"
-                      onClick={() => updateRequestStatus(request.id, 'en-route')}
+                      onClick={() => handleStatusUpdate(request.id, 'en-route')}
                     >
                       Start Journey
                     </Button>
@@ -172,7 +144,7 @@ const ServiceRequestsTab = () => {
                   {request.status === 'en-route' && (
                     <Button
                       size="sm"
-                      onClick={() => updateRequestStatus(request.id, 'in-progress')}
+                      onClick={() => handleStatusUpdate(request.id, 'in-progress')}
                     >
                       Mark Arrived
                     </Button>
@@ -181,7 +153,7 @@ const ServiceRequestsTab = () => {
                     <Button
                       size="sm"
                       className="bg-green-600 hover:bg-green-700"
-                      onClick={() => updateRequestStatus(request.id, 'completed')}
+                      onClick={() => handleStatusUpdate(request.id, 'completed')}
                     >
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Complete
