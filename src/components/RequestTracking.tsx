@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
   MapPin, 
@@ -12,102 +12,56 @@ import {
   CreditCard,
   Star,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
-
-interface ServiceRequest {
-  id: string;
-  service_type: string;
-  vehicle_type: string;
-  vehicle_model: string;
-  address: string;
-  description: string;
-  contact_name: string;
-  contact_phone: string;
-  status: string;
-  payment_status: string;
-  created_at: string;
-  technician_id: string | null;
-}
-
-interface Technician {
-  id: string;
-  name: string;
-  phone: string;
-  rating: number;
-  specialties: string[];
-  avatar_url: string | null;
-}
+import { useRealtimeServiceRequest } from "@/hooks/useRealtimeServiceRequest";
 
 const RequestTracking = () => {
   const { requestId } = useParams<{ requestId: string }>();
   const navigate = useNavigate();
-  const [request, setRequest] = useState<ServiceRequest | null>(null);
-  const [technician, setTechnician] = useState<Technician | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showPayment, setShowPayment] = useState(false);
-  
-  const fetchRequestData = async () => {
-    if (!requestId) return;
-    
-    setIsLoading(true);
-    try {
-      const { data: requestData, error: requestError } = await supabase
-        .from('service_requests')
-        .select('*')
-        .eq('id', requestId)
-        .single();
 
-      if (requestError) throw requestError;
-      setRequest(requestData);
-
-      // Fetch technician if assigned
-      if (requestData.technician_id) {
-        const { data: techData, error: techError } = await supabase
-          .from('technicians')
-          .select('id, name, phone, rating, specialties, avatar_url')
-          .eq('id', requestData.technician_id)
-          .single();
-
-        if (!techError && techData) {
-          setTechnician(techData);
-        }
-      }
-
-      // Check if payment is pending
-      if (requestData.status === 'completed' && requestData.payment_status === 'pending') {
-        setShowPayment(true);
-      }
-    } catch (error) {
-      console.error('Error fetching request:', error);
-      toast.error('Failed to load request details');
-    } finally {
-      setIsLoading(false);
+  // Use real-time subscription hook with callbacks
+  const realtimeOptions = useMemo(() => ({
+    onStatusChange: (oldStatus: string | null, newStatus: string | null) => {
+      console.log(`Status changed from ${oldStatus} to ${newStatus}`);
+    },
+    onTechnicianAssigned: () => {
+      console.log('Technician assigned!');
     }
-  };
+  }), []);
 
+  const { 
+    request, 
+    technician, 
+    isLoading, 
+    isConnected,
+    refresh 
+  } = useRealtimeServiceRequest(requestId, realtimeOptions);
+
+  // Update elapsed time every 10 seconds
   useEffect(() => {
-    fetchRequestData();
-    
-    // Poll for updates every 30 seconds
-    const pollInterval = setInterval(fetchRequestData, 30000);
-    
-    // Update elapsed time
     const timer = setInterval(() => {
       setElapsedTime(prev => prev + 1);
     }, 10000);
     
-    return () => {
-      clearInterval(pollInterval);
-      clearInterval(timer);
-    };
-  }, [requestId]);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Check if payment should be shown
+  useEffect(() => {
+    if (request?.status === 'completed' && request?.payment_status === 'pending') {
+      setShowPayment(true);
+    }
+  }, [request?.status, request?.payment_status]);
   
   const formatElapsedTime = () => {
     if (elapsedTime < 6) {
@@ -182,12 +136,31 @@ const RequestTracking = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">Tracking Your Request</h1>
-              <p className="mt-2">Request #{requestId?.slice(0, 8)}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <p>Request #{requestId?.slice(0, 8)}</p>
+                {/* Real-time connection indicator */}
+                <Badge 
+                  variant="outline" 
+                  className={`text-xs ${isConnected ? 'border-green-300 text-green-100' : 'border-yellow-300 text-yellow-100'}`}
+                >
+                  {isConnected ? (
+                    <>
+                      <Wifi className="h-3 w-3 mr-1" />
+                      Live
+                    </>
+                  ) : (
+                    <>
+                      <WifiOff className="h-3 w-3 mr-1" />
+                      Connecting...
+                    </>
+                  )}
+                </Badge>
+              </div>
             </div>
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={fetchRequestData}
+              onClick={refresh}
               className="text-white border-white hover:bg-white/20"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
