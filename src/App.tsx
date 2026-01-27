@@ -41,6 +41,8 @@ import ApproveTechnician from "./pages/admin/ApproveTechnician";
 import RejectTechnician from "./pages/admin/RejectTechnician";
 import TechnicianManagement from "./pages/admin/TechnicianManagement";
 import TechnicianDetails from "./pages/admin/TechnicianDetails";
+import AddTechnician from "./pages/admin/AddTechnician";
+import MyRequests from "./pages/MyRequests";
 import TechnicianApplications from "./pages/admin/TechnicianApplications";
 
 import CarServiceRequest from "./components/vehicle-services/CarServiceRequest";
@@ -103,6 +105,7 @@ const App = () => (
                   <Route path="request-service/:serviceId/ev" element={<ProtectedRoute><EVServiceRequest /></ProtectedRoute>} />
                   <Route path="request-tracking/:requestId" element={<ProtectedRoute><RequestTracking /></ProtectedRoute>} />
                   <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                  <Route path="my-requests" element={<ProtectedRoute><MyRequests /></ProtectedRoute>} />
                   <Route path="marketplace" element={<Marketplace />} />
                   <Route path="marketplace/product/:id" element={<ProductDetail />} />
                   <Route path="service-communication/:serviceId" element={<ProtectedRoute><ServiceCommunicationPage /></ProtectedRoute>} />
@@ -129,6 +132,7 @@ const App = () => (
                   <Route index element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="dashboard" element={<AdminDashboard />} />
                   <Route path="technicians" element={<TechnicianManagement />} />
+                  <Route path="technicians/add" element={<AddTechnician />} />
                   <Route path="applications" element={<TechnicianApplications />} />
                   <Route path="analytics" element={<AdminAnalytics />} />
                   <Route path="settings" element={<AdminSettings />} />

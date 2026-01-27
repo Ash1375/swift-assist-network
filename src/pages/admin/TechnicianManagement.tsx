@@ -1,20 +1,20 @@
 
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Technician } from "@/types/technician";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, UserPlus } from "lucide-react";
 import { mapTechnicianData } from "@/utils/technicianMappers";
 
 type FilterStatus = 'all' | 'pending' | 'verified' | 'rejected';
 
 const TechnicianManagement = () => {
+  const navigate = useNavigate();
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterStatus>('all');
@@ -71,24 +71,24 @@ const TechnicianManagement = () => {
   
   return (
     <div className="container py-8">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">Technician Management</h1>
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-wrap items-center gap-4">
           <div className="relative">
             <Input
               type="search"
               placeholder="Search technicians..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pr-10"
+              className="pr-10 w-64"
             />
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
           </div>
           
           <Select value={filter} onValueChange={handleFilterChange}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[150px]">
               <Filter className="w-4 h-4 mr-2" />
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder="Filter" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
@@ -97,6 +97,11 @@ const TechnicianManagement = () => {
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
+          
+          <Button onClick={() => navigate("/admin/technicians/add")}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            Add Technician
+          </Button>
         </div>
       </div>
       

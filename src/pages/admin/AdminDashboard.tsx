@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Check, Clock, UserCheck, Users, X } from "lucide-react";
+import { BarChart, Check, Clock, UserCheck, Users, X, UserPlus } from "lucide-react";
 import { Technician } from "@/types/technician";
 import { supabase } from "@/integrations/supabase/client";
 import { mapTechnicianData } from "@/utils/technicianMappers";
@@ -179,6 +179,19 @@ const AdminDashboard = () => {
             <CardDescription>Common administrative tasks</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <a 
+              href="/admin/technicians/add"
+              className="block p-4 border rounded-md hover:bg-muted/50 transition-colors bg-primary/5 border-primary/20"
+            >
+              <div className="flex items-center">
+                <UserPlus className="h-5 w-5 text-primary mr-3" />
+                <span className="font-medium">Add New Technician</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                Manually add a technician with their services and pricing
+              </p>
+            </a>
+            
             <a 
               href="/admin/technicians"
               className="block p-4 border rounded-md hover:bg-muted/50 transition-colors"
