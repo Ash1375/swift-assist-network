@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Clock, MapPin, Phone, Car, Wrench, CheckCircle, AlertCircle, RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { Clock, MapPin, Car, Wrench, CheckCircle, AlertCircle, RefreshCw, Wifi, WifiOff, Star } from "lucide-react";
 import { format } from "date-fns";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { toast } from "@/components/ui/sonner";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import NotificationBanner from "@/components/notifications/NotificationBanner";
+import TechnicianRatingDialog from "@/components/rating/TechnicianRatingDialog";
 
 interface ServiceRequest {
   id: string;
@@ -22,7 +25,9 @@ interface ServiceRequest {
   updated_at: string;
   technician_id: string | null;
   contact_phone: string | null;
+  has_review?: boolean;
   technician?: {
+    id: string;
     name: string;
     phone: string;
     rating: number | null;
@@ -35,6 +40,13 @@ const MyRequests = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
   const [activeTab, setActiveTab] = useState("active");
+  const [showNotificationBanner, setShowNotificationBanner] = useState(true);
+  const [ratingDialog, setRatingDialog] = useState<{
+    open: boolean;
+    request: ServiceRequest | null;
+  }>({ open: false, request: null });
+  
+  const { sendNotification, permission } = usePushNotifications();
 
   useEffect(() => {
     if (!user) return;
@@ -48,18 +60,27 @@ const MyRequests = () => {
           .from('service_requests')
           .select(`
             *,
-            technician:technicians(name, phone, rating)
+            technician:technicians(id, name, phone, rating)
           `)
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
         
+        // Fetch reviews to check which requests have been reviewed
+        const { data: reviews } = await supabase
+          .from('reviews')
+          .select('service_request_id')
+          .eq('user_id', user.id);
+        
+        const reviewedIds = new Set((reviews || []).map(r => r.service_request_id));
+        
         // Map the data to handle the nested technician object
         const mappedData = (data || []).map(req => ({
           ...req,
-          technician: req.technician ? req.technician : null
-        }));
+          technician: req.technician ? req.technician : null,
+          has_review: reviewedIds.has(req.id)
+        })) as ServiceRequest[];
         
         setRequests(mappedData);
       } catch (error) {
@@ -90,27 +111,32 @@ const MyRequests = () => {
             // Fetch the full data with technician info
             const { data } = await supabase
               .from('service_requests')
-              .select(`*, technician:technicians(name, phone, rating)`)
+              .select(`*, technician:technicians(id, name, phone, rating)`)
               .eq('id', payload.new.id)
               .single();
             
             if (data) {
               setRequests(prev => [{
                 ...data,
-                technician: data.technician || null
-              }, ...prev]);
+                technician: data.technician || null,
+                has_review: false
+              } as ServiceRequest, ...prev]);
               toast.success('New request created!');
             }
           } else if (payload.eventType === 'UPDATE') {
             const { data } = await supabase
               .from('service_requests')
-              .select(`*, technician:technicians(name, phone, rating)`)
+              .select(`*, technician:technicians(id, name, phone, rating)`)
               .eq('id', payload.new.id)
               .single();
             
             if (data) {
               setRequests(prev => prev.map(req => 
-                req.id === data.id ? { ...data, technician: data.technician || null } : req
+                req.id === data.id ? { 
+                  ...data, 
+                  technician: data.technician || null,
+                  has_review: req.has_review 
+                } as ServiceRequest : req
               ));
               
               // Show status update notification
@@ -124,6 +150,11 @@ const MyRequests = () => {
               
               if (data.status && statusMessages[data.status]) {
                 toast.success(statusMessages[data.status]);
+                // Send push notification
+                sendNotification(`Service Update: ${data.service_type}`, {
+                  body: statusMessages[data.status],
+                  tag: `service-${data.id}`,
+                });
               }
             }
           }
@@ -197,13 +228,35 @@ const MyRequests = () => {
           )}
         </div>
 
-        {['pending', 'assigned', 'en-route', 'in-progress', 'arrived'].includes(request.status || '') && (
-          <Link to={`/request-tracking/${request.id}`}>
-            <Button variant="outline" size="sm" className="w-full">
-              Track Request
+        <div className="flex gap-2">
+          {['pending', 'assigned', 'en-route', 'in-progress', 'arrived'].includes(request.status || '') && (
+            <Link to={`/request-tracking/${request.id}`} className="flex-1">
+              <Button variant="outline" size="sm" className="w-full">
+                Track Request
+              </Button>
+            </Link>
+          )}
+          
+          {/* Show rate button for completed requests without review */}
+          {request.status === 'completed' && request.technician && !request.has_review && (
+            <Button 
+              size="sm" 
+              className="gap-1"
+              onClick={() => setRatingDialog({ open: true, request })}
+            >
+              <Star className="h-4 w-4" />
+              Rate Service
             </Button>
-          </Link>
-        )}
+          )}
+          
+          {/* Show rated badge */}
+          {request.status === 'completed' && request.has_review && (
+            <Badge variant="secondary" className="gap-1">
+              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+              Rated
+            </Badge>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -220,6 +273,13 @@ const MyRequests = () => {
 
   return (
     <div className="container py-6 max-w-4xl">
+      {/* Notification permission banner */}
+      {showNotificationBanner && permission === "default" && (
+        <div className="mb-6">
+          <NotificationBanner onDismiss={() => setShowNotificationBanner(false)} />
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">My Service Requests</h1>
@@ -294,6 +354,24 @@ const MyRequests = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Rating Dialog */}
+      {ratingDialog.request && ratingDialog.request.technician && user && (
+        <TechnicianRatingDialog
+          open={ratingDialog.open}
+          onOpenChange={(open) => setRatingDialog({ ...ratingDialog, open })}
+          serviceRequestId={ratingDialog.request.id}
+          technicianId={ratingDialog.request.technician.id}
+          technicianName={ratingDialog.request.technician.name}
+          userId={user.id}
+          onSuccess={() => {
+            // Mark the request as reviewed locally
+            setRequests(prev => prev.map(r => 
+              r.id === ratingDialog.request?.id ? { ...r, has_review: true } : r
+            ));
+          }}
+        />
+      )}
     </div>
   );
 };
