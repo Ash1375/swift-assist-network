@@ -1,15 +1,14 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Technician } from "@/types/technician";
 import { mapTechnicianData } from "@/utils/technicianMappers";
 import { useTechnicianAuth } from "@/contexts/TechnicianAuthContext";
+import TechnicianReviews from "@/components/rating/TechnicianReviews";
 import { 
   User, 
   Mail, 
@@ -373,6 +372,18 @@ const TechnicianDetails = () => {
                   </div>
                 )}
               </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className="h-5 w-5 text-yellow-400" />
+                Customer Reviews
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TechnicianReviews technicianId={technician.id} />
             </CardContent>
           </Card>
           
