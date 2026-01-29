@@ -8,7 +8,6 @@ import { submitTechnicianApplication } from "@/utils/technicianFormSubmission";
 import { Button } from "@/components/ui/button";
 
 const TechnicianRegister = () => {
-  const { register } = useTechnicianAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   
@@ -19,7 +18,6 @@ const TechnicianRegister = () => {
       await submitTechnicianApplication(
         data,
         resumeFile,
-        register,
         () => navigate("/technician/login")
       );
     } finally {

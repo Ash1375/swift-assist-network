@@ -1,11 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client"; 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "@/components/ui/sonner"; 
-import { emailService } from "@/services/emailService";
+import { toast } from "@/components/ui/sonner";
+import { apiFetch } from "@/lib/api";
+import { technicianAdminService } from "@/services/technicianAdminService";
 import { Loader2 } from "lucide-react";
 
 const ApproveTechnician = () => {
@@ -19,62 +18,37 @@ const ApproveTechnician = () => {
 
   useEffect(() => {
     const fetchTechnicianData = async () => {
+      if (!technicianId) return;
       try {
-        const { data: technician, error } = await supabase
-          .from('technicians')
-          .select('name, email, verification_status')
-          .eq('id', technicianId)
-          .single();
-        
-        if (error) throw error;
-        
-        if (technician) {
-          setTechnicianName(technician.name);
-          setTechnicianEmail(technician.email);
-          
-          // Check if already approved
-          if (technician.verification_status === 'verified') {
-            setError("This technician has already been approved.");
-          }
-        } else {
+        const res = await apiFetch(`/api/technicians/${technicianId}`, { method: "GET", admin: true });
+        if (!res.ok) {
           setError("Technician not found.");
+          return;
         }
-      } catch (error: any) {
-        console.error("Error fetching technician:", error);
-        setError(error.message || "An error occurred while fetching technician data");
+        const technician = await res.json();
+        setTechnicianName(technician.name);
+        setTechnicianEmail(technician.email);
+        if (technician.verification_status === "verified") {
+          setError("This technician has already been approved.");
+        }
+      } catch {
+        setError("An error occurred while fetching technician data");
       } finally {
         setIsLoading(false);
       }
     };
-    
     fetchTechnicianData();
   }, [technicianId]);
 
   const handleApproval = async () => {
     if (!technicianId) return;
-    
     setIsSubmitting(true);
     try {
-      // Update technician status in database
-      const { error } = await supabase
-        .from('technicians')
-        .update({ verification_status: 'verified' })
-        .eq('id', technicianId);
-        
-      if (error) throw error;
-      
-      // Send approval email
-      await emailService.sendTechnicianStatusEmail(
-        technicianEmail,
-        technicianName,
-        true
-      );
-      
-      toast.success("Technician approved successfully");
-      navigate("/");
-    } catch (error: any) {
-      console.error("Error approving technician:", error);
-      toast.error(error.message || "Failed to approve technician");
+      const success = await technicianAdminService.approveTechnician(technicianId);
+      if (success) {
+        toast.success("Technician approved successfully");
+        navigate("/admin/applications");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -87,7 +61,7 @@ const ApproveTechnician = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="container py-12 max-w-md">
       <Card>
@@ -119,12 +93,12 @@ const ApproveTechnician = () => {
         <CardFooter className="flex justify-between">
           <Button
             variant="outline"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/admin/applications")}
             disabled={isSubmitting}
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleApproval}
             disabled={!!error || isSubmitting}
             className="bg-green-600 hover:bg-green-700"

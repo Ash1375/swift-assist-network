@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { supabase } from "@/integrations/supabase/client";
+import { apiFetch } from "@/lib/api";
 import { toast } from "@/components/ui/sonner";
 import { ArrowLeft, UserPlus, Save } from "lucide-react";
 import { services } from "@/components/services-page/ServicesData";
@@ -26,6 +26,7 @@ const AddTechnician = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    password: "",
     phone: "",
     address: "",
     state: "",
@@ -89,35 +90,34 @@ const AddTechnician = () => {
     setIsSubmitting(true);
 
     try {
-      const { data, error } = await supabase
-        .from('technicians')
-        .insert({
+      const res = await apiFetch("/api/technicians/create", {
+        method: "POST",
+        admin: true,
+        body: JSON.stringify({
           name: formData.name,
           email: formData.email,
+          password: formData.password || undefined,
           phone: formData.phone,
           address: formData.address,
           state: formData.state,
           district: formData.district,
           region: formData.region,
           locality: formData.locality,
-          service_area_range: formData.serviceAreaRange,
+          serviceAreaRange: formData.serviceAreaRange,
           experience: formData.experience,
           specialties: formData.specialties,
           pricing: formData.pricing,
-          verification_status: formData.verificationStatus,
-          rating: 0,
-          completed_jobs: 0
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
+          status: formData.verificationStatus,
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Failed to add technician");
+      }
       toast.success("Technician added successfully!");
       navigate("/admin/technicians");
-    } catch (error: any) {
-      console.error("Error adding technician:", error);
-      toast.error(error.message || "Failed to add technician");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to add technician");
     } finally {
       setIsSubmitting(false);
     }
@@ -184,6 +184,16 @@ const AddTechnician = () => {
                     onChange={(e) => handleChange("phone", e.target.value)}
                     placeholder="+91 XXXXXXXXXX"
                     required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Initial password (min 8 chars; leave blank for default)</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => handleChange("password", e.target.value)}
+                    placeholder="Optional"
                   />
                 </div>
                 <div className="space-y-2">

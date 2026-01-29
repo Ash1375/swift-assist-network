@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Technician } from "@/types/technician";
-import { supabase } from "@/integrations/supabase/client";
+import { apiFetch } from "@/lib/api";
 import { Search, Eye, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { mapTechnicianData } from "@/utils/technicianMappers";
 import {
@@ -21,59 +20,45 @@ import {
 import { technicianAdminService } from "@/services/technicianAdminService";
 import { toast } from "@/components/ui/sonner";
 
+const statusToTab: Record<string, string> = {
+  pending: "pending",
+  verified: "approved",
+  rejected: "rejected",
+};
+
 const TechnicianApplications = () => {
   const [applications, setApplications] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState("pending");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  
+
   const fetchApplications = async (showLoading = true) => {
     if (showLoading) setLoading(true);
     try {
-      // Ensure admin is logged in before calling Edge Function
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session) {
-        console.error('Admin not logged in:', sessionError);
-        toast.error("Please log in as admin to view applications");
-        setLoading(false);
-        return;
-      }
+      const statusParam = activeTab === "all" ? "" : statusToTab[activeTab] || activeTab;
+      const path = statusParam ? `/api/technicians/list?status=${statusParam}` : "/api/technicians/list";
+      const res = await apiFetch(path, { method: "GET", admin: true });
 
-      // Admin-only: get-technician-applications requires Authorization: Bearer <admin_access_token>.
-      // supabase.functions.invoke sends the current session (admin must be logged in).
-      const { data, error } = await supabase.functions.invoke('get-technician-applications', {
-        method: 'POST',
-        body: { status: activeTab },
-      });
-
-      if (error) {
-        console.error('Edge Function error:', error);
-        if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
-          toast.error("Admin authentication failed. Please log in again.");
-        } else {
-          throw error;
+      if (!res.ok) {
+        if (res.status === 401) {
+          toast.error("Please log in as admin to view applications");
+          setLoading(false);
+          return;
         }
-        return;
+        throw new Error("Failed to load applications");
       }
 
-      const result = data as { error?: string; applications?: unknown[] } | null;
-      if (result?.error) {
-        console.error('Edge Function returned error:', result.error);
-        throw new Error(result.error);
-      }
-
-      const rows = Array.isArray(result?.applications) ? result.applications : [];
-      const mappedTechnicians = rows.map((row: unknown) => mapTechnicianData(row));
+      const rows = await res.json();
+      const mappedTechnicians = (Array.isArray(rows) ? rows : []).map((row: unknown) => mapTechnicianData(row));
       setApplications(mappedTechnicians);
-    } catch (error) {
-      console.error('Error fetching applications:', error);
+    } catch {
       toast.error("Failed to load applications");
     } finally {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchApplications();
   }, [activeTab]);
@@ -123,12 +108,12 @@ const TechnicianApplications = () => {
       .map(([k, v]) => `${k}: ₹${v}`)
       .join(", ") || "-";
   };
-  
+
   return (
     <div className="w-full max-w-full animate-fade-in">
       <h1 className="text-2xl md:text-3xl font-bold mb-2">Technician Applications</h1>
       <p className="text-muted-foreground mb-6">Review and manage technician applications</p>
-      
+
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
         <div className="flex-1 relative">
           <Input
@@ -141,7 +126,7 @@ const TechnicianApplications = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         </div>
       </div>
-      
+
       <Tabs defaultValue="pending" value={activeTab} onValueChange={setActiveTab}>
         <div className="mb-6">
           <TabsList className="grid grid-cols-4 w-full sm:w-[400px]">
@@ -151,7 +136,7 @@ const TechnicianApplications = () => {
             <TabsTrigger value="rejected">Rejected</TabsTrigger>
           </TabsList>
         </div>
-        
+
         <TabsContent value={activeTab} className="mt-0">
           <Card className="overflow-hidden">
             <CardContent className="p-0 overflow-x-auto">

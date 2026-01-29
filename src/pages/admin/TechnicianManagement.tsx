@@ -7,42 +7,42 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Technician } from "@/types/technician";
-import { supabase } from "@/integrations/supabase/client";
+import { apiFetch } from "@/lib/api";
 import { Search, Filter, UserPlus } from "lucide-react";
 import { mapTechnicianData } from "@/utils/technicianMappers";
 
-type FilterStatus = 'all' | 'pending' | 'verified' | 'rejected';
+type FilterStatus = "all" | "pending" | "verified" | "rejected";
+
+const statusToApi: Record<FilterStatus, string> = {
+  all: "",
+  pending: "pending",
+  verified: "approved",
+  rejected: "rejected",
+};
 
 const TechnicianManagement = () => {
   const navigate = useNavigate();
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<FilterStatus>('all');
-  const [search, setSearch] = useState('');
-  
+  const [filter, setFilter] = useState<FilterStatus>("all");
+  const [search, setSearch] = useState("");
+
   useEffect(() => {
     const fetchTechnicians = async () => {
       try {
-        let query = supabase.from('technicians').select('*');
-        
-        if (filter !== 'all') {
-          query = query.eq('verification_status', filter);
-        }
-        
-        const { data, error } = await query;
-        
-        if (error) throw error;
-        
-        // Map the data to our Technician type using the mapper utility
-        const mappedTechnicians = data.map(mapTechnicianData);
+        const status = statusToApi[filter];
+        const path = status ? `/api/technicians/list?status=${status}` : "/api/technicians/list";
+        const res = await apiFetch(path, { method: "GET", admin: true });
+        if (!res.ok) return;
+        const data = await res.json();
+        const mappedTechnicians = (Array.isArray(data) ? data : []).map(mapTechnicianData);
         setTechnicians(mappedTechnicians);
-      } catch (error) {
-        console.error('Error fetching technicians:', error);
+      } catch {
+        // ignore
       } finally {
         setLoading(false);
       }
     };
-    
     fetchTechnicians();
   }, [filter]);
 

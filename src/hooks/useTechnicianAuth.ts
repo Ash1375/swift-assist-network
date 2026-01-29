@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { Technician } from "@/types/technician";
-import { supabase } from "@/integrations/supabase/client";
 import { technicianAuthService } from "@/services/technicianAuthService";
 import { technicianAdminService } from "@/services/technicianAdminService";
+import { getTechnicianToken } from "@/lib/api";
 
 export const useTechnicianAuth = () => {
   const [technician, setTechnician] = useState<Technician | null>(null);
@@ -11,55 +10,24 @@ export const useTechnicianAuth = () => {
 
   useEffect(() => {
     const checkTechnicianAuth = async () => {
-      // Check if there is an active Supabase session
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        // Check if the authenticated user is a technician
+      const token = getTechnicianToken();
+      if (token) {
         try {
-          const techData = await technicianAuthService.fetchTechnicianProfile(session.user.email!);
+          const techData = await technicianAuthService.fetchTechnicianProfile("");
           if (techData) {
             setTechnician(techData);
             localStorage.setItem("resqnow_technician", JSON.stringify(techData));
           } else {
-            // User is authenticated but not a technician
             localStorage.removeItem("resqnow_technician");
           }
-        } catch (error: any) {
-          // PGRST116 or "not found" errors are expected for non-technicians
-          if (error?.code === 'PGRST116' || error?.message?.includes('not found')) {
-            localStorage.removeItem("resqnow_technician");
-          } else {
-            console.error("Error fetching technician:", error);
-          }
+        } catch {
+          localStorage.removeItem("resqnow_technician");
         }
       } else {
-        // Check if we have stored technician information locally
-        const storedTechnician = localStorage.getItem("resqnow_technician");
-        if (storedTechnician) {
-          const parsedTech = JSON.parse(storedTechnician);
-          // Validate that the stored technician data is still valid via API call
-          try {
-            const data = await technicianAuthService.validateStoredTechnician(parsedTech.id);
-            if (data) {
-              // Update the verification status which might have changed
-              parsedTech.verification_status = data.verification_status;
-              setTechnician(parsedTech);
-              localStorage.setItem("resqnow_technician", JSON.stringify(parsedTech));
-            } else {
-              // If technician no longer exists, clear local storage
-              localStorage.removeItem("resqnow_technician");
-            }
-          } catch (error) {
-            console.error("Error validating stored technician:", error);
-            localStorage.removeItem("resqnow_technician");
-          }
-        }
+        localStorage.removeItem("resqnow_technician");
       }
-      
       setIsLoading(false);
     };
-    
     checkTechnicianAuth();
   }, []);
 
@@ -71,15 +39,15 @@ export const useTechnicianAuth = () => {
   };
 
   const register = async (
-    name: string, 
-    email: string, 
-    password: string, 
-    phone: string, 
+    name: string,
+    email: string,
+    password: string,
+    phone: string,
     address: string,
     region: string,
     district: string,
     state: string,
-    locality: string, // Added locality parameter 
+    locality: string,
     serviceAreaRange: number,
     experience: number,
     specialties: string[],
@@ -90,7 +58,6 @@ export const useTechnicianAuth = () => {
       region, district, state, locality, serviceAreaRange,
       experience, specialties, pricing
     );
-    
     setTechnician(technicianData);
     localStorage.setItem("resqnow_technician", JSON.stringify(technicianData));
     return technicianData;

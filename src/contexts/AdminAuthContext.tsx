@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
-import { Session, User } from "@supabase/supabase-js";
+import { apiFetch, setAdminToken, getAdminToken } from "@/lib/api";
 
 interface AdminUser {
   id: string;
@@ -29,146 +28,64 @@ const AdminAuthContext = createContext<AdminAuthContextType>({
   checkAdminAccess: async () => false,
 });
 
+const ADMIN_STORAGE_KEY = "resqnow_admin_user";
+
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Check if user has admin role using server-side validation
-  const verifyAdminRole = async (userId: string): Promise<boolean> => {
-    try {
-      const { data, error } = await supabase
-        .rpc('has_role', { _user_id: userId, _role: 'admin' });
-      
-      if (error) {
-        console.error("Error checking admin role:", error);
-        return false;
-      }
-      
-      return data === true;
-    } catch (error) {
-      console.error("Error verifying admin role:", error);
-      return false;
-    }
-  };
-
-  // Fetch user profile data
-  const fetchUserProfile = async (user: User): Promise<AdminUser | null> => {
-    const isAdmin = await verifyAdminRole(user.id);
-    
-    if (!isAdmin) {
-      return null;
-    }
-
-    // Get user profile for display name (handle missing profile gracefully)
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('full_name')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    return {
-      id: user.id,
-      email: user.email || '',
-      name: profile?.full_name || user.email?.split('@')[0] || 'Admin',
-      role: 'admin'
-    };
-  };
-
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          // Use setTimeout to avoid potential deadlocks with Supabase auth
-          setTimeout(async () => {
-            const adminData = await fetchUserProfile(session.user);
-            setAdminUser(adminData);
-            setIsLoading(false);
-          }, 0);
-        } else {
-          setAdminUser(null);
-          setIsLoading(false);
-        }
+    const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
+    if (stored && getAdminToken()) {
+      try {
+        const user = JSON.parse(stored) as AdminUser;
+        setAdminUser(user);
+      } catch {
+        localStorage.removeItem(ADMIN_STORAGE_KEY);
+        setAdminToken(null);
       }
-    );
-
-    // Then check for existing session
-    const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const adminData = await fetchUserProfile(session.user);
-        setAdminUser(adminData);
-      }
-      setIsLoading(false);
-    };
-
-    initializeAuth();
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    }
+    setIsLoading(false);
   }, []);
 
   const loginAdmin = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Use Supabase Auth for login
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const res = await apiFetch("/api/admin/login", {
+        method: "POST",
+        body: JSON.stringify({ email: email.trim(), password }),
       });
-
-      if (authError) {
-        throw new Error(authError.message);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Invalid email or password.");
       }
-
-      if (!authData.user) {
-        throw new Error("Login failed");
-      }
-
-      // Verify admin role server-side
-      const isAdmin = await verifyAdminRole(authData.user.id);
-      
-      if (!isAdmin) {
-        // Sign out if not an admin
-        await supabase.auth.signOut();
-        throw new Error("Access denied: Admin privileges required");
-      }
-
-      const adminData = await fetchUserProfile(authData.user);
-      
-      if (!adminData) {
-        await supabase.auth.signOut();
-        throw new Error("Access denied: Admin privileges required");
-      }
-
-      setAdminUser(adminData);
+      const data = await res.json();
+      setAdminToken(data.token);
+      const admin = data.admin as AdminUser;
+      setAdminUser(admin);
+      localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(admin));
       toast.success("Admin login successful");
       navigate("/admin/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Admin login failed");
-      throw error;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Admin login failed";
+      toast.error(message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
   };
 
   const logoutAdmin = async () => {
-    await supabase.auth.signOut();
+    setAdminToken(null);
+    localStorage.removeItem(ADMIN_STORAGE_KEY);
     setAdminUser(null);
     toast.success("Admin logged out");
     navigate("/");
   };
 
   const checkAdminAccess = async (): Promise<boolean> => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session?.user) {
-      return false;
-    }
-
-    return verifyAdminRole(session.user.id);
+    return !!getAdminToken();
   };
 
   return (
@@ -197,23 +114,19 @@ export const AdminProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ c
   useEffect(() => {
     const verify = async () => {
       if (!isLoading) {
-        // Always verify admin status server-side
         const hasAccess = await checkAdminAccess();
         setVerified(hasAccess);
-        
         if (!hasAccess) {
           toast.error("Admin access required");
           navigate("/admin/login");
         }
       }
     };
-    
     verify();
   }, [isLoading, isAdminAuthenticated, navigate, checkAdminAccess]);
 
   if (isLoading || verified === null) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
-
   return verified ? <>{children}</> : null;
 };

@@ -1,11 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client"; 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "@/components/ui/sonner"; 
-import { emailService } from "@/services/emailService";
+import { toast } from "@/components/ui/sonner";
+import { apiFetch } from "@/lib/api";
+import { technicianAdminService } from "@/services/technicianAdminService";
 import { Loader2 } from "lucide-react";
 
 const RejectTechnician = () => {
@@ -19,62 +18,37 @@ const RejectTechnician = () => {
 
   useEffect(() => {
     const fetchTechnicianData = async () => {
+      if (!technicianId) return;
       try {
-        const { data: technician, error } = await supabase
-          .from('technicians')
-          .select('name, email, verification_status')
-          .eq('id', technicianId)
-          .single();
-        
-        if (error) throw error;
-        
-        if (technician) {
-          setTechnicianName(technician.name);
-          setTechnicianEmail(technician.email);
-          
-          // Check if already rejected
-          if (technician.verification_status === 'rejected') {
-            setError("This technician application has already been rejected.");
-          }
-        } else {
+        const res = await apiFetch(`/api/technicians/${technicianId}`, { method: "GET", admin: true });
+        if (!res.ok) {
           setError("Technician not found.");
+          return;
         }
-      } catch (error: any) {
-        console.error("Error fetching technician:", error);
-        setError(error.message || "An error occurred while fetching technician data");
+        const technician = await res.json();
+        setTechnicianName(technician.name);
+        setTechnicianEmail(technician.email);
+        if (technician.verification_status === "rejected") {
+          setError("This technician application has already been rejected.");
+        }
+      } catch {
+        setError("An error occurred while fetching technician data");
       } finally {
         setIsLoading(false);
       }
     };
-    
     fetchTechnicianData();
   }, [technicianId]);
 
   const handleRejection = async () => {
     if (!technicianId) return;
-    
     setIsSubmitting(true);
     try {
-      // Update technician status in database
-      const { error } = await supabase
-        .from('technicians')
-        .update({ verification_status: 'rejected' })
-        .eq('id', technicianId);
-        
-      if (error) throw error;
-      
-      // Send rejection email
-      await emailService.sendTechnicianStatusEmail(
-        technicianEmail,
-        technicianName,
-        false
-      );
-      
-      toast.success("Technician application rejected");
-      navigate("/");
-    } catch (error: any) {
-      console.error("Error rejecting technician:", error);
-      toast.error(error.message || "Failed to reject technician");
+      const success = await technicianAdminService.rejectTechnician(technicianId);
+      if (success) {
+        toast.success("Technician application rejected");
+        navigate("/admin/applications");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -87,7 +61,7 @@ const RejectTechnician = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="container py-12 max-w-md">
       <Card>
@@ -105,7 +79,7 @@ const RejectTechnician = () => {
           ) : (
             <div className="space-y-4">
               <p>
-                You are about to reject <strong>{technicianName}</strong>'s application.
+                You are about to reject <strong>{technicianName}</strong>&apos;s application.
               </p>
               <p>
                 An email notification will be sent to {technicianEmail} informing them about this decision.
@@ -119,12 +93,12 @@ const RejectTechnician = () => {
         <CardFooter className="flex justify-between">
           <Button
             variant="outline"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/admin/applications")}
             disabled={isSubmitting}
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleRejection}
             disabled={!!error || isSubmitting}
             variant="destructive"

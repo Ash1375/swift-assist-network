@@ -1,12 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Check, Clock, UserCheck, Users, X, UserPlus } from "lucide-react";
 import { Technician } from "@/types/technician";
-import { supabase } from "@/integrations/supabase/client";
+import { apiFetch } from "@/lib/api";
 import { mapTechnicianData } from "@/utils/technicianMappers";
 
 const AdminDashboard = () => {
@@ -16,60 +14,44 @@ const AdminDashboard = () => {
     pendingApplications: 0,
     rejectedApplications: 0
   });
-  
   const [recentApplications, setRecentApplications] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Fetch statistics
-        const { data: technicians, error } = await supabase
-          .from('technicians')
-          .select('id, verification_status');
-        
-        if (error) throw error;
-        
-        const totalCount = technicians ? technicians.length : 0;
-        const verifiedCount = technicians ? technicians.filter(t => t.verification_status === 'verified').length : 0;
-        const pendingCount = technicians ? technicians.filter(t => t.verification_status === 'pending').length : 0;
-        const rejectedCount = technicians ? technicians.filter(t => t.verification_status === 'rejected').length : 0;
-        
+        const res = await apiFetch("/api/technicians/list", { method: "GET", admin: true });
+        if (!res.ok) return;
+        const technicians = await res.json();
+        const list = (Array.isArray(technicians) ? technicians : []).map(mapTechnicianData);
+        const totalCount = list.length;
+        const verifiedCount = list.filter(t => t.verification_status === "verified").length;
+        const pendingCount = list.filter(t => t.verification_status === "pending").length;
+        const rejectedCount = list.filter(t => t.verification_status === "rejected").length;
         setStats({
           totalTechnicians: totalCount,
           verifiedTechnicians: verifiedCount,
           pendingApplications: pendingCount,
           rejectedApplications: rejectedCount
         });
-        
-        // Fetch recent applications
-        const { data: recentApps, error: recentError } = await supabase
-          .from('technicians')
-          .select('*')
-          .eq('verification_status', 'pending')
-          .order('created_at', { ascending: false })
-          .limit(5);
-          
-        if (recentError) throw recentError;
-        
-        setRecentApplications(recentApps ? recentApps.map(mapTechnicianData) : []);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+        const pending = list.filter(t => t.verification_status === "pending").slice(0, 5);
+        setRecentApplications(pending);
+      } catch {
+        // ignore
       } finally {
         setLoading(false);
       }
     };
-    
     fetchDashboardData();
   }, []);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'pending':
+      case "pending":
         return <Badge variant="secondary" className="ml-2">Pending</Badge>;
-      case 'verified':
+      case "verified":
         return <Badge variant="success" className="ml-2">Verified</Badge>;
-      case 'rejected':
+      case "rejected":
         return <Badge variant="destructive" className="ml-2">Rejected</Badge>;
       default:
         return <Badge className="ml-2">Unknown</Badge>;
@@ -81,8 +63,7 @@ const AdminDashboard = () => {
       <div className="px-4 md:px-0">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">Admin Dashboard</h1>
       </div>
-      
-      {/* Stats Cards */}
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8 px-4 md:px-0">
         <Card className="hover:shadow-md transition-all border-l-4 border-l-primary">
           <CardContent className="p-3 md:p-6 flex flex-col">
@@ -94,7 +75,6 @@ const AdminDashboard = () => {
             <p className="text-xs md:text-sm text-muted-foreground mt-1 md:mt-2">Technicians</p>
           </CardContent>
         </Card>
-        
         <Card className="hover:shadow-md transition-all border-l-4 border-l-green-500">
           <CardContent className="p-3 md:p-6 flex flex-col">
             <div className="flex items-center justify-between">
@@ -105,7 +85,6 @@ const AdminDashboard = () => {
             <p className="text-xs md:text-sm text-muted-foreground mt-1 md:mt-2">Ready</p>
           </CardContent>
         </Card>
-        
         <Card className="hover:shadow-md transition-all border-l-4 border-l-amber-500">
           <CardContent className="p-3 md:p-6 flex flex-col">
             <div className="flex items-center justify-between">
@@ -116,7 +95,6 @@ const AdminDashboard = () => {
             <p className="text-xs md:text-sm text-muted-foreground mt-1 md:mt-2">Review</p>
           </CardContent>
         </Card>
-        
         <Card className="hover:shadow-md transition-all border-l-4 border-l-red-500">
           <CardContent className="p-3 md:p-6 flex flex-col">
             <div className="flex items-center justify-between">
@@ -128,9 +106,8 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4 md:px-0">
-        {/* Recent Applications */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Recent Applications</CardTitle>
@@ -142,8 +119,8 @@ const AdminDashboard = () => {
             ) : recentApplications.length > 0 ? (
               <div className="space-y-6">
                 {recentApplications.map((technician) => (
-                  <div 
-                    key={technician.id} 
+                  <div
+                    key={technician.id}
                     className="flex items-start justify-between border-b border-border pb-4"
                   >
                     <div>
@@ -153,11 +130,11 @@ const AdminDashboard = () => {
                       </div>
                       <p className="text-sm text-muted-foreground">{technician.email}</p>
                       <p className="text-sm text-muted-foreground">
-                        {technician.specialties.join(', ')}
+                        {(technician.specialties || []).join(", ")}
                       </p>
                     </div>
                     <div className="text-right">
-                      <Link 
+                      <Link
                         to={`/admin/technician/${technician.id}`}
                         className="text-sm text-primary hover:underline"
                       >
@@ -172,15 +149,14 @@ const AdminDashboard = () => {
             )}
           </CardContent>
         </Card>
-        
-        {/* Quick Actions */}
+
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Common administrative tasks</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Link 
+            <Link
               to="/admin/technicians/add"
               className="block p-4 border rounded-md hover:bg-muted/50 transition-colors bg-primary/5 border-primary/20"
             >
@@ -192,8 +168,7 @@ const AdminDashboard = () => {
                 Manually add a technician with their services and pricing
               </p>
             </Link>
-            
-            <Link 
+            <Link
               to="/admin/technicians"
               className="block p-4 border rounded-md hover:bg-muted/50 transition-colors"
             >
@@ -205,8 +180,7 @@ const AdminDashboard = () => {
                 View, edit and manage all technician profiles
               </p>
             </Link>
-            
-            <Link 
+            <Link
               to="/admin/applications"
               className="block p-4 border rounded-md hover:bg-muted/50 transition-colors"
             >
@@ -218,8 +192,7 @@ const AdminDashboard = () => {
                 Review and process pending applications
               </p>
             </Link>
-            
-            <Link 
+            <Link
               to="/admin/analytics"
               className="block p-4 border rounded-md hover:bg-muted/50 transition-colors"
             >

@@ -1,6 +1,6 @@
 import { toast } from "@/components/ui/sonner";
 import { RegisterFormValues } from "@/types/technician-registration";
-import { resumeService } from "@/services/resumeService";
+import { technicianAuthService } from "@/services/technicianAuthService";
 
 function toNumber(value: unknown): number {
   if (typeof value === "number" && !Number.isNaN(value)) return value;
@@ -10,22 +10,7 @@ function toNumber(value: unknown): number {
 
 export const submitTechnicianApplication = async (
   data: RegisterFormValues,
-  resumeFile: File | null,
-  register: (
-    name: string,
-    email: string,
-    password: string,
-    phone: string,
-    address: string,
-    region: string,
-    district: string,
-    state: string,
-    locality: string,
-    serviceAreaRange: number,
-    experience: number,
-    specialties: string[],
-    pricing: Record<string, number>
-  ) => Promise<unknown>,
+  _resumeFile: File | null,
   onSuccess: () => void
 ) => {
   try {
@@ -41,7 +26,7 @@ export const submitTechnicianApplication = async (
       winching: toNumber(p.winching)
     };
 
-    const technician = await register(
+    await technicianAuthService.register(
       (data.name || "").trim(),
       (data.email || "").trim().toLowerCase(),
       data.password,
@@ -57,20 +42,11 @@ export const submitTechnicianApplication = async (
       formattedPricing
     );
 
-    if (resumeFile && technician && typeof technician === "object" && "id" in technician) {
-      try {
-        await resumeService.uploadResume((technician as { id: string }).id, resumeFile);
-      } catch (uploadErr) {
-        console.warn("[TechnicianRegister] Resume upload failed (registration succeeded):", uploadErr);
-        toast.warning("Registration successful, but document upload failed. You can add it later.");
-      }
-    }
-
-    toast.success("Registered successfully. You will receive an email after admin approval.");
+    toast.success("Registered successfully. You will get a confirmation mail once admin reviews your application.");
     onSuccess();
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Registration failed. Please try again.";
-    console.error("[TechnicianRegister] Submission error:", error);
     toast.error(message);
+    throw error;
   }
 };
