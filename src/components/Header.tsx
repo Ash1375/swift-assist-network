@@ -41,7 +41,7 @@ const Header = () => {
     >
       <div className="container flex h-16 lg:h-20 items-center justify-between px-4">
         <Link to="/" className="flex items-center">
-          <span className="text-2xl lg:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-700">Towbuddy</span>
+          <span className="text-2xl lg:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-700">ResQNow</span>
         </Link>
 
         <nav className="hidden lg:flex items-center gap-8">

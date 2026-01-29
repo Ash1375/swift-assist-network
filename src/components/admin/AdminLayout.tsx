@@ -24,7 +24,7 @@ const AdminLayout = () => {
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-card border-r">
         <div className="p-6">
-          <h2 className="text-2xl font-bold text-primary">Towbuddy Admin</h2>
+          <h2 className="text-2xl font-bold text-primary">ResQNow Admin</h2>
           <p className="text-sm text-muted-foreground">Management Dashboard</p>
         </div>
         

@@ -14,7 +14,7 @@ const AdminSettings = () => {
     pushNotifications: false,
     autoApprove: false,
     maintenanceMode: false,
-    platformName: "Towbuddy",
+    platformName: "ResQNow",
     supportEmail: "support@swiftassist.com",
     maxServiceRadius: "50",
   });

@@ -60,12 +60,12 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return null;
     }
 
-    // Get user profile for display name
+    // Get user profile for display name (handle missing profile gracefully)
     const { data: profile } = await supabase
       .from('profiles')
       .select('full_name')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     return {
       id: user.id,

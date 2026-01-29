@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -128,7 +128,7 @@ const TechnicianDetails = () => {
                 The technician you are looking for does not exist or has been removed.
               </p>
               <Button className="mt-4" asChild>
-                <a href="/admin/technicians">Back to Technicians</a>
+                <Link to="/admin/technicians">Back to Technicians</Link>
               </Button>
             </div>
           </CardContent>
@@ -152,7 +152,7 @@ const TechnicianDetails = () => {
           }
           className="text-sm py-1 px-3"
         >
-          {technician.verification_status === 'pending' && 'Pending Review'}
+          {technician.verification_status === 'pending' && 'Pending'}
           {technician.verification_status === 'verified' && 'Approved'}
           {technician.verification_status === 'rejected' && 'Rejected'}
         </Badge>
@@ -213,7 +213,7 @@ const TechnicianDetails = () => {
                     <Globe className="w-5 h-5 mt-0.5 mr-3 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground">Service Area Range</p>
-                      <p className="font-medium">{technician.serviceAreaRange} miles</p>
+                      <p className="font-medium">{technician.serviceAreaRange} km</p>
                     </div>
                   </div>
                 </div>
@@ -251,12 +251,16 @@ const TechnicianDetails = () => {
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Service Pricing</p>
                   <div className="space-y-2">
-                    {Object.entries(technician.pricing).map(([service, price]) => (
-                      <div key={service} className="flex justify-between items-center py-1 border-b">
-                        <span>{service}</span>
-                        <span className="font-medium">${price}</span>
-                      </div>
-                    ))}
+                    {technician.pricing && Object.keys(technician.pricing).length > 0 ? (
+                      Object.entries(technician.pricing).map(([service, price]) => (
+                        <div key={service} className="flex justify-between items-center py-1 border-b">
+                          <span className="capitalize">{service.replace(/([A-Z])/g, ' $1').trim()}</span>
+                          <span className="font-medium">₹{price}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No pricing set</p>
+                    )}
                   </div>
                 </div>
               </div>

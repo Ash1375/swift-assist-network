@@ -7,7 +7,7 @@ export const useTechnicianAuthState = () => {
   const [technician, setTechnician] = useState<Technician | null>(null);
 
   useEffect(() => {
-    const storedTechnician = localStorage.getItem("towbuddy_technician");
+    const storedTechnician = localStorage.getItem("resqnow_technician");
     if (storedTechnician) {
       setTechnician(JSON.parse(storedTechnician));
     }
@@ -23,7 +23,7 @@ export const useTechnicianAuthState = () => {
         if (foundTechnician) {
           const { password: _, ...technicianWithoutPassword } = foundTechnician;
           setTechnician(technicianWithoutPassword);
-          localStorage.setItem("towbuddy_technician", JSON.stringify(technicianWithoutPassword));
+          localStorage.setItem("resqnow_technician", JSON.stringify(technicianWithoutPassword));
           resolve(technicianWithoutPassword);
         } else {
           reject(new Error("Invalid email or password"));
@@ -74,7 +74,7 @@ export const useTechnicianAuthState = () => {
           
           const { password: _, ...technicianWithoutPassword } = newTechnician;
           setTechnician(technicianWithoutPassword);
-          localStorage.setItem("towbuddy_technician", JSON.stringify(technicianWithoutPassword));
+          localStorage.setItem("resqnow_technician", JSON.stringify(technicianWithoutPassword));
           resolve(technicianWithoutPassword);
         }
       }, 500);
@@ -83,7 +83,7 @@ export const useTechnicianAuthState = () => {
 
   const logout = () => {
     setTechnician(null);
-    localStorage.removeItem("towbuddy_technician");
+    localStorage.removeItem("resqnow_technician");
   };
 
   return {

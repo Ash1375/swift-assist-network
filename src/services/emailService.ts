@@ -14,7 +14,7 @@ export const emailService = {
         
       const html = `
         <h2>New Technician Application</h2>
-        <p>A new technician has applied to join Towbuddy:</p>
+        <p>A new technician has applied to join ResQNow:</p>
         <hr />
         <h3>Technician Details:</h3>
         <ul>
@@ -52,7 +52,7 @@ export const emailService = {
           </div>
         </div>
         
-        <p>Thank you,<br />Towbuddy Team</p>
+        <p>Thank you,<br />ResQNow Team</p>
       `;
       
       const { data, error } = await supabase.functions.invoke("send-technician-email", {
@@ -82,26 +82,26 @@ export const emailService = {
     isApproved: boolean
   ): Promise<boolean> => {
     try {
-      const subject = isApproved 
-        ? "Your Towbuddy Application has been Approved!" 
-        : "Update on Your Towbuddy Application";
+      const subject = isApproved
+        ? "Your ResQNow Application has been Approved!"
+        : "Update on Your ResQNow Application";
         
       const html = isApproved
         ? `
           <h2>Congratulations, ${name}!</h2>
-          <p>Your application to join the Towbuddy technician network has been approved.</p>
+          <p>Your application to join the ResQNow technician network has been approved.</p>
           <p>You can now log in to your technician dashboard and start accepting service requests.</p>
           <p><a href="${window.location.origin}/technician/login" style="padding: 10px 20px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 5px;">Log in to Your Dashboard</a></p>
           <p>Thank you for joining our team!</p>
-          <p>Regards,<br />Towbuddy Team</p>
+          <p>Regards,<br />ResQNow Team</p>
         `
         : `
           <h2>Hello ${name},</h2>
-          <p>We have reviewed your application to join the Towbuddy technician network.</p>
+          <p>We have reviewed your application to join the ResQNow technician network.</p>
           <p>Unfortunately, we cannot accept your application at this time.</p>
           <p>Please contact our support team if you have any questions.</p>
-          <p>Thank you for your interest in Towbuddy.</p>
-          <p>Regards,<br />Towbuddy Team</p>
+          <p>Thank you for your interest in ResQNow.</p>
+          <p>Regards,<br />ResQNow Team</p>
         `;
       
       const { data, error } = await supabase.functions.invoke("send-technician-email", {

@@ -19,7 +19,7 @@ const About = () => {
           <div>
             <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
             <p className="text-lg text-gray-700 mb-4">
-              At TowBuddyCo, our mission is to revolutionize roadside assistance by building a seamless and reliable network that connects travelers with nearby technicians in times of need. We are committed to creating a trustworthy ecosystem where help is just a click away—ensuring safety, convenience, and peace of mind for everyone on the road.
+              At ResQNow, our mission is to revolutionize roadside assistance by building a seamless and reliable network that connects travelers with nearby technicians in times of need. We are committed to creating a trustworthy ecosystem where help is just a click away—ensuring safety, convenience, and peace of mind for everyone on the road.
             </p>
             <p className="text-lg text-gray-700 mb-4">
               Whether it's a flat tire, fuel shortage, or battery issue, our goal is to empower people with fast and dependable support wherever they are.

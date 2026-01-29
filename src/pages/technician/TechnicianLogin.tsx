@@ -33,14 +33,14 @@ const TechnicianLogin = () => {
       await login(data.email, data.password);
       toast({
         title: "Login successful!",
-        description: "Welcome to the Towbuddy technician portal",
+        description: "Welcome to the ResQNow technician portal",
       });
       navigate("/technician/dashboard");
-    } catch (error) {
-      console.error(error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Invalid email or password. Please try again.";
       toast({
         title: "Login failed",
-        description: "Invalid email or password",
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -51,8 +51,9 @@ const TechnicianLogin = () => {
   return (
     <div className="container py-20 flex flex-col items-center">
       <div className="max-w-lg w-full">
+
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold">Technician Portal</h1>
+          <h2 className="text-2xl font-bold">Technician Portal</h2>
           <p className="text-muted-foreground mt-2">Login to your technician account</p>
         </div>
 
@@ -61,7 +62,7 @@ const TechnicianLogin = () => {
             <User size={64} className="text-primary mb-4" />
             <h3 className="text-lg font-medium mb-2">Join Our Network</h3>
             <p className="text-sm text-center text-muted-foreground">
-              Become a Towbuddy technician and grow your business while helping drivers in need.
+              Become a ResQNow technician and grow your business while helping drivers in need.
             </p>
             <Button variant="link" asChild className="mt-4">
               <Link to="/technician/register">Sign up as a technician</Link>

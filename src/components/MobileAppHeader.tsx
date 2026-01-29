@@ -24,7 +24,7 @@ const MobileAppHeader = () => {
     <header className="sticky top-0 z-50 w-full bg-card/95 backdrop-blur-lg border-b border-border">
       <div className="flex h-14 items-center justify-between px-4">
         <Link to="/" className="flex items-center">
-          <span className="text-lg font-bold text-primary">Towbuddy</span>
+          <span className="text-lg font-bold text-primary">ResQNow</span>
         </Link>
 
         <div className="flex items-center gap-2">

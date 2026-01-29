@@ -45,11 +45,11 @@ const AdminDashboardLayout = () => {
   
   return (
     <div className="flex min-h-screen bg-muted/10">
-      {/* Sidebar */}
+      {/* Sidebar - fixed on mobile, relative on desktop */}
       <aside 
         className={cn(
-          "bg-card border-r border-border transition-all duration-300 ease-in-out",
-          "fixed md:relative z-40 h-full md:h-auto",
+          "bg-card border-r border-border transition-all duration-300 ease-in-out flex-shrink-0",
+          "fixed md:relative z-40 h-screen md:h-auto md:min-h-screen",
           isSidebarCollapsed ? "w-16" : "w-64 md:w-64",
           "md:block"
         )}
@@ -91,7 +91,7 @@ const AdminDashboardLayout = () => {
               to="/admin/technicians"
               className={cn(
                 "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
-                isActive("/admin/technician")
+                isActive("/admin/technicians") || isActive("/admin/technician/")
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
@@ -159,9 +159,9 @@ const AdminDashboardLayout = () => {
         </div>
       </aside>
       
-      {/* Main content */}
+      {/* Main content - add left margin on desktop to prevent sidebar overlap */}
       <div className={cn(
-        "flex-1 flex flex-col transition-all duration-300",
+        "flex-1 flex flex-col transition-all duration-300 min-w-0",
         !isSidebarCollapsed ? "md:ml-64" : "md:ml-16"
       )}>
         {/* Top nav */}
@@ -234,7 +234,7 @@ const AdminDashboardLayout = () => {
                     <div className="flex flex-col space-y-1 leading-none">
                       <p className="font-medium">Admin User</p>
                       <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        admin@towbuddy.com
+                        admin@resqnow.com
                       </p>
                     </div>
                   </div>
@@ -252,8 +252,8 @@ const AdminDashboardLayout = () => {
           </div>
         </header>
         
-        {/* Content area */}
-        <main className="flex-1 overflow-y-auto bg-muted/20 pb-20 md:pb-0">
+        {/* Content area - proper padding to prevent overlap */}
+        <main className="flex-1 overflow-y-auto bg-muted/20 p-4 md:p-6 pb-20 md:pb-6">
           <Outlet />
         </main>
       </div>

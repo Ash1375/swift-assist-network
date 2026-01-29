@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -156,12 +157,12 @@ const AdminDashboard = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <a 
-                        href={`/admin/technician/${technician.id}`}
+                      <Link 
+                        to={`/admin/technician/${technician.id}`}
                         className="text-sm text-primary hover:underline"
                       >
                         View Details
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 ))}
@@ -179,8 +180,8 @@ const AdminDashboard = () => {
             <CardDescription>Common administrative tasks</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <a 
-              href="/admin/technicians/add"
+            <Link 
+              to="/admin/technicians/add"
               className="block p-4 border rounded-md hover:bg-muted/50 transition-colors bg-primary/5 border-primary/20"
             >
               <div className="flex items-center">
@@ -190,10 +191,10 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground mt-2">
                 Manually add a technician with their services and pricing
               </p>
-            </a>
+            </Link>
             
-            <a 
-              href="/admin/technicians"
+            <Link 
+              to="/admin/technicians"
               className="block p-4 border rounded-md hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center">
@@ -203,10 +204,10 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground mt-2">
                 View, edit and manage all technician profiles
               </p>
-            </a>
+            </Link>
             
-            <a 
-              href="/admin/applications"
+            <Link 
+              to="/admin/applications"
               className="block p-4 border rounded-md hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center">
@@ -216,10 +217,10 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground mt-2">
                 Review and process pending applications
               </p>
-            </a>
+            </Link>
             
-            <a 
-              href="/admin/analytics"
+            <Link 
+              to="/admin/analytics"
               className="block p-4 border rounded-md hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center">
@@ -229,7 +230,7 @@ const AdminDashboard = () => {
               <p className="text-sm text-muted-foreground mt-2">
                 View performance metrics and statistics
               </p>
-            </a>
+            </Link>
           </CardContent>
         </Card>
       </div>

@@ -69,7 +69,7 @@ const PaymentStep = ({ servicePrice, onPaymentConfirm }: PaymentStepProps) => {
           key: "rzp_test_9A89TOV4DLdBeJ", // Test key - replace with actual key
           amount: servicePrice * 100, // Amount in paise
           currency: "INR",
-          name: "TowBuddy",
+          name: "ResQNow",
           description: "Roadside Assistance Service",
           image: "/favicon.ico",
           handler: function (response: any) {

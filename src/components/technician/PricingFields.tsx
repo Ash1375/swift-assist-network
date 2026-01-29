@@ -29,13 +29,18 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
                 <div className="flex items-center">
                   <span className="text-xl mr-2">₹</span>
                   <FormControl>
-                    <Input 
+                    <Input
                       type="number"
-                      placeholder="0.00"
+                      placeholder="0"
                       min="0"
-                      step="0.01" 
-                      {...field} 
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      step="1"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10) || "")}
+                      onKeyDown={(e) => {
+                        if (e.key === '.' || e.key === ',') {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   </FormControl>
                 </div>
@@ -53,13 +58,18 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
                 <div className="flex items-center">
                   <span className="text-xl mr-2">₹</span>
                   <FormControl>
-                    <Input 
+                    <Input
                       type="number"
-                      placeholder="0.00"
+                      placeholder="0"
                       min="0"
-                      step="0.01" 
-                      {...field} 
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      step="1"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10) || "")}
+                      onKeyDown={(e) => {
+                        if (e.key === '.' || e.key === ',') {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   </FormControl>
                 </div>
@@ -77,13 +87,18 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
                 <div className="flex items-center">
                   <span className="text-xl mr-2">₹</span>
                   <FormControl>
-                    <Input 
+                    <Input
                       type="number"
-                      placeholder="0.00"
+                      placeholder="0"
                       min="0"
-                      step="0.01" 
-                      {...field} 
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      step="1"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10) || "")}
+                      onKeyDown={(e) => {
+                        if (e.key === '.' || e.key === ',') {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   </FormControl>
                 </div>
@@ -101,13 +116,18 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
                 <div className="flex items-center">
                   <span className="text-xl mr-2">₹</span>
                   <FormControl>
-                    <Input 
+                    <Input
                       type="number"
-                      placeholder="0.00"
+                      placeholder="0"
                       min="0"
-                      step="0.01" 
-                      {...field} 
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      step="1"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10) || "")}
+                      onKeyDown={(e) => {
+                        if (e.key === '.' || e.key === ',') {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   </FormControl>
                 </div>
@@ -125,13 +145,18 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
                 <div className="flex items-center">
                   <span className="text-xl mr-2">₹</span>
                   <FormControl>
-                    <Input 
+                    <Input
                       type="number"
-                      placeholder="0.00"
+                      placeholder="0"
                       min="0"
-                      step="0.01" 
-                      {...field} 
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      step="1"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10) || "")}
+                      onKeyDown={(e) => {
+                        if (e.key === '.' || e.key === ',') {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   </FormControl>
                 </div>
@@ -149,13 +174,18 @@ const PricingFields = ({ form }: PricingFieldsProps) => {
                 <div className="flex items-center">
                   <span className="text-xl mr-2">₹</span>
                   <FormControl>
-                    <Input 
+                    <Input
                       type="number"
-                      placeholder="0.00"
+                      placeholder="0"
                       min="0"
-                      step="0.01" 
-                      {...field} 
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      step="1"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10) || "")}
+                      onKeyDown={(e) => {
+                        if (e.key === '.' || e.key === ',') {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   </FormControl>
                 </div>

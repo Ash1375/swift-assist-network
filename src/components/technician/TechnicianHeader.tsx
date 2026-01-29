@@ -38,9 +38,7 @@ const TechnicianHeader = () => {
   };
 
   const navLinks = [
-    { path: "/technician/dashboard", label: "Dashboard" },
-    { path: "/technician/profile", label: "Profile" },
-    { path: "/technician/help", label: "Help" },
+    { path: "/", label: "Home" },
   ];
 
   return (
@@ -49,7 +47,7 @@ const TechnicianHeader = () => {
         <div className="flex items-center">
           <Link to="/technician/dashboard" className="flex items-center">
             <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-800">
-              Towbuddy Technician
+              ResQNow Technician
             </span>
           </Link>
           

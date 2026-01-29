@@ -18,14 +18,24 @@ export const useTechnicianAuth = () => {
         // Check if the authenticated user is a technician
         try {
           const techData = await technicianAuthService.fetchTechnicianProfile(session.user.email!);
-          setTechnician(techData);
-          localStorage.setItem("towbuddy_technician", JSON.stringify(techData));
-        } catch (error) {
-          console.error("Error fetching technician:", error);
+          if (techData) {
+            setTechnician(techData);
+            localStorage.setItem("resqnow_technician", JSON.stringify(techData));
+          } else {
+            // User is authenticated but not a technician
+            localStorage.removeItem("resqnow_technician");
+          }
+        } catch (error: any) {
+          // PGRST116 or "not found" errors are expected for non-technicians
+          if (error?.code === 'PGRST116' || error?.message?.includes('not found')) {
+            localStorage.removeItem("resqnow_technician");
+          } else {
+            console.error("Error fetching technician:", error);
+          }
         }
       } else {
         // Check if we have stored technician information locally
-        const storedTechnician = localStorage.getItem("towbuddy_technician");
+        const storedTechnician = localStorage.getItem("resqnow_technician");
         if (storedTechnician) {
           const parsedTech = JSON.parse(storedTechnician);
           // Validate that the stored technician data is still valid via API call
@@ -35,14 +45,14 @@ export const useTechnicianAuth = () => {
               // Update the verification status which might have changed
               parsedTech.verification_status = data.verification_status;
               setTechnician(parsedTech);
-              localStorage.setItem("towbuddy_technician", JSON.stringify(parsedTech));
+              localStorage.setItem("resqnow_technician", JSON.stringify(parsedTech));
             } else {
               // If technician no longer exists, clear local storage
-              localStorage.removeItem("towbuddy_technician");
+              localStorage.removeItem("resqnow_technician");
             }
           } catch (error) {
             console.error("Error validating stored technician:", error);
-            localStorage.removeItem("towbuddy_technician");
+            localStorage.removeItem("resqnow_technician");
           }
         }
       }
@@ -56,7 +66,7 @@ export const useTechnicianAuth = () => {
   const login = async (email: string, password: string) => {
     const technicianData = await technicianAuthService.login(email, password);
     setTechnician(technicianData);
-    localStorage.setItem("towbuddy_technician", JSON.stringify(technicianData));
+    localStorage.setItem("resqnow_technician", JSON.stringify(technicianData));
     return technicianData;
   };
 
@@ -82,7 +92,7 @@ export const useTechnicianAuth = () => {
     );
     
     setTechnician(technicianData);
-    localStorage.setItem("towbuddy_technician", JSON.stringify(technicianData));
+    localStorage.setItem("resqnow_technician", JSON.stringify(technicianData));
     return technicianData;
   };
 

@@ -219,7 +219,7 @@ const RequestTracking = () => {
               <CardContent className="p-6 text-center">
                 <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto mb-3" />
                 <h3 className="text-lg font-semibold text-green-800 mb-2">Payment Successful!</h3>
-                <p className="text-sm text-green-600 mb-4">Thank you for using TowBuddy. Your request has been completed.</p>
+                <p className="text-sm text-green-600 mb-4">Thank you for using ResQNow. Your request has been completed.</p>
                 <Badge className="bg-green-600">Transaction Complete</Badge>
               </CardContent>
             </Card>
