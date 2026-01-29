@@ -13,7 +13,7 @@ const ProfileSettings = () => {
     name: "John Doe",
     email: "john@example.com",
     phone: "+1 (555) 123-4567",
-    company: "TowBuddy Inc.",
+    company: "ResQNow Inc.",
     avatar: ""
   })
 

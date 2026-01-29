@@ -8,8 +8,11 @@ export const resumeService = {
    */
   uploadResume: async (technicianId: string, file: File) => {
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${technicianId}/resume.${fileExt}`;
+      const fileExt = file.name.split('.').pop() || 'bin';
+      const isImage = file.type.startsWith('image/');
+      const fileName = isImage
+        ? `${technicianId}/shop_verification.${fileExt}`
+        : `${technicianId}/resume.${fileExt}`;
       
       // Create storage bucket if it doesn't exist
       const { data: buckets } = await supabase
@@ -25,7 +28,10 @@ export const resumeService = {
             allowedMimeTypes: [
               'application/pdf',
               'application/msword',
-              'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+              'image/jpeg',
+              'image/png',
+              'image/webp'
             ]
           });
       }

@@ -4,15 +4,22 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { status: 200, headers: corsHeaders });
+  }
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl?.trim() || !supabaseServiceKey?.trim()) {
+    console.error("[send-technician-email] Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+    return new Response(
+      JSON.stringify({ error: "Server configuration error" }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
   }
 
   try {
@@ -28,10 +35,10 @@ serve(async (req) => {
       );
     }
 
-    // Create Supabase client with user's auth token
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
+  const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+    global: { headers: { Authorization: authHeader } },
+  });
 
     // Verify the JWT and get claims
     const token = authHeader.replace('Bearer ', '');
@@ -101,38 +108,57 @@ serve(async (req) => {
       .replace(/on\w+="[^"]*"/gi, '')
       .replace(/on\w+='[^']*'/gi, '');
 
-    // For now, we'll just log the email details since we don't have an actual email service integrated yet
-    // In a production environment, you would integrate with a service like SendGrid, AWS SES, or Resend
-    console.log("Email sent by admin:", {
-      adminUserId: userId,
-      to,
-      subject,
-      html: sanitizedHtml.substring(0, 200) + '...',
-      technicianId: technicianId || 'N/A'
-    });
-    
-    const adminEmail = "ash970462@gmail.com";
-    console.log(`CC'd to admin: ${adminEmail}`);
-    
-    return new Response(
-      JSON.stringify({ 
-        success: true,
-        message: "Email sent successfully (simulated)"
-      }),
-      { 
-        status: 200, 
-        headers: { "Content-Type": "application/json", ...corsHeaders } 
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    if (resendKey) {
+      try {
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${resendKey}`,
+          },
+          body: JSON.stringify({
+            from: Deno.env.get("EMAIL_FROM") || "ResQNow <onboarding@resend.dev>",
+            to: [to],
+            subject,
+            html: sanitizedHtml,
+          }),
+        });
+        const result = await res.json();
+        if (!res.ok) {
+          console.error("[send-technician-email] Resend API error:", res.status, result);
+          return new Response(
+            JSON.stringify({ error: result.message || "Email delivery failed" }),
+            { status: 502, headers: { "Content-Type": "application/json", ...corsHeaders } }
+          );
+        }
+        console.log("[send-technician-email] Sent via Resend:", result.id);
+        return new Response(
+          JSON.stringify({ success: true, message: "Email sent successfully", id: result.id }),
+          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      } catch (sendErr) {
+        console.error("[send-technician-email] Resend request failed:", sendErr);
+        return new Response(
+          JSON.stringify({ error: "Email service error. Please try again later." }),
+          { status: 502, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
       }
+    }
+
+    console.log("[send-technician-email] No RESEND_API_KEY; email logged only:", { to, subject });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: "Email queued (configure RESEND_API_KEY for delivery)",
+      }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error) {
-    console.error("Error in send-technician-email function:", error);
-    
+    console.error("[send-technician-email] Error:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Internal server error" }),
-      { 
-        status: 500, 
-        headers: { "Content-Type": "application/json", ...corsHeaders } 
-      }
+      JSON.stringify({ error: error?.message || "Internal server error" }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 });

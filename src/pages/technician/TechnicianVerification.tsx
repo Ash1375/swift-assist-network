@@ -42,7 +42,7 @@ const TechnicianVerification = () => {
             <CheckCircle size={64} className="text-green-500 mb-4" />
             <h2 className="text-2xl font-bold mb-2">Verification Complete</h2>
             <p className="text-muted-foreground text-center mb-6 max-w-md">
-              Congratulations! Your account has been verified. You're now an official Towbuddy technician.
+              Congratulations! Your account has been verified. You're now an official ResQNow technician.
             </p>
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 w-full max-w-md">
               <h3 className="font-medium text-green-800 mb-2 flex items-center">
@@ -112,7 +112,7 @@ const TechnicianVerification = () => {
           </CardContent>
           <CardFooter className="flex justify-center border-t pt-6">
             <p className="text-sm text-muted-foreground text-center">
-              Need help? Contact us at <span className="font-medium">support@towbuddy.com</span>
+              Need help? Contact us at <span className="font-medium">support@resqnow.com</span>
             </p>
           </CardFooter>
         </Card>

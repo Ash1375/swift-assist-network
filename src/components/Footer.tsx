@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
-            <h3 className="text-2xl font-bold mb-6 text-red-500">Towbuddy</h3>
+            <h3 className="text-2xl font-bold mb-6 text-red-500">ResQNow</h3>
             <p className="mb-6 text-gray-300">
               Providing reliable roadside assistance and puncture repair services 24/7. 
               We're just a call away when you need help on the road.
@@ -107,7 +107,7 @@ const Footer = () => {
         
         <div className="border-t border-gray-800 pt-8">
           <p className="text-center text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} Towbuddy. All rights reserved.
+            &copy; {new Date().getFullYear()} ResQNow. All rights reserved.
           </p>
         </div>
       </div>

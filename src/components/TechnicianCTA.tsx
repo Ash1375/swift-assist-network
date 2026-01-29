@@ -18,7 +18,7 @@ const TechnicianCTA = () => {
               Join our network of professionals
             </h2>
             <p className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Become a Towbuddy technician and grow your business while helping drivers in need. Get access to a steady stream of customers and enjoy the benefits of our platform.
+              Become a ResQNow technician and grow your business while helping drivers in need. Get access to a steady stream of customers and enjoy the benefits of our platform.
             </p>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
               <Button className="bg-blue-600 hover:bg-blue-700" size="lg" asChild>

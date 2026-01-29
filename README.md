@@ -1,8 +1,8 @@
-# TowBuddy - Roadside Assistance Platform
+# ResQNow - Roadside Assistance Platform
 
 ## About This Project
 
-TowBuddy is a comprehensive roadside assistance platform that connects vehicle owners with nearby technicians for quick and reliable service.
+ResQNow is a comprehensive roadside assistance platform that connects vehicle owners with nearby technicians for quick and reliable service.
 
 ## Getting Started
 
@@ -17,7 +17,7 @@ TowBuddy is a comprehensive roadside assistance platform that connects vehicle o
 git clone <YOUR_GIT_URL>
 
 # Navigate to the project directory
-cd towbuddy
+cd resqnow
 
 # Install dependencies
 npm install
@@ -55,6 +55,43 @@ src/
 ├── integrations/       # Third-party integrations
 └── lib/               # Utility functions
 ```
+
+## Environment & Backend Setup
+
+### Frontend vs Edge Functions env
+
+- **Project root `.env`** is for the **frontend (Vite)** only. It uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (or `VITE_SUPABASE_ANON_KEY`). The Edge Functions **do not** read this file.
+- **Edge Functions** run on Supabase’s servers. They get `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from **Supabase** (auto-injected when deployed). Any extra secrets (e.g. `RESEND_API_KEY`) must be set in **Supabase Dashboard → Project Settings → Edge Functions → Secrets** (or via `supabase secrets set`). For local dev, see `supabase/.env.example`.
+
+### Supabase Edge Functions
+
+Technician registration and admin email notifications use Supabase Edge Functions. Set these in your Supabase project (Dashboard → Edge Functions → Secrets or project settings):
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SUPABASE_URL` | Yes | Supabase project URL (set automatically when deployed) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Used by `register-technician` and `get-technician-applications` (creates auth user + technician row; fetches list for admin) |
+| `RESEND_API_KEY` | No | [Resend](https://resend.com) API key to send approval/rejection emails; if unset, emails are logged only |
+| `EMAIL_FROM` | No | Sender address for emails (e.g. `ResQNow <onboarding@yourdomain.com>`); defaults to Resend onboarding address |
+
+**Edge Functions used in the technician flow:** `register-technician`, `get-technician-applications`, `send-technician-email`. Deploy all three so registration, admin applications list, and approval/rejection emails work.
+
+### Admin Access to Applications
+
+The Admin Applications page (`/admin/applications`) fetches technicians via the **get-technician-applications** Edge Function (service role), so the list is not blocked by RLS. You must still be logged in as an **admin** for the function to return data:
+
+1. Log in to the app as a user that exists in `auth.users`.
+2. Ensure that user has the **admin** role: insert a row into `public.user_roles` with `user_id = <your auth user id>` and `role = 'admin'`.
+
+Example (run in Supabase SQL editor after creating an admin user):
+
+```sql
+INSERT INTO public.user_roles (user_id, role)
+VALUES ('<auth-users-uuid>', 'admin')
+ON CONFLICT (user_id, role) DO NOTHING;
+```
+
+Without this, the technicians list will be empty for non-technician admins because RLS only allows admins (or the technician themselves) to select technician rows.
 
 ## Development
 
